@@ -1,0 +1,6 @@
+name = "ImpurityModelBase"
+uuid = "a5817ebb-6d84-46c1-a17a-d25f868e249e"
+authors = ["Guo Chu <guochu604b@gmail.com>"]
+version = "0.0.1"
+
+[deps]
