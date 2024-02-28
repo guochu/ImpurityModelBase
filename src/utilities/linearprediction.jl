@@ -1,7 +1,8 @@
-abstract type ExtrapolationScheme end
+abstract type AbstractPredictionScheme end
 
 # see PHYSICAL REVIEW B 79, 245101 (2009), BarthelWhite2009
-struct LinearExtrapolation{T<:Number} <: ExtrapolationScheme
+# also Appendix in PHYSICAL REVIEW B 90, 115124 (2014), WolfSchollwock2014b
+struct LinearPrediction{T<:Number} <: AbstractPredictionScheme
 	stepsize::Float64
 	nob::Int
 	nfit::Int
@@ -11,7 +12,7 @@ struct LinearExtrapolation{T<:Number} <: ExtrapolationScheme
 	a::Vector{T}
 end
 
-function LinearExtrapolation(obs::Vector{T}, ws::Vector{<:Real}; stepsize::Real, nfit=length(obs), p::Int=div(nfit, 2)) where {T<:Number}
+function LinearPrediction(obs::Vector{T}, ws::Vector{<:Real}; stepsize::Real, nfit=length(obs), p::Int=div(nfit, 2)) where {T<:Number}
 	nobs = length(obs)
 	(nfit <= nobs) || throw(ArgumentError("nfit must be less than nobs")) 
 	(p <= nfit) || throw(ArgumentError("p must be less than nfit"))
@@ -45,13 +46,13 @@ function LinearExtrapolation(obs::Vector{T}, ws::Vector{<:Real}; stepsize::Real,
 
 	# println("a is $a")
 
-	return LinearExtrapolation{T}(convert(Float64, stepsize), length(obs), nfit, p, copy(obs), ws, a)
+	return LinearPrediction{T}(convert(Float64, stepsize), length(obs), nfit, p, copy(obs), ws, a)
 end
-LinearExtrapolation(obs::Vector{<:Number}; kwargs...) = LinearExtrapolation(obs, ones(length(obs)); kwargs...)
+LinearPrediction(obs::Vector{<:Number}; kwargs...) = LinearPrediction(obs, ones(length(obs)); kwargs...)
 
-current_size(x::LinearExtrapolation) = length(x.obs)
+current_size(x::LinearPrediction) = length(x.obs)
 
-function compute_next!(x::LinearExtrapolation{T}) where T
+function compute_next!(x::LinearPrediction{T}) where T
 	obs_new = zero(T)
 	n = current_size(x)
 	for i in 1:x.p
@@ -60,7 +61,7 @@ function compute_next!(x::LinearExtrapolation{T}) where T
 	push!(x.obs, -obs_new)
 end
 
-function Base.getindex(x::LinearExtrapolation, j::Int)
+function Base.getindex(x::LinearPrediction, j::Int)
 	if j <= current_size(x)
 		return x.obs[j]
 	else
@@ -68,10 +69,10 @@ function Base.getindex(x::LinearExtrapolation, j::Int)
 		return x[j]
 	end	
 end
-Base.getindex(x::LinearExtrapolation, j::AbstractRange{Int64}) = [x[i] for i in j]
+Base.getindex(x::LinearPrediction, j::AbstractRange{Int64}) = [x[i] for i in j]
 
 # make a simple linear extrapolation
-function (x::LinearExtrapolation)(t::Real)
+function (x::LinearPrediction)(t::Real)
 	(t >= zero(t)) || throw(ArgumentError("t must be nonnegative"))
 	ns = t / x.stepsize
 	n = floor(Int, ns)

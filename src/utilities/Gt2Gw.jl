@@ -51,4 +51,5 @@ function gf_retarded_ω(gt::Vector{<:Number}, ws::Vector{<:Real}; δt::Real)
 	return [x(w) for w in ws]
 end 
 
+Gt_to_Gw(gt::Vector{<:Number}, ws::Vector{<:Real}; δt::Real) = gf_retarded_ω(gt, ws, δt=δt)
 

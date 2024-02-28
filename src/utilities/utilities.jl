@@ -1,11 +1,12 @@
 module Utilities
 
 # utilities for real spectrum functions
-export ExtrapolationScheme, LinearExtrapolation
-export FourierTransformScheme, FourierTransform, gf_retarded_ω
+export AbstractPredictionScheme, LinearPrediction
+# export FourierTransformScheme, FourierTransform, gf_retarded_ω
+export Gt_to_Gw
 
-include("extrapolation.jl")
-include("fouriertransform.jl")
+include("linearprediction.jl")
+include("Gt2Gw.jl")
 
 
 end
