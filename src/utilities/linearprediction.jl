@@ -31,6 +31,11 @@ function LinearPrediction(obs::Vector{T}, ws::Vector{<:Real}; stepsize::Real, nf
 			end
 		end
 	end
+	# a diagonal shift to avoid numeric instability of inverting
+	δ = 1.0e-6
+	for i in 1:p
+		Rmat[i, i] += δ
+	end
 	for n in n_start:nobs
 		for j in 1:p
 			if j < n
