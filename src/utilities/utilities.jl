@@ -13,6 +13,7 @@ export toulouse_Gw, toulouse_Gt, toulouse_Giw, toulouse_Gτ
 
 include("linearprediction.jl")
 include("Gt2Gw.jl")
+include("toulouse.jl")
 
 
 end
