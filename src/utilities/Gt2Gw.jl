@@ -93,8 +93,10 @@ function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, lb::Real, ub::Real, dw::Real=1.
 	τs = 0:δτ:β
 	Gτ = zeros(eltype(Aw), length(τs))
 	for (w, Awi) in zip(lb:dw:(ub-dw), Aw)
+		tmp = -Awi * dw / (1+exp(-β*w))
 		for (i, τ) in enumerate(τs)
-			Gτ[i] += -exp(-w*τ) * Awi * dw / (1+exp(-β*w))
+			# Gτ[i] += -exp(-w*τ) * Awi * dw / (1+exp(-β*w))
+			Gτ[i] += exp(-w*τ) * tmp
 		end
 	end
 	return Gτ
