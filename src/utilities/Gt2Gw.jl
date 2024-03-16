@@ -51,5 +51,63 @@ function gf_retarded_ω(gt::Vector{<:Number}, ws::Vector{<:Real}; δt::Real)
 	return [x(w) for w in ws]
 end 
 
-Gt_to_Gw(gt::Vector{<:Number}, ws::Vector{<:Real}; δt::Real) = gf_retarded_ω(gt, ws, δt=δt)
+# function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real, ws::Vector{<:Real})
+# 	x = FourierTransform(gt, δt=stepsize)
+# 	return [x(w) for w in ws]
+# end 
+
+function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
+	Aw = zeros(real(eltype(Gw)), length(Gw))
+	for i in 1:length(Gw)
+		Gwi = Gw[i]
+		abs_Gwi = abs(Gwi)
+		if (verbosity > 0) && (abs_Gwi < 0) && (abs_Gwi > 1.0e-4)
+			println("Gw[$(i)] = ", Gwi)
+		end
+		Aw[i] = (abs_Gwi > 0) ? -imag(Gwi)/π : zero(Gwi)
+	end
+	return Aw
+end
+
+function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4)
+	x = FourierTransform(gt, δt=stepsize)
+	return [x(w) for w in lb:dw:ub]
+end 
+function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, verbosity::Int=1)
+	if (verbosity > 0) && (abs(gt[end]) > 1.0e-6)
+		println("last element of input GF has abs value ", abs(gt[end]))
+	end
+	Gw = Gt_to_Gw(gt, stepsize, lb=lb, ub=ub, dw=dw)
+	Aw = Gw_to_Aw(Gw, verbosity=verbosity)
+	nrm = sum(Aw) * dw
+	if (verbosity > 0) && (abs(nrm-1) > 1.0e-2)
+		println("sum(A(ω)) = ", nrm)
+	end	
+	if normalize
+		Aw ./= nrm
+	end
+	return Aw
+end
+
+function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, lb::Real, ub::Real, dw::Real=1.0e-4, δτ::Real=0.1)
+	τs = 0:δτ:β
+	Gτ = zeros(eltype(Aw), length(τs))
+	for (w, Awi) in zip(lb:dw:(ub-dw), Aw)
+		for (i, τ) in enumerate(τs)
+			Gτ[i] += -exp(-w*τ) * Awi * dw / (1+exp(-β*w))
+		end
+	end
+	return Gτ
+end
+
+# function Aw_to_Git_single(Aw::Vector{<:Real}, τ::Real; β::Real, lb::Real, ub::Real, dw::Real=1.0e-4)
+# 	gτ = zero(eltype(Aw))
+# 	for w, Awi in zip(lb:dw:(ub-dw), Aw)
+# 		gτ += -exp(w*τ) * Awi / (1+exp(-β*w))
+# 	end
+# 	return gτ
+# end
+
+
+
 

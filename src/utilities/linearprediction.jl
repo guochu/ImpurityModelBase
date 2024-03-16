@@ -86,3 +86,26 @@ function (x::LinearPrediction)(t::Real)
 	(dif ≈ zero(t)) && return x[n+1]
 	return x[n+1] * (1-dif) + x[n+2] * dif
 end
+
+function linear_predict(obs::Vector{<:Number}, stepsize::Real; nfit=length(obs), p::Int=div(nfit, 2), 
+						δt::Real=stepsize, maxiter::Int=10000, tol::Real=1.0e-6, verbosity::Int=1)
+	x = LinearPrediction(obs, stepsize=stepsize, nfit=nfit, p=p)
+	iter = 0
+	delta = abs(x.obs[end])
+	while (delta > tol) && (iter < maxiter)
+		compute_next!(x)
+		iter += 1
+		delta = abs(x.obs[end])
+	end
+    if (verbosity >= 2) && (iter < maxiter)
+        println("early converge in $iter-th iterations with error $(delta)")
+    end
+    if (verbosity > 0) && (delta >= tol)
+        println("fail to converge, required precision: $(tol), actual precision $delta in $iter iterations")
+    end
+
+    t_all = (length(x.obs)-1) * stepsize
+    n = round(Int, t_all / δt)
+    return [x((i-1) * δt) for i in 1:n+1]
+end
+

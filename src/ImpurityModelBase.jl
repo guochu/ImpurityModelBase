@@ -11,8 +11,9 @@ export free_greater, free_lesser, free_Gt, free_Gτ
 export toulouse_Gw, toulouse_Gt, toulouse_Giw, toulouse_Gτ
 
 # utilities
-export AbstractPredictionScheme, LinearPrediction
+export AbstractPredictionScheme, LinearPrediction, linear_predict
 export FourierTransformScheme, FourierTransform, Gt_to_Gw
+export Gt_to_Aw, Aw_to_Gτ
 
 
 
