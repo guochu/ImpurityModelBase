@@ -11,7 +11,7 @@ function Gτ_to_Giw(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
 	(gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
 	Nτ = length(gτ)-1
 	δτ = β / Nτ
-	f(ω) = sum(gτ[k]*exp(im*k*δτ*ω) for k in 1:Nτ) * δτ
+        f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1) * δτ
 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 end
 
