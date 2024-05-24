@@ -2,6 +2,8 @@
 # using ImpurityModelBase
 include("src/includes.jl")
 using LinearAlgebra
+using Interpolations
+using DelimitedFiles
 
 f(D, ϵ) = sqrt(1-(ϵ/D)^2) / π
 spectrum_func(D=1) = SpectrumFunction(ϵ->f(D, ϵ), lb=0, ub=D)
@@ -51,7 +53,9 @@ interp=linear_interpolation(0:0.1:10.0, gτ)
 gτ1 = interp.(0:0.01:10.0)
 giw3 = Gτ_to_Giw(gτ1, β=10.0)
 
+gτ2 = Giw_to_Gτ(giw2, β=10, N=100)
 
-writedlm("a.dat", [1:2002 -real.(giw1) -imag.(giw1)])
+writedlm("a.dat", [1:2002 real.(giw1) imag.(giw1)])
 writedlm("b.dat", [1:2002 real.(giw2) imag.(giw2)])
-writedlm("c.dat", [1:2002 -real.(giw3) -imag.(giw3)])
+writedlm("c.dat", [1:2002 real.(giw3) imag.(giw3)])
+writedlm("d.dat", [1:101 gτ gτ2])

@@ -11,20 +11,20 @@ function Gτ_to_Giw(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
 	(gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
 	Nτ = length(gτ)-1
 	δτ = β / Nτ
-        f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1) * δτ
+        f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 end
 
 function Giw_to_Gτ(Giw::Vector{<:Number}; β::Real, N::Int)
 	iseven(length(Giw)) || throw(ArgumentError("even number of frequencies expected"))
 	nmax = div(length(Giw), 2) - 1
-	δτ = β / N
-	f(τ) = sum(Giw[i] * exp(-im*τ*(2*n-1)*π/β) for (i, n) in enumerate(-nmax:nmax+1))
+        δτ = β / N
+        f(τ) = sum((Giw[i]-1/(im*(2n-1)*π/β)) * exp(-im*τ*(2n-1)*π/β) for (i, n) in enumerate(-nmax:nmax+1))
 	gτ = zeros(Float64, N+1)
 	for i in 1:N
 		tmp = f((i-1) * δτ)
 		(abs(imag(tmp)) < 1.0e-8) || error("imaginary part of Gτ is too large")
-		gτ[i] = real(tmp) / β
+		gτ[i] = real(tmp)/β - 0.5
 	end
 	gτ[end] = 1 - gτ[1]
 	return gτ
