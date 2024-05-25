@@ -7,7 +7,7 @@ The last element is thus redunant, and only the first N elementes are
 used for the Fourier transfermation
 
 """
-function Gτ_to_Giw(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
+function Gτ_to_Giw(gτ::AbstractVector{<:Real}; β::Real, nmax::Int=1000)
 	(gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
 	Nτ = length(gτ)-1
 	δτ = β / Nτ
@@ -15,7 +15,7 @@ function Gτ_to_Giw(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 end
 
-function Giw_to_Gτ(Giw::Vector{<:Number}; β::Real, N::Int)
+function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, N::Int)
 	iseven(length(Giw)) || throw(ArgumentError("even number of frequencies expected"))
 	nmax = div(length(Giw), 2) - 1
 	δτ = β / N
@@ -38,3 +38,5 @@ end
 # 	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
 # 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 # end
+frequences(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
+frequences(Giw::AbstractVector; β::Real) = frequences(β, div(length(Giw), 2)-1)

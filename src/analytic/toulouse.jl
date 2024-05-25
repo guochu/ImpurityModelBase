@@ -75,6 +75,7 @@ function toulouse_Δiw(spectrum::SpectrumFunction; β::Real, nmax::Int=1000)
 
     return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 end
+toulouse_Δiw(bath::AbstractFermionicBath; nmax::Int=1000) = toulouse_Δiw(bath.spectrum, β=bath.β, nmax=nmax)
 
 function toulouse_Δτ(spectrum::SpectrumFunction; β::Real, N::Int)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
@@ -82,3 +83,4 @@ function toulouse_Δτ(spectrum::SpectrumFunction; β::Real, N::Int)
     f(τ) = quadgk(ϵ -> -f(ϵ) / (exp(-ϵ*τ) / (1+exp(-β*ϵ)) ), lu, ub)[1]
     return [f(i*δτ) for i in 0:N-1]
 end
+toulouse_Δτ(bath::AbstractFermionicBath; N::Int) = toulouse_Δτ(bath.spectrum, β=bath.β, N=N)
