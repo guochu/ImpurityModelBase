@@ -12,7 +12,7 @@ export toulouse_Δiw, toulouse_Δτ
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
 export FourierTransformScheme, FourierTransform, Gt_to_Gw
-export Gt_to_Aw, Aw_to_Gτ, Gτ_to_Giw, Giw_to_Gτ, frequences
+export Gt_to_Aw, Aw_to_Gτ, Gτ_to_Giw, Giw_to_Gτ, ifrequences
 
 
 using QuadGK

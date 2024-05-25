@@ -38,5 +38,5 @@ end
 # 	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
 # 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
 # end
-frequences(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
-frequences(Giw::AbstractVector; β::Real) = frequences(β, div(length(Giw), 2)-1)
+ifrequences(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
+ifrequences(Giw::AbstractVector; β::Real) = ifrequences(β, div(length(Giw), 2)-1)
