@@ -7,13 +7,11 @@ The last element is thus redunant, and only the first N elementes are
 used for the Fourier transfermation
 
 """
-function Gτ_to_Giw(gτ::AbstractVector{<:Real}; β::Real, nmax::Int=1000)
+function Gτ_to_Giw(gτ::AbstractVector{<:Real}; kwargs...)
 	(gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
-	Nτ = length(gτ)-1
-	δτ = β / Nτ
-	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
-	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
+	return ifourier(gτ; kwargs...)
 end
+Δτ_to_Δiw(gτ::AbstractVector{<:Real}; kwargs...) = ifourier(gτ; kwargs...)
 
 function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, N::Int)
 	iseven(length(Giw)) || throw(ArgumentError("even number of frequencies expected"))
@@ -30,13 +28,13 @@ function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, N::Int)
 	return gτ
 end
 
+ifrequencies(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
+ifrequencies(Giw::AbstractVector; β::Real) = ifrequencies(β, div(length(Giw), 2)-1)
 
-# function fourier_imag(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
-# 	(gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
-# 	Nτ = length(gτ)-1
-# 	δτ = β / Nτ
-# 	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
-# 	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
-# end
-ifrequences(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
-ifrequences(Giw::AbstractVector; β::Real) = ifrequences(β, div(length(Giw), 2)-1)
+function ifourier(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)
+	# (gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
+	Nτ = length(gτ)-1
+	δτ = β / Nτ
+	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
+	return [f((2*n-1)*π/β) for n in -nmax:nmax+1]
+end
