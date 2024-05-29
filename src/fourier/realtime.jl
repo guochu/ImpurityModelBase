@@ -69,6 +69,7 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	return Aw
 end
 
+
 function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4)
 	x = FourierTransform(gt, δt=stepsize)
 	return [x(w) for w in lb:dw:ub]
