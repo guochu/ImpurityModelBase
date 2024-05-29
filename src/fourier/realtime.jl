@@ -59,12 +59,11 @@ end
 function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	Aw = zeros(real(eltype(Gw)), length(Gw))
 	for i in 1:length(Gw)
-		Gwi = Gw[i]
-		abs_Gwi = abs(Gwi)
-		if (verbosity > 0) && (abs_Gwi < 0) && (abs_Gwi > 1.0e-4)
-			println("Gw[$(i)] = ", Gwi)
+		Gwi = -imag(Gw[i])/π
+		if (verbosity > 0) && (Gwi < 0) && (abs(Gwi) > 1.0e-4)
+			println("negative Aw[$(i)] = ", Gwi)
 		end
-		Aw[i] = (abs_Gwi > 0) ? -imag(Gwi)/π : zero(Gwi)
+		Aw[i] = (Gwi >= 0) ? Gwi: zero(Gwi)
 	end
 	return Aw
 end
@@ -90,6 +89,11 @@ function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::
 end
 
 function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, lb::Real, ub::Real, dw::Real=1.0e-4, δτ::Real=0.1)
+	# check the summation of Aw
+	nrm = sum(Aw) * dw
+	if abs(nrm-1) > 1.0e-2
+		println("sum(A(ω)) = ", nrm)
+	end
 	τs = 0:δτ:β
 	Gτ = zeros(eltype(Aw), length(τs))
 	for (w, Awi) in zip(lb:dw:(ub-dw), Aw)
