@@ -28,7 +28,8 @@ function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, N::Int)
 	return gτ
 end
 
-ifrequencies(β::Real, nmax::Int=1000) = [(2*n-1)*π/β for n in -nmax:nmax+1]
+ifrequency(β::Real, n::Int) = (2*n-1)*π/β
+ifrequencies(β::Real, nmax::Int=1000) = [ifrequency(β, n) for n in -nmax:nmax+1]
 ifrequencies(Giw::AbstractVector; β::Real) = ifrequencies(β, div(length(Giw), 2)-1)
 
 function ifourier(gτ::Vector{<:Real}; β::Real, nmax::Int=1000)

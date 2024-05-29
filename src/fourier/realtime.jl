@@ -102,6 +102,8 @@ function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, lb::Real, ub::Real, dw::Real=1.
 	return Gτ
 end
 
+frequencies(;lb::Real, ub::Real, dw::Real=1.0e-4) = lb:dw:ub
+
 # function Aw_to_Git_single(Aw::Vector{<:Real}, τ::Real; β::Real, lb::Real, ub::Real, dw::Real=1.0e-4)
 # 	gτ = zero(eltype(Aw))
 # 	for w, Awi in zip(lb:dw:(ub-dw), Aw)
@@ -109,7 +111,4 @@ end
 # 	end
 # 	return gτ
 # end
-
-
-
 

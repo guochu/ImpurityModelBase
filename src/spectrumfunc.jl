@@ -25,3 +25,10 @@ function (x::SpectrumFunction)(ϵ::Real)
 	@assert lowerbound(x) <= ϵ <= upperbound(x)
 	return x.f(ϵ)
 end
+
+function semicircular(t::Real)
+	t = convert(Float64, t)
+	D = 2*t
+	return SpectrumFunction(ϵ -> sqrt(1-(ϵ/D)^2) * (D/π), lb = -D, ub = D)
+end
+semicircular(; t::Real=1) = semicircular(t)

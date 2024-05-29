@@ -4,15 +4,17 @@ module ImpurityModelBase
 export AbstractFermionicBath, FermionicBath, FermionicVacuum, fermionicbath, thermaloccupation
 export SpectrumFunction, lowerbound, upperbound
 
-# analytic
+# Fourier transformations
+export Gt_to_Gw, Gt_to_Δw, Aw_to_Gτ, Gw_to_Aw, frequencies
+export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
+
+# analytical solutions 
 export free_greater, free_lesser, free_Gt, free_Gτ
-export toulouse_Gw, toulouse_Gt, toulouse_Giw, toulouse_Gτ
-export toulouse_Δiw, toulouse_Δτ
+export toulouse_Gw, toulouse_Gt
+export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
-export FourierTransformScheme, FourierTransform, Gt_to_Gw
-export Gt_to_Aw, Aw_to_Gτ, Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequencies
 
 
 using QuadGK
@@ -20,8 +22,13 @@ using QuadGK
 include("spectrumfunc.jl")
 include("bath.jl")
 
+
+# fourier transformations
+include("fourier/fourier.jl")
+
 # collections of some analytical solutions
-include("analytic/analytic.jl")
+include("freefermion.jl")
+include("toulouse/toulouse.jl")
 
 
 # utilities for real spectrum functions
