@@ -63,7 +63,7 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 		if (verbosity > 0) && (Gwi < 0) && (abs(Gwi) > 1.0e-4)
 			println("negative Aw[$(i)] = ", Gwi)
 		end
-		Aw[i] = (Gwi >= 0) ? Gwi: zero(Gwi)
+		Aw[i] = (Gwi >= 0) ? Gwi : zero(Gwi)
 	end
 	return Aw
 end
