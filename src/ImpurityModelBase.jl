@@ -15,7 +15,7 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
-
+export bethe_Gw_to_Δw, bethe_Giw_to_Δiw
 
 using QuadGK
 
