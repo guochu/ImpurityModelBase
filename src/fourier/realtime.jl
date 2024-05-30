@@ -68,15 +68,15 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	return Aw
 end
 
-function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4)
-	x = FourierTransform(gt, δt=stepsize)
+function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, δ::Real=1.0e-8)
+	x = FourierTransform(gt, δt=stepsize, δ=δ)
 	return [x(w) for w in lb:dw:ub]
 end 
-function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, verbosity::Int=1)
+function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, δ::Real=1.0e-8, verbosity::Int=1)
 	if (verbosity > 0) && (abs(gt[end]) > 1.0e-6)
 		println("last element of input GF has abs value ", abs(gt[end]))
 	end
-	Gw = Gt_to_Gw(gt, stepsize, lb=lb, ub=ub, dw=dw)
+	Gw = Gt_to_Gw(gt, stepsize, lb=lb, ub=ub, dw=dw, δ=δ)
 	Aw = Gw_to_Aw(Gw, verbosity=verbosity)
 	nrm = sum(Aw) * dw
 	if (verbosity > 0) && (abs(nrm-1) > 1.0e-2)
