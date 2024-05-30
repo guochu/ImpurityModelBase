@@ -23,7 +23,7 @@ end
 toulouse_Gt(bath::AbstractFermionicBath, t::Real; kwargs...) = toulouse_Gt(bath.spectrum, t; μ=bath.μ, kwargs...)
 
 
-function toulouse_Δw(spectrum::SpectrumFunction, ω::Real; δ::Real=1.0e-8))
+function toulouse_Δw(spectrum::SpectrumFunction, ω::Real; δ::Real=1.0e-8)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
     return quadgk(ϵ -> f(ϵ) / (ω - ϵ + im*δ), lb, ub)[1]
 end
