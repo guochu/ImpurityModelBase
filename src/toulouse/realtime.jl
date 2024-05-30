@@ -27,4 +27,4 @@ function toulouse_Δw(spectrum::SpectrumFunction, ω::Real; δ::Real=1.0e-8)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
     return quadgk(ϵ -> f(ϵ) / (ω - ϵ + im*δ), lb, ub)[1]
 end
-toulouse_Aw(spectrum::SpectrumFunction, ω::Real; kwargs...) = -imag(toulouse_Δw(spectrum, ω; kwargs...)) / π
+toulouse_Jw(spectrum::SpectrumFunction, ω::Real; kwargs...) = -imag(toulouse_Δw(spectrum, ω; kwargs...)) / π

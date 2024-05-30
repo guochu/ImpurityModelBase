@@ -10,7 +10,7 @@ export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
 
 # analytical solutions 
 export free_greater, free_lesser, free_Gt, free_Gτ
-export toulouse_Gw, toulouse_Gt, toulouse_Δw, toulouse_Aw
+export toulouse_Gw, toulouse_Gt, toulouse_Δw, toulouse_Jw
 export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 
 # utilities
