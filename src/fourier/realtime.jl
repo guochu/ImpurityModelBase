@@ -60,7 +60,7 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	Aw = zeros(real(eltype(Gw)), length(Gw))
 	for i in 1:length(Gw)
 		Gwi = -imag(Gw[i])/π
-		if (verbosity > 0) && (Gwi < 0) && (abs(Gwi) > 1.0e-4)
+		if (verbosity > 0) && (Gwi < 0) && (abs(Gwi) > 1.0e-3)
 			println("negative Aw[$(i)] = ", Gwi)
 		end
 		Aw[i] = (Gwi >= 0) ? Gwi : zero(Gwi)
