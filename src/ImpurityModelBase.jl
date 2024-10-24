@@ -1,7 +1,7 @@
 module ImpurityModelBase
 
 # definition of bath, spectrum density
-export SpectrumFunction, lowerbound, upperbound, semicircular
+export SpectrumFunction, lowerbound, upperbound, semicircular, Leggett
 
 export AbstractBath, AbstractFermionicBath, AbstractBosonicBath
 export FermionicBath, FermionicVacuum, fermionicbath, thermaloccupation, fermidirac
