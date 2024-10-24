@@ -39,11 +39,11 @@ end
 semicircular(; t::Real=1) = semicircular(t)
 
 """
-	Leggett(; α::Real=1, d::Real=3, ωc::Real=1)
+	Leggett(; α::Real, d::Real, ωc::Real)
 
 J(ω) = (α/(2ωc))(ωᵈ/ωcᵈ)e^(-ω/ωc)	
 """
-function Leggett(; α::Real=1, d::Real=3, ωc::Real=1)
+function Leggett(; α::Real=1, d::Real=1, ωc::Real=1)
 	d = convert(Float64, d)
 	return SpectrumFunction(ϵ -> (α/2)*(ϵ^d/ωc^(d-1))*exp(-ϵ/ωc), lb = 0, ub = ωc)
 end

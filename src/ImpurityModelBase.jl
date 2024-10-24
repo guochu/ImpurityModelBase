@@ -38,7 +38,7 @@ include("freefermion.jl")
 include("toulouse/toulouse.jl")
 
 include("freeboson.jl")
-include("holstein/holstein.jl")
+include("independentbosons/independentbosons.jl")
 
 
 # utilities for real spectrum functions
