@@ -13,9 +13,12 @@ export Gt_to_Gw, Gt_to_Δw, Aw_to_Gτ, Gw_to_Aw, frequencies
 export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
 
 # analytical solutions 
-export free_greater, free_lesser, free_Gt, free_Gτ
+export freefermion_greater, freefermion_lesser, freefermion_Gt, freefermion_Gτ, freefermion_occupation
 export toulouse_Gw, toulouse_Gt, toulouse_Δw, toulouse_Jw
 export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
+
+export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
+export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
@@ -33,7 +36,9 @@ include("fourier/fourier.jl")
 # collections of some analytical solutions
 include("freefermion.jl")
 include("toulouse/toulouse.jl")
+
 include("freeboson.jl")
+include("holstein/holstein.jl")
 
 
 # utilities for real spectrum functions
