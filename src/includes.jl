@@ -1,6 +1,6 @@
 using QuadGK
 
-include("spectrumfunc.jl")
+include("auxiliary/auxiliary.jl")
 include("bath/bath.jl")
 
 

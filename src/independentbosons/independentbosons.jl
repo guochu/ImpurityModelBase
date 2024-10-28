@@ -1,15 +1,12 @@
-function _compute_Δ(spectrum::SpectrumFunction)
-    f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
-    return quadgk(ω -> f(ω) / ω, lb, ub)[1]
-end
+_compute_Δ(s::SpectrumFunction) = quadgkwrapper(bounded(ω->s.f(ω)/ω, lb=lowerbound(s), ub=upperbound(s)))
 
 function _exponent_f(spectrum::SpectrumFunction, τ, β)
-    f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
+    f = spectrum.f
     function ff(ω) 
         x = exp(-β*ω)
         (f(ω)/ω^2) * (1-exp(-τ*ω)+x-exp(-(β-τ)*ω))/(1-x)
     end
-    _e = quadgk(ω -> ff(ω), lb, ub)[1]
+    _e = quadgkwrapper(bounded(ω -> ff(ω), lb=lowerbound(spectrum), ub=upperbound(spectrum)))
     return exp(-_e)
 end
 
