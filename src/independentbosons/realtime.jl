@@ -1,9 +1,9 @@
 """
-    free_holstein_greater(spectrum::SpectrumFunction, t::Real; ϵ_d::Real, n₀, Δ)
+    free_holstein_greater(spectrum::AbstractSpectrumFunction, t::Real; ϵ_d::Real, n₀, Δ)
 
 Retarded Green's function in the real time axis
 """
-function independentbosons_greater(spectrum::SpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0, 
+function independentbosons_greater(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0, 
                                     n₀::Union{Real, Nothing}=nothing, nbands::Int=1, Δ::Real=_compute_Δ(spectrum))
     (nbands in (1, 2)) || throw(ArgumentError("nbands must be 1 or 2"))
     μ′ = -ϵ_d + Δ
@@ -22,7 +22,7 @@ function independentbosons_greater(spectrum::SpectrumFunction, t::Real; β::Real
 end
 
 
-function independentbosons_lesser(spectrum::SpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0,
+function independentbosons_lesser(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0,
                                    n₀::Union{Real, Nothing}=nothing, nbands::Int=1, Δ::Real=_compute_Δ(spectrum))
     (nbands in (1, 2)) || throw(ArgumentError("nbands must be 1 or 2"))
     μ′ = -ϵ_d + Δ

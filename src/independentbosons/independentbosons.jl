@@ -1,6 +1,6 @@
-_compute_Δ(s::SpectrumFunction) = quadgkwrapper(bounded(ω->s.f(ω)/ω, lb=lowerbound(s), ub=upperbound(s)))
+_compute_Δ(s::AbstractSpectrumFunction) = quadgkwrapper(bounded(ω->s.f(ω)/ω, lb=lowerbound(s), ub=upperbound(s)))
 
-function _exponent_f(spectrum::SpectrumFunction, τ, β)
+function _exponent_f(spectrum::AbstractSpectrumFunction, τ, β)
     f = spectrum.f
     function ff(ω) 
         x = exp(-β*ω)

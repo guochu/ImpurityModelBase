@@ -2,15 +2,15 @@
 # imaginary-time Green's function of Toulouse model
 
 """
-    toulouse_Giw(spectrum::SpectrumFunction, ω::Real; ϵ_d::Real, μ::Real)
+    toulouse_Giw(spectrum::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real)
 
 Matsubara Green's function in the frequency axis
 """
-function toulouse_Giw(spectrum::SpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0)
+function toulouse_Giw(spectrum::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0)
 	f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
     1.0/(im*ω-ϵ_d-quadgkwrapper(bounded(ε -> f(ε)/(im*ω+μ-ε), lb=lb, ub=ub)))
 end
-function toulouse_Giw(spectrum::SpectrumFunction; β::Real, ϵ_d::Real, μ::Real=0, nmax::Int=1000)
+function toulouse_Giw(spectrum::AbstractSpectrumFunction; β::Real, ϵ_d::Real, μ::Real=0, nmax::Int=1000)
     return [toulouse_Giw(spectrum, (2*n-1)*π/β; ϵ_d=ϵ_d, μ=μ) for n in -nmax:nmax+1]
 end
 
@@ -18,11 +18,11 @@ toulouse_Giw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Giw(ba
 
 
 """
-    toulouse_Gτ(spectrum::SpectrumFunction, τ::Real; β::Real, ϵ_d::Real, μ::Real, nmax::Int)
+    toulouse_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, μ::Real, nmax::Int)
 
 Matsubara Green's function in the imaginary-time axis
 """
-function toulouse_Gτ(spectrum::SpectrumFunction, τ::Real; β::Real, ϵ_d::Real, μ::Real=0., nmax::Int=1000)
+function toulouse_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, μ::Real=0., nmax::Int=1000)
     res = 0.0
     for n = -nmax:nmax+1
         ω = (2n-1)*π/β
@@ -31,7 +31,7 @@ function toulouse_Gτ(spectrum::SpectrumFunction, τ::Real; β::Real, ϵ_d::Real
     res = -(res/β-0.5)
 end
 toulouse_Gτ(bath::AbstractFermionicBath, τ::Real; kwargs...) = toulouse_Gτ(bath.spectrum, τ; β=bath.β, μ=bath.μ, kwargs...)
-function toulouse_Gτ(spectrum::SpectrumFunction; β::Real, N::Int, ϵ_d::Real, μ::Real=0., nmax::Int=1000)
+function toulouse_Gτ(spectrum::AbstractSpectrumFunction; β::Real, N::Int, ϵ_d::Real, μ::Real=0., nmax::Int=1000)
     δτ = β / N
     gτ = zeros(Float64, N+1)
     for i in 1:N
@@ -45,7 +45,7 @@ function toulouse_Gτ(spectrum::SpectrumFunction; β::Real, N::Int, ϵ_d::Real, 
 end
 toulouse_Gτ(bath::AbstractFermionicBath; N::Int, kwargs...) = toulouse_Gτ(bath.spectrum, β=bath.β, μ=bath.μ, N=N, kwargs...)
 
-function toulouse_Δiw(spectrum::SpectrumFunction; β::Real, nmax::Int=1000)
+function toulouse_Δiw(spectrum::AbstractSpectrumFunction; β::Real, nmax::Int=1000)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
     ff(ω) = quadgkwrapper(bounded(ϵ -> f(ϵ) / (im*ω - ϵ), lb, ub))
 
@@ -53,7 +53,7 @@ function toulouse_Δiw(spectrum::SpectrumFunction; β::Real, nmax::Int=1000)
 end
 toulouse_Δiw(bath::AbstractFermionicBath; nmax::Int=1000) = toulouse_Δiw(bath.spectrum, β=bath.β, nmax=nmax)
 
-function toulouse_Δτ(spectrum::SpectrumFunction; β::Real, N::Int)
+function toulouse_Δτ(spectrum::AbstractSpectrumFunction; β::Real, N::Int)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
     δτ = β / N
     ff(τ) = quadgkwrapper(bounede(ϵ -> -f(ϵ) / (exp(-ϵ*τ) / (1+exp(-β*ϵ)) ), lb, ub))

@@ -1,17 +1,17 @@
 # bosonic baths
-struct BosonicBath{F <: SpectrumFunction} <: AbstractBosonicBath
+struct BosonicBath{F <: AbstractSpectrumFunction} <: AbstractBosonicBath
 	f::F
 	β::Float64
 	μ::Float64
 end
-BosonicBath(f::SpectrumFunction; β::Real, μ::Real=0) = BosonicBath(f, convert(Float64, β), convert(Float64, μ))
+BosonicBath(f::AbstractSpectrumFunction; β::Real, μ::Real=0) = BosonicBath(f, convert(Float64, β), convert(Float64, μ))
 
 
-struct BosonicVacuum{F <: SpectrumFunction} <: AbstractBosonicBath
+struct BosonicVacuum{F <: AbstractSpectrumFunction} <: AbstractBosonicBath
 	f::F
 	μ::Float64	
 end
-BosonicVacuum(f::SpectrumFunction; μ::Real=0) = BosonicVacuum(f, convert(Float64, μ))
+BosonicVacuum(f::AbstractSpectrumFunction; μ::Real=0) = BosonicVacuum(f, convert(Float64, μ))
 
 
 function boseeinstein(β::Real, μ::Real, ϵ::Real)
@@ -34,7 +34,7 @@ thermaloccupation(bath::AbstractBosonicBath, ϵ::Real) = boseeinstein(bath.β, b
 	bosonic_bath(f; β::Real=Inf) 
 	f should support y = f(x) with y positive
 """
-bosonicbath(f::SpectrumFunction; β::Real=Inf, μ::Real=0) = (β == Inf) ? BosonicVacuum(f, μ=μ) : BosonicBath(f, β=β, μ=μ)
+bosonicbath(f::AbstractSpectrumFunction; β::Real=Inf, μ::Real=0) = (β == Inf) ? BosonicVacuum(f, μ=μ) : BosonicBath(f, β=β, μ=μ)
 
 
 # function bosonicbath(f; β::Real=Inf, μ::Real=0) 

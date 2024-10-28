@@ -1,10 +1,10 @@
 
 """
-    independentbosons_Gτ(spectrum::SpectrumFunction, τ::Real; β, ϵ_d, n₀, U, Δ)
+    independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β, ϵ_d, n₀, U, Δ)
 
 Matsubara Green's function in the imaginary-time axis
 """
-function independentbosons_Gτ(spectrum::SpectrumFunction, τ::Real; β::Real, ϵ_d::Real, U::Real=0, nbands::Int=1, Δ::Real=_compute_Δ(spectrum))
+function independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, U::Real=0, nbands::Int=1, Δ::Real=_compute_Δ(spectrum))
     (nbands in (1, 2)) || throw(ArgumentError("nbands must be 1 or 2"))
     μ′ = -ϵ_d + Δ
     if nbands == 1
@@ -14,7 +14,7 @@ function independentbosons_Gτ(spectrum::SpectrumFunction, τ::Real; β::Real, �
         return _interact(τ, β, -ϵ_d, Δ, U)*_exponent_f(spectrum, τ, β)
     end
 end
-function independentbosons_Gτ(spectrum::SpectrumFunction; β::Real, N::Int, ϵ_d::Real, U::Real=0, nbands::Int=1)
+function independentbosons_Gτ(spectrum::AbstractSpectrumFunction; β::Real, N::Int, ϵ_d::Real, U::Real=0, nbands::Int=1)
     Δ = _compute_Δ(spectrum)
     δτ = β / N
     gτ = zeros(Float64, N+1)
