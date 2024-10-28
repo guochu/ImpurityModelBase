@@ -3,7 +3,7 @@
 
 Dirac delta function
 """
-struct DiracDelta <: AbstractBoundedFunction
+struct DiracDelta <: AbstractSpectrumFunction
 	ω₀::Float64
 	α::Float64
 	lb::Float64

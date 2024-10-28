@@ -1,7 +1,8 @@
 module ImpurityModelBase
 
 # definition of bath, spectrum density
-export AbstractBoundedFunction, BoundedFunction, SpectrumFunction, bounded, spectrum
+export AbstractBoundedFunction, AbstractSpectrumFunction
+export BoundedFunction, SpectrumFunction, bounded, spectrum
 export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
 export DiracDelta, quadgkwrapper
 

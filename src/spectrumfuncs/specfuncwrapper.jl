@@ -1,5 +1,6 @@
 # the x-axis of boundary function is real!!!
 abstract type AbstractBoundedFunction <: Function end
+abstract type AbstractSpectrumFunction <: AbstractBoundedFunction end
 lowerbound(x::AbstractBoundedFunction) = x.lb
 upperbound(x::AbstractBoundedFunction) = x.ub
 (x::AbstractBoundedFunction)(ϵ::Real) = ifelse(lowerbound(x) <= ϵ <= upperbound(x), x.f(ϵ), 0.)
@@ -26,7 +27,7 @@ bounded(f; kwargs...) = BoundedFunction(f; kwargs...)
 
 Wrapper for spectrum function, including a lower bound and upper bound
 """
-struct SpectrumFunction{F} <: AbstractBoundedFunction
+struct SpectrumFunction{F} <: AbstractSpectrumFunction
 	f::F
 	lb::Float64
 	ub::Float64
