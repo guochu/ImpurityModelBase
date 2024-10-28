@@ -1,0 +1,5 @@
+include("quadgkwrapper.jl")
+include("specfuncwrapper.jl")
+include("discretespectrum.jl")
+include("diracdeltaspectrum.jl")
+include("prodfunc.jl")

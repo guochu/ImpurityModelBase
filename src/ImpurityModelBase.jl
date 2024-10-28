@@ -1,8 +1,8 @@
 module ImpurityModelBase
 
 # definition of bath, spectrum density
-export AbstractBoundedFunction, BoundedFunction, SpectrumFunction, bounded 
-export lowerbound, upperbound, semicircular, Leggett
+export AbstractBoundedFunction, BoundedFunction, SpectrumFunction, bounded, spectrum
+export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
 export DiracDelta, quadgkwrapper
 
 export AbstractBath, AbstractFermionicBath, AbstractBosonicBath
@@ -28,7 +28,7 @@ export bethe_Gw_to_Δw, bethe_Giw_to_Δiw
 
 using QuadGK
 
-include("auxiliary/auxiliary.jl")
+include("spectrumfuncs/spectrumfuncs.jl")
 include("bath/bath.jl")
 
 

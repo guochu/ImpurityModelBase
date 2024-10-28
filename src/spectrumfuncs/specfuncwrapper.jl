@@ -5,6 +5,8 @@ upperbound(x::AbstractBoundedFunction) = x.ub
 (x::AbstractBoundedFunction)(ϵ::Real) = ifelse(lowerbound(x) <= ϵ <= upperbound(x), x.f(ϵ), 0.)
 quadgkwrapper(m::AbstractBoundedFunction; kwargs...) = _quadgk(m.f, lowerbound(m), upperbound(m); kwargs...)
 
+Base.:(-)(x::AbstractBoundedFunction) = bounded(ϵ->-x.f(ϵ), lowerbound(x), upperbound(x))
+Base.adjoint(x::AbstractBoundedFunction) = bounded(ϵ->conj(x.f(ϵ)), lowerbound(x), upperbound(x))
 
 struct BoundedFunction{F} <: AbstractBoundedFunction
 	f::F
@@ -33,6 +35,8 @@ function SpectrumFunction(f; lb::Real=-Inf, ub::Real=Inf)
 	(lb < ub) || throw(ArgumentError("lb must be less than ub"))
 	return SpectrumFunction(f, convert(Float64, lb), convert(Float64, ub))
 end	
+spectrum(f, lb::Real, ub::Real) = SpectrumFunction(f, lb=lb, ub=ub)
+spectrum(f; kwargs...) = SpectrumFunction(f; kwargs...)
 
 
 """
