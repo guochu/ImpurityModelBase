@@ -62,5 +62,5 @@ J(ω) = (α/(2ωc))(ωᵈ/ωcᵈ)e^(-ω/ωc)
 """
 function Leggett(; α::Real=1, d::Real=1, ωc::Real=1)
 	d = convert(Float64, d)
-	return SpectrumFunction(ϵ -> (α/2)*(ϵ^d/ωc^(d-1))*exp(-ϵ/ωc), lb = 0, ub = ωc)
+	return SpectrumFunction(ϵ -> (α/2)*(ϵ^d/ωc^(d-1))*exp(-ϵ/ωc), lb = 0, ub = 100*ωc)
 end
