@@ -40,6 +40,9 @@ spectrum(f, lb::Real, ub::Real) = SpectrumFunction(f, lb=lb, ub=ub)
 spectrum(f; kwargs...) = SpectrumFunction(f; kwargs...)
 
 
+spectrumshift(m::SpectrumFunction, μ::Real) = spectrum(ϵ->m.f(ϵ+μ), lowerbound(m)-μ, upperbound(m)-μ)
+
+
 """
 	semicircular(t::Real)
 

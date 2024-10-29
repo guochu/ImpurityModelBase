@@ -4,7 +4,7 @@ module ImpurityModelBase
 export AbstractBoundedFunction, AbstractSpectrumFunction
 export BoundedFunction, SpectrumFunction, bounded, spectrum
 export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
-export DiracDelta, quadgkwrapper
+export DiracDelta, quadgkwrapper, spectrumshift
 
 export AbstractBath, AbstractFermionicBath, AbstractBosonicBath
 export FermionicBath, FermionicVacuum, fermionicbath, thermaloccupation, fermidirac

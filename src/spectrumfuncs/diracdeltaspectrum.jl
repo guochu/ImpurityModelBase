@@ -16,3 +16,5 @@ end
 (x::DiracDelta)(ϵ::Real) = error("can not call to a delta function")
 
 quadgkwrapper(f::DiracDelta) = ifelse(lowerbound(f) <= f.ω₀ <= upperbound(f), f.α, 0.)
+
+spectrumshift(m::DiracDelta, μ::Real) = DiracDelta(ω₀=m.ω₀+μ, α=m.α, lb=lowerbound(m)-μ, ub=upperbound(m)-μ)
