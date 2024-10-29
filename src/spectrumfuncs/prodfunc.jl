@@ -1,4 +1,5 @@
 Base.:*(x::AbstractBoundedFunction, y::Function) = bounded(ϵ->x(ϵ)*y(ϵ), lowerbound(x), upperbound(x))
+Base.:/(x::AbstractBoundedFunction, y::Function) = bounded(ϵ->x(ϵ)/y(ϵ), lowerbound(x), upperbound(x))
 
 
 struct DeltaMultF{F<:Function} <: AbstractBoundedFunction
@@ -12,7 +13,9 @@ Base.:(-)(x::DeltaMultF) = DeltaMultF(x.δ, ϵ->-x.f(ϵ))
 Base.adjoint(x::DeltaMultF) = DeltaMultF(x.δ, ϵ->conj(x.f(ϵ)))
 
 Base.:*(x::DiracDelta, y::Function) = DeltaMultF(x, y)
+Base.:/(x::DiracDelta, y::Function) = DeltaMultF(x, ϵ->1/y(ϵ))
 Base.:*(x::DeltaMultF, y::Function) = DeltaMultF(x.δ, ϵ->x.f(ϵ)*y(ϵ))
+Base.:/(x::DeltaMultF, y::Function) = DeltaMultF(x.δ, ϵ->x.f(ϵ)/y(ϵ))
 
 
 function quadgkwrapper(m::DeltaMultF; kwargs...)

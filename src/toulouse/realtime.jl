@@ -1,13 +1,18 @@
 # real-time Green's function of Toulouse model
 
+# function toulouse_Gw(spectrum::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8)
+#     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
+#     1.0/(ω-ϵ_d-quadgkwrapper(bounded(ε -> f(ε)/(ω+μ-ε+im*δ), lb, ub)))
+# end
+
 """
     toulouse_Gw(spectrum::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real)
 
 Retarded Green's function in the frequency axis
 """
-function toulouse_Gw(spectrum::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8)
-	f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
-	1.0/(ω-ϵ_d-quadgkwrapper(bounded(ε -> f(ε)/(ω+μ-ε+im*δ), lb, ub)))
+function toulouse_Gw(f::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8)
+    g(ϵ) = ω+μ-ϵ+im*δ
+	return 1.0/(ω-ϵ_d-quadgkwrapper(f/g))
 end
 toulouse_Gw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Gw(bath.spectrum, ω; μ=bath.μ, kwargs...)
 
@@ -23,8 +28,13 @@ end
 toulouse_Gt(bath::AbstractFermionicBath, t::Real; kwargs...) = toulouse_Gt(bath.spectrum, t; μ=bath.μ, kwargs...)
 
 
+# function toulouse_Δw(spectrum::AbstractSpectrumFunction, ω::Real; δ::Real=1.0e-8)
+#     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
+#     return quadgkwrapper(bounded(ϵ -> f(ϵ) / (ω - ϵ + im*δ), lb, ub))
+# end
 function toulouse_Δw(spectrum::AbstractSpectrumFunction, ω::Real; δ::Real=1.0e-8)
     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
-    return quadgkwrapper(bounded(ϵ -> f(ϵ) / (ω - ϵ + im*δ), lb, ub))
+    g(ϵ) = ω - ϵ + im*δ
+    return quadgkwrapper(f / g)
 end
 toulouse_Jw(spectrum::AbstractSpectrumFunction, ω::Real; kwargs...) = -imag(toulouse_Δw(spectrum, ω; kwargs...)) / π
