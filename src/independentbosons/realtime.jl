@@ -32,10 +32,20 @@ function independentbosons_lesser(spectrum::AbstractSpectrumFunction, t::Real; �
         if isnothing(n₀)
             n₀ = freefermion_occupation(β, μ′)
         end
-        r = im*n₀*exp(im*t*μ′)*_exponent_f(spectrum, im*t, β)
+        r = im*n₀*exp(im*t*μ′)*_exponent_f(spectrum, -im*t, β)
     else               
         isnothing(n₀) || println("only local thermal initial state is supported for interacting case, n₀ is ignored")
-        r = im*_interact(im*t, β, -ϵ_d, Δ, U)*_exponent_f(spectrum, im*t, β)        
+        r = im*_interact_lesser(im*t, β, -ϵ_d, Δ, U)*_exponent_f(spectrum, -im*t, β)        
     end
     return r 
+end
+
+
+
+function _interact_lesser(τ, β, μ, Δ, U)
+    # we have used μ ← μ + Δ
+    μ′ = μ + Δ
+    x = exp(-β * μ′)
+    y = exp(β*(μ+3Δ-U))
+    return (exp(τ*μ′) + y*exp(τ*(μ+3Δ-U))) / (x + 2 + y)
 end
