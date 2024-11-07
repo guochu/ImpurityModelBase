@@ -14,7 +14,7 @@ function noninteracting_operators(ϵ_d; ω₀=1, α=0.5, d=100)
 	H = Himp + Hhyb + Hbath
 	A, B = kron(σ₋, Ib), kron(σ₊, Ib)
 
-	return H, A, B, Himp, Hbath
+	return H, A, B
 end
 
 # ϵ_d(n̂↑ + n̂↓) + U n̂↑n̂↓ + α (n̂↑ + n̂↓)(b̂ + b̂†) + ω₀b̂†b̂ 
@@ -35,14 +35,14 @@ function interacting_operators(U, ϵ_d=U/2; ω₀=1, α=0.5, d=100)
 
 	A, B = kron(kron(σ₋, Is), Ib), kron(kron(σ₊, Is), Ib)
 
-	return H, A, B, Himp, Hbath
+	return H, A, B
 end
 
-function gen_initstate(H, Himp, Hbath, β, init_state::Symbol)
-	if init_state == :globalthermal
-		return exp(-β*H)
-	else
-		# return exp(-β*Himp) * exp(-β*Hbath)
-		return exp(-β*(Himp + Hbath)) 
-	end
-end
+# function gen_initstate(H, Himp, Hbath, β, init_state::Symbol)
+# 	if init_state == :globalthermal
+# 		return exp(-β*H)
+# 	else
+# 		# return exp(-β*Himp) * exp(-β*Hbath)
+# 		return exp(-β*(Himp + Hbath)) 
+# 	end
+# end
