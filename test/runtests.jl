@@ -13,4 +13,4 @@ include("auxiliary.jl")
 
 include("interactingbosons/ed.jl")
 include("interactingbosons/noninteracting.jl")
-include("interactingbosons/interacting.jl")
+# include("interactingbosons/interacting.jl")

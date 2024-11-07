@@ -42,11 +42,11 @@ function gf_imag(H, A, B, β::Real, n::Int)
 end
 
 # <e^iHt A e^-iHt B>
-function gf_real(H, A, B, β::Real, t::Real, n::Int)
+function gf_real(H, A, B, β::Real, t::Real, n::Int, ρ=exp(-β*H))
 	δt = t / n
 	ts = 0:δt:t
 	λs, U = eigen(Hermitian(H))
-	ρ = U * Diagonal(exp.(-β .* λs)) * U'
+	# ρ = U * Diagonal(exp.(-β .* λs)) * U'
 	tr_ρ = tr(ρ)
 	gt(tj) = -im*tr(U * Diagonal(exp.(im*tj .* λs)) * U' * A * U * Diagonal(exp.(-im*tj .* λs)) * U' * B * ρ) / tr_ρ
 	ls(tj) = im*tr(B * U * Diagonal(exp.(im*tj .* λs)) * U' * A * U * Diagonal(exp.(-im*tj .* λs)) * U' * ρ) / tr_ρ
@@ -63,10 +63,13 @@ function noninteracting_operators(ϵ_d; ω₀=1, α=0.5, d=100)
 	b̂, b̂′, n̂b = p2["a"], p2["adag"], p2["n"]
 	Ib = one(b̂)
 	# total Hamiltonian
-	H = -ϵ_d * kron(n̂, Ib) + sqrt(α) * kron(n̂, b̂′ + b̂) + ω₀ * kron(Is, n̂b)
+	Himp = -ϵ_d * kron(n̂, Ib)
+	Hbath = ω₀ * kron(Is, n̂b)
+	Hhyb = sqrt(α) * kron(n̂, b̂′ + b̂)
+	H = Himp + Hhyb + Hbath
 	A, B = kron(σ₋, Ib), kron(σ₊, Ib)
 
-	return H, A, B
+	return H, A, B, Himp, Hbath
 end
 
 # ϵ_d(n̂↑ + n̂↓) + U n̂↑n̂↓ + α (n̂↑ + n̂↓)(b̂ + b̂†) + ω₀b̂†b̂ 
@@ -80,9 +83,21 @@ function interacting_operators(U, ϵ_d=U/2; ω₀=1, α=0.5, d=100)
 	b̂, b̂′, n̂b = p2["a"], p2["adag"], p2["n"]
 	Ib = one(b̂)
 	# total Hamiltonian
-	H =  kron(-ϵ_d*n_ud + U * nn, Ib) + sqrt(α) * kron(n_ud, b̂′ + b̂) + ω₀ * kron(kron(Is, Is), n̂b)
+	Himp = kron(-ϵ_d*n_ud + U * nn, Ib)
+	Hbath = ω₀ * kron(kron(Is, Is), n̂b)
+	Hhyb = sqrt(α) * kron(n_ud, b̂′ + b̂)
+	H =  Himp + Hhyb + Hbath
 
 	A, B = kron(kron(σ₋, Is), Ib), kron(kron(σ₊, Is), Ib)
 
-	return H, A, B	
+	return H, A, B, Himp, Hbath
+end
+
+function gen_initstate(H, Himp, Hbath, β, init_state::Symbol)
+	if init_state == :globalthermal
+		return exp(-β*H)
+	else
+		# return exp(-β*Himp) * exp(-β*Hbath)
+		return exp(-β*(Himp + Hbath)) 
+	end
 end
