@@ -14,12 +14,17 @@ end
 
 # _interact(τ, β, μ, Δ, U) = (exp(τ*(μ+Δ)) + exp(β*(μ+Δ) + τ*(μ+Δ-U))) / (1+2*exp(β*(μ+Δ))+exp(β*(2μ+2Δ-U)))
 
-function _interact(τ, β, μ, Δ, U)
-    # we have used μ ← μ + Δ
-    μ′ = μ + Δ
-    x = exp(-β * μ′)
-    return (exp(τ*μ′) * x + exp(τ*(μ+3Δ-U))) / (x + 2 + exp(β*(μ+3Δ-U)))
-end
+# function _interact(τ, β, μ, Δ, U)
+#     # we have used μ ← μ + Δ
+#     μ′ = μ + Δ
+#     x = exp(-β * μ′)
+#     return (exp(τ*μ′) * x + exp(τ*(μ+3Δ-U))) / (x + 2 + exp(β*(μ+3Δ-U)))
+# end
+# function _interact(τ, β, μ, U)
+#     # we have used μ ← μ + Δ
+#     x = exp(-β * μ)
+#     return (exp(τ*μ) * x + exp(τ*(μ-U))) / (x + 2 + exp(β*(μ-U)))
+# end
 
 include("realtime.jl")
 include("imagtime.jl")

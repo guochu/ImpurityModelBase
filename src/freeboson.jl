@@ -3,7 +3,7 @@
 
 Greater Green's function of a free particle
 """
-freeboson_greater(t::Real; β::Real, ω::Real) = exp(-im*ω*t)/(1-exp(-β*ω))
+freeboson_greater(t::Real; β::Real, ω::Real) = -im*exp(-im*ω*t)/(1-exp(-β*ω))
 
 """
 	freeboson_lesser(t::Real; β::Real, μ::Real)
@@ -12,7 +12,7 @@ Lesser Green's function of a free particle
 """
 function freeboson_lesser(t::Real; β::Real, ω::Real)
 	x = exp(-β*ω)
-	return exp(-im*ω*t) * (x / (1-x))
+	return im*exp(-im*ω*t) * (x / (1-x))
 end
 
 """
