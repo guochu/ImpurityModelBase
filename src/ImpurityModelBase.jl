@@ -24,7 +24,7 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
-export holstein_Gw
+export holstein_Gw, holstein_Σw
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict

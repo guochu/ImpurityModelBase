@@ -9,6 +9,11 @@ function holstein_Gw(f::AbstractSpectrumFunction, ϵ::Real; α::Real, ω::Real, 
 	return x
 end
 
+function holstein_Σw(f::AbstractSpectrumFunction, ϵ::Real; α::Real, ω::Real, ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8, order::Int=10)
+	Gw = holstein_Gw(f, ϵ, α=α, ω=ω, ϵ_d=ϵ_d, μ=μ, δ=δ, order=order)
+	Gw0 = toulouse_Gw(f, ϵ, ϵ_d=ϵ_d, μ=μ, δ=δ)
+	return 1/Gw - 1/Gw0
+end
 
 function holstein_Gw_util(f::AbstractSpectrumFunction, ϵ::Real, order::Int, x; α::Real, ω::Real, ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8)
 	G0w(y) = toulouse_Gw(f, y, ϵ_d=ϵ_d, μ=μ, δ=δ)
