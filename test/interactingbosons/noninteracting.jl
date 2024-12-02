@@ -2,7 +2,7 @@ println("------------------------------------")
 println("|       noninteracting fermions    |")
 println("------------------------------------")
 
-spectrum_func() = DiracDelta(ω₀=1, α=0.5)
+spectrum_func() = DiracDelta(ω=1, α=0.5)
 
 
 @testset "Noninteracting fermions: imaginary time" begin

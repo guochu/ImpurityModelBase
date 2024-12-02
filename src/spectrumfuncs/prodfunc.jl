@@ -19,6 +19,6 @@ Base.:/(x::DeltaMultF, y::Function) = DeltaMultF(x.δ, ϵ->x.f(ϵ)/y(ϵ))
 
 
 function quadgkwrapper(m::DeltaMultF; kwargs...)
-	ω₀, α = m.δ.ω₀, m.δ.α
+	ω₀, α = m.δ.ω, m.δ.α
 	return ifelse(lowerbound(m) <= ω₀ <= upperbound(m), α * m.f(ω₀), 0.)
 end 
