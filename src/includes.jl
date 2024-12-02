@@ -14,6 +14,9 @@ include("toulouse/toulouse.jl")
 include("freeboson.jl")
 include("independentbosons/independentbosons.jl")
 
+# holstein model
+include("holstein/holstein.jl")
+
 
 # utilities for real spectrum functions
 include("utilities/utilities.jl")
