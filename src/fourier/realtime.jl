@@ -72,6 +72,21 @@ function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::
 	x = FourierTransform(gt, δt=stepsize, δ=δ)
 	return [x(w) for w in lb:dw:ub]
 end 
+function Gw_to_Gt(Gw::Vector{<:Number}, dw::Real; lb::Real, ub::Real, δt::Real=1.0e-4)
+	iseven(length(Gw)) && throw(ArgumentError("odd number of frequencies expected"))
+	n = div(length(Gw), 2)
+	ts = lb:δt:ub
+	Gt = similar(Gw)
+	for (i, tj) in enumerate(ts)
+		r = zero(eltype(Gw))
+		for nj in -n:n
+			wj = nj * dw
+			r += Gw[nj+n+1] * exp(-im*wj*tj)
+		end
+		Gt[i] = r * dw
+	end
+	return Gt
+end
 function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, δ::Real=1.0e-8, verbosity::Int=1)
 	if (verbosity > 0) && (abs(gt[end]) > 1.0e-6)
 		println("last element of input GF has abs value ", abs(gt[end]))
