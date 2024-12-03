@@ -72,21 +72,25 @@ function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::
 	x = FourierTransform(gt, δt=stepsize, δ=δ)
 	return [x(w) for w in lb:dw:ub]
 end 
-function Gw_to_Gt(Gw::Vector{<:Number}, dw::Real; lb::Real, ub::Real, δt::Real=1.0e-4)
+function Gw_to_Gt(Gw::Vector{<:Number}, dw::Real; lb::Real, ub::Real, δt::Real=1.0e-4, δ::Real=1.0e-8)
 	iseven(length(Gw)) && throw(ArgumentError("odd number of frequencies expected"))
 	n = div(length(Gw), 2)
 	ts = lb:δt:ub
-	Gt = similar(Gw)
+	Gt = zeros(eltype(Gw), length(ts))
 	for (i, tj) in enumerate(ts)
 		r = zero(eltype(Gw))
 		for nj in -n:n
 			wj = nj * dw
-			r += Gw[nj+n+1] * exp(-im*wj*tj)
+			if nj != 0
+				r += (Gw[nj+n+1] - 1.0/(wj+im*δ)) * exp(-im*wj*tj)
+			end
+			# r += (Gw[nj+n+1] - 1.0/(wj+im*δ)) * exp(-im*wj*tj)
 		end
-		Gt[i] = r * dw
+		Gt[i] = r * dw / (2*pi) - im
 	end
 	return Gt
 end
+
 function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, δ::Real=1.0e-8, verbosity::Int=1)
 	if (verbosity > 0) && (abs(gt[end]) > 1.0e-6)
 		println("last element of input GF has abs value ", abs(gt[end]))
