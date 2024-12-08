@@ -67,6 +67,7 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	end
 	return Aw
 end
+Δw_to_Jw(Δw::Vector{<:Number}; verbosity::Int=1) = Gw_to_Aw(Δω, verbosity=verbosity)
 
 function Gt_to_Gw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, δ::Real=1.0e-8)
 	x = FourierTransform(gt, δt=stepsize, δ=δ)

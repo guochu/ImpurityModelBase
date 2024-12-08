@@ -12,7 +12,7 @@ export BosonicBath, BosonicVacuum, bosonicbath, boseeinstein
 
 
 # Fourier transformations
-export Gt_to_Gw, Gw_to_Gt, Gt_to_Δw, Aw_to_Gτ, Gw_to_Aw, frequencies
+export Gt_to_Gw, Gw_to_Gt, Gt_to_Δw, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw, frequencies
 export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
 
 # analytical solutions 
@@ -24,7 +24,7 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
-export holstein_Gw, holstein_Σw
+export holstein_Gw, holstein_Σw, holstein_scaleless_parameters, holstein_bare_parameters
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
