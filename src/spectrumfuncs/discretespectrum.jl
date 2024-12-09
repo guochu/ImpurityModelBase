@@ -19,7 +19,7 @@ end
 DiscreteSpectrum(ws::Vector{<:Real}, fs::AbstractVector{T}) where {T<:Number} = DiscreteSpectrum{T}(ws, fs)
 
 function (x::DiscreteSpectrum)(ω::Real)
-	((ω < lowerbound(x)) || (ω > upperbound(x))) && return zero(eltype(x.fs))
+	((ω < lowerbound(x)) || (ω > upperbound(x))) && return 0.
 	(ω == x.ws[end]) && return x.fs[end]
 	i = 0
 	for pos in 1:(length(x.fs)-1)

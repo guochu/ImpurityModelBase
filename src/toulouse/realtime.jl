@@ -12,7 +12,7 @@ Retarded Green's function in the frequency axis
 """
 function toulouse_Gw(f::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8)
     g(ϵ) = ω+μ-ϵ+im*δ
-	return 1.0/(ω-ϵ_d-quadgkwrapper(f/g))
+	return 1.0/(ω+im*δ-ϵ_d-quadgkwrapper(f/g))
 end
 toulouse_Gw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Gw(bath.spectrum, ω; μ=bath.μ, kwargs...)
 
