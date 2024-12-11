@@ -55,7 +55,7 @@ function semicircular(t::Real)
 end
 semicircular(; t::Real=1) = semicircular(t)
 
-semicircular2(t=1) = SpectrumFunction(ϵ->(2/(pi*t^2)) * sqrt(t^2 - ϵ^2), lb=-t, ub=t)
+semicircular2(t) = SpectrumFunction(ϵ->(2/(pi*t^2)) * sqrt(t^2 - ϵ^2), lb=-t, ub=t)
 semicircular2(; t::Real=1) = semicircular2(t)
 
 """
