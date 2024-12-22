@@ -28,7 +28,7 @@ function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, Nτ::Int)
 	iseven(length(Giw)) || throw(ArgumentError("even number of frequencies expected"))
 	nmax = div(length(Giw), 2) - 1
 	δτ = β / Nτ
-	f(τ) = sum((Giw[i]-1/(im*(2n-1)*π/β)) * exp(-im*τ*(2n-1)*π/β) for (i, n) in enumerate(-nmax:nmax+1))
+	f(τ) = sum((Giw[i]-1/(im*ω)) * exp(-im*τ*ω) for (i, ω) in ifrequencies(β, nmax))
 	gτ = zeros(Float64, Nτ+1)
 	for i in 1:Nτ
 		tmp = f((i-1) * δτ)
@@ -42,7 +42,7 @@ end
 """
 	ifrequency(β, n)
 
-Return imaginary-time frequency (2n-1)π/β
+Return imaginary-frequency (2n-1)π/β
 """
 ifrequency(β::Real, n::Int) = (2*n-1)*π/β
 ifrequencies(β::Real, nmax::Int=1000) = [ifrequency(β, n) for n in -nmax:nmax+1]
@@ -53,7 +53,7 @@ function ifourier(gτ::Vector{<:Real}; β::Real, n::Int=1000)
 	Nτ = length(gτ)-1
 	δτ = β / Nτ
 	f(ω) = sum(gτ[k]*exp(im*(k-1)*δτ*ω) for k in 1:Nτ+1)*δτ
-	return [f((2*nj-1)*π/β) for nj in -n:n+1]
+	return [f(ω) for ω in ifrequencies(β, n)]
 end
 
 

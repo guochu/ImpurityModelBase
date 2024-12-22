@@ -14,7 +14,7 @@ function toulouse_Giw(f::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Rea
     1.0/(im*ω-ϵ_d-quadgkwrapper(f / g))
 end
 function toulouse_Giw(spectrum::AbstractSpectrumFunction; β::Real, ϵ_d::Real, μ::Real=0, n::Int=1000)
-    return [toulouse_Giw(spectrum, (2*nj-1)*π/β; ϵ_d=ϵ_d, μ=μ) for nj in ifrequencies(β, n)]
+    return [toulouse_Giw(spectrum, x; ϵ_d=ϵ_d, μ=μ) for x in ifrequencies(β, n)]
 end
 toulouse_Giw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Giw(bath.spectrum, ω; μ=bath.μ, kwargs...)
 
@@ -28,8 +28,7 @@ for each n, the imaginary frequency point is (2n-1)π/β
 """
 function toulouse_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, μ::Real=0., n::Int=1000)
     res = 0.0
-    for nj in ifrequencies(β, n)
-        ω = (2nj-1)*π/β
+    for ω in ifrequencies(β, n)
         res += (toulouse_Giw(spectrum, ω; ϵ_d=ϵ_d, μ=μ)-1/(im*ω))*exp(-im*τ*ω)
     end
     res = -(res/β-0.5)
@@ -69,7 +68,7 @@ function toulouse_Δiw(f::AbstractSpectrumFunction; β::Real, n::Int=1000)
         return quadgkwrapper(f / g)
     end 
 
-    return [ff((2*nj-1)*π/β) for nj in ifrequencies(β, n)]
+    return [ff(x) for x in ifrequencies(β, n)]
 end
 toulouse_Δiw(bath::AbstractFermionicBath; n::Int=1000) = toulouse_Δiw(bath.spectrum, β=bath.β, n=n)
 

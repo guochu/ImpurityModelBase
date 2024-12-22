@@ -13,7 +13,7 @@ export BosonicBath, BosonicVacuum, bosonicbath, boseeinstein
 
 # Fourier transformations
 export Gt_to_Gw, Gw_to_Gt, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw
-export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw
+export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
 
 # analytical solutions 
 export freefermion_greater, freefermion_lesser, freefermion_Gt, freefermion_Gτ, freefermion_occupation
