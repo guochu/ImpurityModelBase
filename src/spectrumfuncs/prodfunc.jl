@@ -2,6 +2,11 @@ Base.:*(x::AbstractBoundedFunction, y::Function) = bounded(ϵ->x(ϵ)*y(ϵ), lowe
 Base.:/(x::AbstractBoundedFunction, y::Function) = bounded(ϵ->x(ϵ)/y(ϵ), lowerbound(x), upperbound(x))
 
 
+"""
+	struct DeltaMultF{F<:Function}
+
+Delta function mult a spectrum function
+"""
 struct DeltaMultF{F<:Function} <: AbstractBoundedFunction
 	δ::DiracDelta
 	f::F

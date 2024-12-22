@@ -1,5 +1,4 @@
 include("quadgkwrapper.jl")
 include("specfuncwrapper.jl")
-include("discretespectrum.jl")
-include("diracdeltaspectrum.jl")
+include("predefinedspecfuncs/predefinedspecfuncs.jl")
 include("prodfunc.jl")

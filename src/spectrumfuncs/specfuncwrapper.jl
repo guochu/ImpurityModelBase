@@ -12,6 +12,13 @@ with a lowerbound and upperbound
 """
 quadgkwrapper(m::AbstractBoundedFunction; kwargs...) = _quadgk(m.f, lowerbound(m), upperbound(m); kwargs...)
 
+"""
+	spectrumshift(m::AbstractSpectrumFunction, μ::Real)
+
+Return a new spectrum by shift the x-axis by μ
+"""
+spectrumshift(m::AbstractSpectrumFunction, μ::Real) = error("spectrumshift not implemented for spectrum function type $(typeof(m))")
+
 Base.:(-)(x::AbstractBoundedFunction) = bounded(ϵ->-x.f(ϵ), lowerbound(x), upperbound(x))
 Base.adjoint(x::AbstractBoundedFunction) = bounded(ϵ->conj(x.f(ϵ)), lowerbound(x), upperbound(x))
 
@@ -52,11 +59,6 @@ end
 spectrum(f, lb::Real, ub::Real) = SpectrumFunction(f, lb=lb, ub=ub)
 spectrum(f; kwargs...) = SpectrumFunction(f; kwargs...)
 
-"""
-	spectrumshift(m::SpectrumFunction, μ::Real)
-
-Return a new spectrum by shift the x-axis by μ
-"""
 spectrumshift(m::SpectrumFunction, μ::Real) = spectrum(ϵ->m.f(ϵ+μ), lowerbound(m)-μ, upperbound(m)-μ)
 
 function check_spectrumfunction(f, lb, ub)
@@ -70,29 +72,4 @@ function check_spectrumfunction(f, lb, ub)
 	r = f(rand(lb:ub))
 	isa(r, Real) || throw(ArgumentError("the output of spectrum function should be real"))
 	(r >= 0) || throw(ArgumentError("the output of spectrum function should be positive"))
-end
-
-"""
-	semicircular(t::Real)
-
-Often used for fermionic bath spectrum density
-"""
-function semicircular(t::Real)
-	t = convert(Float64, t)
-	D = 2*t
-	return SpectrumFunction(ϵ -> sqrt(1-(ϵ/D)^2) * (D/π), lb = -D, ub = D)
-end
-semicircular(; t::Real=1) = semicircular(t)
-
-semicircular2(t) = SpectrumFunction(ϵ->(2/(pi*t^2)) * sqrt(t^2 - ϵ^2), lb=-t, ub=t)
-semicircular2(; t::Real=1) = semicircular2(t)
-
-"""
-	Leggett(; α::Real, d::Real, ωc::Real)
-
-J(ω) = (α/(2ωc))(ωᵈ/ωcᵈ)e^(-ω/ωc)	
-"""
-function Leggett(; α::Real=1, d::Real=1, ωc::Real=1)
-	d = convert(Float64, d)
-	return SpectrumFunction(ϵ -> (α/2)*(ϵ^d/ωc^(d-1))*exp(-ϵ/ωc), lb = 0, ub = 100*ωc)
 end

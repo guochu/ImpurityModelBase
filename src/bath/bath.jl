@@ -30,3 +30,10 @@ function Base.getproperty(m::Vacuum, s::Symbol)
 		return getfield(m, s)
 	end
 end
+
+function safe_mult(β::Real, ϵ::Real)
+	if (β == Inf) && (ϵ == 0)
+		return zero(ϵ)
+	end
+	return β * ϵ
+end

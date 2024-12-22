@@ -1,7 +1,7 @@
 """
 	struct DiracDelta
 
-Dirac delta function
+Dirac delta spectrum function with a lower and upper bound
 """
 struct DiracDelta <: AbstractSpectrumFunction
 	ω::Float64
@@ -16,5 +16,4 @@ end
 (x::DiracDelta)(ϵ::Real) = error("can not call to a delta function")
 
 quadgkwrapper(f::DiracDelta) = ifelse(lowerbound(f) <= f.ω <= upperbound(f), f.α, 0.)
-
 spectrumshift(m::DiracDelta, μ::Real) = DiracDelta(ω=m.ω+μ, α=m.α, lb=lowerbound(m)-μ, ub=upperbound(m)-μ)

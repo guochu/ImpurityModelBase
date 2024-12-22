@@ -1,21 +1,18 @@
-using QuadGK
+using QuadGK, Interpolations
 
+# spectrum functions
 include("spectrumfuncs/spectrumfuncs.jl")
+
+# baths
 include("bath/bath.jl")
 
 
 # fourier transformations
-include("fourier/fourier.jl")
+include("fouriertransforms/fouriertransforms.jl")
 
-# collections of some analytical solutions
-include("freefermion.jl")
-include("toulouse/toulouse.jl")
 
-include("freeboson.jl")
-include("independentbosons/independentbosons.jl")
-
-# holstein model
-include("holstein/holstein.jl")
+# some analytical solutions
+include("analyticsolutions/analyticsolutions.jl")
 
 
 # utilities for real spectrum functions
