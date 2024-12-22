@@ -14,8 +14,10 @@ struct DiscreteSpectrum{T<:Number, I} <: AbstractBoundedFunction
 	interp::I
 end
 
-function DiscreteSpectrum(ws::Vector{<:Real}, fs::AbstractVector{<:Number})
+function DiscreteSpectrum(ws::Vector{<:Real}, fs::AbstractVector{T}) where {T<:Number}
 	all(fs .>= 0) || throw(ArgumentError("spectrum values should be positive"))
+	ws = convert(Vector{Float64}, ws)
+	fs = convert(Vector{T}, fs)
 	interp = linear_interpolation(ws, fs)
 	return DiscreteSpectrum(ws, fs, interp)
 end 

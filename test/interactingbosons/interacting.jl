@@ -10,7 +10,7 @@ println("------------------------------------")
 	β = N * δτ
 	for U in (0, 1)
 		for ϵ_d in (-0.5, 0., 0.7)
-			g1 = independentbosons_Gτ(spectrum_func(), β=β, ϵ_d=-ϵ_d, N=N, U=U, bands=2)
+			g1 = independentbosons_Gτ(spectrum_func(), β=β, ϵ_d=-ϵ_d, Nτ=N, U=U, bands=2)
 			H, a, adag = interacting_operators(U, ϵ_d, ω₀=1, α=0.5, d=100)
 			g2 = gf_imag(H, a, adag, β, N)
 			@test norm(g1 - g2) / norm(g1) < tol

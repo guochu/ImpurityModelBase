@@ -1,8 +1,13 @@
 
 """
-    independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β, ϵ_d, n₀, U, Δ)
+    independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β, ϵ_d, U, bands, Δ)
 
-Matsubara Green's function in the imaginary-time axis
+Matsubara Green's function in the imaginary-time axis for the independent bosons model
+
+ϵ_d is the on-site energy of the localized electron
+U is the interaction strength of the localized electron
+bands is the total number of bands, which can be 1 (noninteracting) 
+or 2 (interacting)
 """
 function independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, U::Real=0, bands::Int=1, Δ::Real=_compute_Δ(spectrum))
     (bands in (1, 2)) || throw(ArgumentError("bands must be 1 or 2"))
@@ -15,11 +20,11 @@ function independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β:
         return fermion_Gτ(τ, β=β, μ=μ′, U=U′)*_exponent_f(spectrum, τ, β)
     end
 end
-function independentbosons_Gτ(spectrum::AbstractSpectrumFunction; β::Real, N::Int, ϵ_d::Real, U::Real=0, bands::Int=1)
+function independentbosons_Gτ(spectrum::AbstractSpectrumFunction; β::Real, Nτ::Int, ϵ_d::Real, U::Real=0, bands::Int=1)
     Δ = _compute_Δ(spectrum)
-    δτ = β / N
-    gτ = zeros(Float64, N+1)
-    for i in 1:N
+    δτ = β / Nτ
+    gτ = zeros(Float64, Nτ+1)
+    for i in 1:Nτ
         τ = (i-1) * δτ
         tmp = independentbosons_Gτ(spectrum, τ, β=β, ϵ_d=ϵ_d, U=U, Δ=Δ, bands=bands)
         (abs(imag(tmp)) < 1.0e-8) || error("imaginary part of Gτ is too large")

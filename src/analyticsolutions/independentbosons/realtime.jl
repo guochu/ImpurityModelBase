@@ -1,7 +1,7 @@
 """
-    free_holstein_greater(spectrum::AbstractSpectrumFunction, t::Real; ϵ_d::Real, n₀, Δ)
+    independentbosons_greater(spectrum::AbstractSpectrumFunction, t; β, ϵ_d, U, bands, Δ)
 
-Retarded Green's function in the real time axis
+Greater Green's function in the real time axis for the independent bosons model
 """
 function independentbosons_greater(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0, 
                                     bands::Int=1, Δ::Real=_compute_Δ(spectrum))
@@ -15,7 +15,11 @@ function independentbosons_greater(spectrum::AbstractSpectrumFunction, t::Real; 
     return r
 end
 
+"""
+    independentbosons_lesser(spectrum::AbstractSpectrumFunction, t; β, ϵ_d, U, bands, Δ)
 
+Lesser Green's function in the real time axis for the independent bosons model
+"""
 function independentbosons_lesser(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0,
                                     bands::Int=1, Δ::Real=_compute_Δ(spectrum))
     μ, U = _normalized_paras(-ϵ_d, U, Δ, bands)

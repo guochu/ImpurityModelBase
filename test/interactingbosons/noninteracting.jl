@@ -11,7 +11,7 @@ spectrum_func() = DiracDelta(ω=1, α=0.5)
 	N = 10
 	β = N * δτ
 	for ϵ_d in (-0.5, 0., 0.7)
-		g1 = independentbosons_Gτ(spectrum_func(), β=β, ϵ_d=-ϵ_d, N=N)
+		g1 = independentbosons_Gτ(spectrum_func(), β=β, ϵ_d=-ϵ_d, Nτ=N)
 		H, a, adag = noninteracting_operators(ϵ_d, ω₀=1, α=0.5, d=100)
 		g2 = gf_imag(H, a, adag, β, N)
 		@test norm(g1 - g2) / norm(g1) < tol
