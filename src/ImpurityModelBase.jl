@@ -24,12 +24,13 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
-export holstein_scaleless_parameters, holstein_bare_parameters
-export holstein_G0w_to_Gw, holstein_G0w_to_Σw, holstein_Gw, holstein_Σw
+export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
+export holstein_G0w_to_Gw, holstein_G0w_to_Σw, holstein_Gw, holstein_Σw, bethe_holstein_dmft_iteration
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
-export bethe_Gw_to_Δw, bethe_Giw_to_Δiw
+# bethe lattice
+# export bethe_Gw_to_Δw, bethe_Giw_to_Δiw
 
 using QuadGK, Interpolations
 
