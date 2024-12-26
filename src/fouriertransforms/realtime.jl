@@ -146,28 +146,12 @@ end
 
 
 function _inverse_fourier(gw::Vector{<:Number}, t::Real; wmin::Real, δw::Real, δ::Real)
-	ws = [wmin + (i-1)*δw for i in 1:length(gw)]
-	interp = linear_interpolation(ws, gw)
-	# f(ω) = interp(ω) - 1.0/(ω+im*δ)
-	A = quadgkwrapper(bounded(ω->(interp(ω) - 1.0/(ω+im*δ)) * exp(-im*ω*t), ws[1], ws[end]))
-	return A/(2π)-im
-
-	# r = zero(eltype(gw))
-	# for i in 1:length(gw)-1
-	# 	wj = wmin + δw*(i-1)
-	# 	if wj != 0
-	# 		r += (gw[i] - 1.0/(wj+im*δ)) * exp(-im*wj*t) 
-	# 	end
-	# end
-	# return (r*δw) / (2π) - im
+	r = zero(eltype(gw))
+	for i in 1:length(gw)-1
+		wj = wmin + δw*(i-1)
+		# r += (gw[i] - 1.0/(wj+im*δ)) * exp(-im*wj*t) 
+		# r += (gw[i] - 0.5/(wj+im) - 0.5/(wj-im)) * exp(-im*wj*t) 
+		r += (gw[i] - 1.0/(wj+im)) * exp(-im*wj*t) 
+	end
+	return (r*δw) / (2π) - im*exp(-t)
 end
-
-# function _inverse_fourier(gw::Vector{<:Number}, t::Real; wmin::Real, δw::Real, δ::Real)
-# 	r = zero(eltype(gw))
-# 	for i in 1:length(gw)-1
-# 		wj = wmin + δw*(i-1)
-# 		# r += (gw[i] - 1.0/(wj+im*δ)) * exp(-im*wj*t) 
-# 		r += (gw[i] - 1.0/(wj+im) - 1.0/(wj-im)) * exp(-im*wj*t) 
-# 	end
-# 	return (r*δw) / (2π) - im
-# end
