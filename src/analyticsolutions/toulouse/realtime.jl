@@ -41,8 +41,7 @@ The hybridization function in the real-frequency axis for the Toulouse model
 
 f is the bath spectrum density
 """
-function toulouse_Δw(spectrum::AbstractSpectrumFunction, ω::Real; δ::Real=1.0e-8)
-    f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
+function toulouse_Δw(f::AbstractSpectrumFunction, ω::Real; δ::Real=1.0e-8)
     g(ϵ) = ω - ϵ + im*δ
     return quadgkwrapper(f / g)
 end
