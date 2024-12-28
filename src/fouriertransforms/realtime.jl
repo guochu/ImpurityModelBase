@@ -120,7 +120,7 @@ stepsize of A(ω)
 β is the inverse temperature, Nτ is the number of discrete points 
 on the imaginary-time axis
 """
-function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, wmin::Real, δw::Real=1.0e-4, Nτ::Int)
+function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, Nτ::Int, wmin::Real, δw::Real=1.0e-4)
 	# check the summation of Aw
 	nrm = sum(Aw) * δw
 	if abs(nrm-1) > 1.0e-2
