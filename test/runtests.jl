@@ -13,6 +13,8 @@ include("ed.jl")
 ### auxiliary
 include("auxiliary.jl")
 
+include("fourier.jl")
+
 include("freefermions.jl")
 
 

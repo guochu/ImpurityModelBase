@@ -28,7 +28,7 @@ function Giw_to_Gτ(Giw::AbstractVector{<:Number}; β::Real, Nτ::Int)
 	iseven(length(Giw)) || throw(ArgumentError("even number of frequencies expected"))
 	nmax = div(length(Giw), 2) - 1
 	δτ = β / Nτ
-	f(τ) = sum((Giw[i]-1/(im*ω)) * exp(-im*τ*ω) for (i, ω) in ifrequencies(β, nmax))
+	f(τ) = sum((Giw[i]-1/(im*ω)) * exp(-im*τ*ω) for (i, ω) in enumerate(ifrequencies(β, nmax)))
 	gτ = zeros(Float64, Nτ+1)
 	for i in 1:Nτ
 		tmp = f((i-1) * δτ)
