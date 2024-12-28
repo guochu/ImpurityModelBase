@@ -56,6 +56,12 @@
 # 	return [x(w) for w in ws]
 # end 
 
+"""
+	Gw_to_Aw(Gw::Vector{<:Number}; verbosity)
+
+Obtaining spectrum density A(ω) from frequency-domain Green's function G(ω),
+using the relation A(ω) = -imag(G(ω)) / π
+"""
 function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	Aw = zeros(real(eltype(Gw)), length(Gw))
 	for i in 1:length(Gw)
@@ -67,47 +73,53 @@ function Gw_to_Aw(Gw::Vector{<:Number}; verbosity::Int=1)
 	end
 	return Aw
 end
+
+"""
+	Δw_to_Jw(Δw::Vector{<:Number}; verbosity)
+
+Obtaining the bath spectrum density J(ω) from the frequency-domain hybridization function Δ(ω),
+using the relation J(ω) = -imag(Δ(ω)) / π (the relation is the same as Gw_to_Aw)
+"""
 Δw_to_Jw(Δw::Vector{<:Number}; verbosity::Int=1) = Gw_to_Aw(Δω, verbosity=verbosity)
 
-Gt_to_Gw(gt::Vector{<:Number}, ws::Vector{<:Real}; δt::Real, δ::Real=1.0e-8) = [_fourier(gt, w, δt=δt, δ=δ) for w in ws]
-Gw_to_Gt(gw::Vector{<:Number}, ts::Vector{<:Real}; wmin::Real, δw::Real=1.0e-6, δ::Real=1.0e-8) = [_inverse_fourier(gw, t, wmin=wmin, δw=δw, δ=δ) for t in ts]
+"""
+	Gt_to_Gw(gt::Vector{<:Number}, ws; δt, δ::Real=1.0e-8)
 
-# function Gw_to_Gt(Gw::Vector{<:Number}, dw::Real; lb::Real, ub::Real, δt::Real=1.0e-4, δ::Real=1.0e-8)
-# 	iseven(length(Gw)) && throw(ArgumentError("odd number of frequencies expected"))
-# 	n = div(length(Gw), 2)
-# 	ts = lb:δt:ub
-# 	Gt = zeros(eltype(Gw), length(ts))
-# 	for (i, tj) in enumerate(ts)
-# 		r = zero(eltype(Gw))
-# 		for nj in -n:n
-# 			wj = nj * dw
-# 			if nj != 0
-# 				r += (Gw[nj+n+1] - 1.0/(wj+im*δ)) * exp(-im*wj*tj)
-# 			end
-# 			# r += (Gw[nj+n+1] - 1.0/(wj+im*δ)) * exp(-im*wj*tj)
-# 		end
-# 		Gt[i] = r * dw / (2*pi) - im
-# 	end
-# 	return Gt
-# end
+Convert the real-time Green's function G(t) to the real-frequency Green's function G(ω)
+using Fourier transformation
 
-# function Gt_to_Aw(gt::Vector{<:Number}, stepsize::Real; lb::Real, ub::Real, dw::Real=1.0e-4, normalize::Bool=true, δ::Real=1.0e-8, verbosity::Int=1)
-# 	if (verbosity > 0) && (abs(gt[end]) > 1.0e-6)
-# 		println("last element of input GF has abs value ", abs(gt[end]))
-# 	end
-# 	Gw = Gt_to_Gw(gt, stepsize, lb=lb, ub=ub, dw=dw, δ=δ)
-# 	Aw = Gw_to_Aw(Gw, verbosity=verbosity)
-# 	nrm = sum(Aw) * dw
-# 	if (verbosity > 0) && (abs(nrm-1) > 1.0e-2)
-# 		println("sum(A(ω)) = ", nrm)
-# 	end	
-# 	if normalize
-# 		Aw ./= nrm
-# 	end
-# 	return Aw
-# end
+G(t) is assumed to be equally spaced with stepsize δt, and should have converged to 0
+"""
+Gt_to_Gw(gt::Vector{<:Number}, ws::Union{Vector{<:Real}, AbstractRange}; δt::Real, δ::Real=1.0e-8) = [_fourier(gt, w, δt=δt, δ=δ) for w in ws]
+
+"""
+	Gw_to_Gt(gw::Vector{<:Number}, ts; wmin, δw, δ::Real=1.0e-8)
+
+Convert the real-frequency Green's function G(ω) tp the real-time Green's function G(t)
+using inverse Fourier frequency
+
+G(ω) is assumed to be equally spaced with stepsize δw,
+wmin is the smallest frequency
+
+In the implemented the assympototic behavior 1/ω is used for G(ω) with ω < wmin
+or w > wmax (wmax is calculated based on the size of G(ω), wmin and δw)
+"""
+Gw_to_Gt(gw::Vector{<:Number}, ts::Union{Vector{<:Real}, AbstractRange}; wmin::Real, δw::Real=1.0e-6, δ::Real=1.0e-8) = [_inverse_fourier(gw, t, wmin=wmin, δw=δw, δ=δ) for t in ts]
 
 
+
+"""
+	Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, wmin::Real, δw::Real=1.0e-4, Nτ::Int)
+
+Convert spectrum density A(ω) to imaginary-time Green's function G(τ), using 
+inverse analytical continuation
+
+wmin is the smallest real frequency for A(ω), δw is the real-frequency 
+stepsize of A(ω)
+
+β is the inverse temperature, Nτ is the number of discrete points 
+on the imaginary-time axis
+"""
 function Aw_to_Gτ(Aw::Vector{<:Real}; β::Real, wmin::Real, δw::Real=1.0e-4, Nτ::Int)
 	# check the summation of Aw
 	nrm = sum(Aw) * δw
@@ -135,7 +147,7 @@ function _fourier(gt::Vector{<:Number}, ω::Real; δt::Real, δ::Real)
 	r = zero(ComplexF64)
 	ω′ = im * ω - δ 
 
-	for i in 1:length(ts)-1
+	for i in 1:length(gt)-1
 		tj = (i-1) * δt
 		r += gt[i] * exp(ω′ * tj)
 	end
