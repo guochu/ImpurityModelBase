@@ -25,7 +25,8 @@ export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freebos
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
 export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
-export holstein_G0w_to_Gw, holstein_G0w_to_Σw, holstein_Gw, holstein_Σw, bethe_holstein_dmft_iteration
+export holstein_G0w_to_Gw, holstein_G0w_to_Σw, bethe_holstein_dmft_iteration
+export holstein_Gt, holstein_Gw, holstein_Σw
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict
