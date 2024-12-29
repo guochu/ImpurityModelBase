@@ -70,7 +70,7 @@ end
 
 function holstein_Gt(f::AbstractSpectrumFunction, t::Real; g::Real, ω::Real, ϵ_d::Real, μ::Real=0, wmax::Real=20., wmin::Real=-wmax, δ::Real=1.0e-8, order::Int=10)
     A = quadgkwrapper(bounded(ϵ -> (holstein_Gw(f, ϵ; ϵ_d=ϵ_d, g=g, ω=ω, μ=μ, δ=δ, order=order)-1.0/(ϵ+im*δ))*exp(-im*ϵ*t), wmin, wmax))
-    return im*(A/(2π)-im)
+    return A/(2π)-im
 end
 
 function holstein_Gw(f::AbstractSpectrumFunction, ϵ::Real; g::Real, ω::Real, ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8, order::Int=10)

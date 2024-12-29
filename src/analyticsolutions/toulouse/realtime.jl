@@ -29,7 +29,7 @@ f is the bath spectrum density
 """
 function toulouse_Gt(spectrum::AbstractSpectrumFunction, t::Real; ϵ_d::Real, μ::Real=0, wmax::Real=20., wmin::Real=-wmax, δ::Real=1.0e-8)
     A = quadgkwrapper(bounded(ω -> (toulouse_Gw(spectrum, ω; ϵ_d=ϵ_d, μ=μ, δ=δ)-1.0/(ω+im*δ))*exp(-im*ω*t), wmin, wmax))
-    return im*(A/(2π)-im)
+    return A/(2π)-im
 end
 toulouse_Gt(bath::AbstractFermionicBath, t::Real; kwargs...) = toulouse_Gt(bath.spectrum, t; μ=bath.μ, kwargs...)
 
