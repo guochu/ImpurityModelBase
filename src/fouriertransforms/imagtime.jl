@@ -46,7 +46,8 @@ Return imaginary-frequency (2n-1)π/β
 """
 ifrequency(β::Real, n::Int) = (2*n-1)*π/β
 ifrequencies(β::Real, nmax::Int=1000) = [ifrequency(β, n) for n in -nmax:nmax+1]
-ifrequencies(Giw::AbstractVector; β::Real) = ifrequencies(β, div(length(Giw), 2)-1)
+ifrequencies(; β::Real, n::Int=1000) = ifrequencies(β, n)
+# ifrequencies(Giw::AbstractVector; β::Real) = ifrequencies(β, div(length(Giw), 2)-1)
 
 function ifourier(gτ::Vector{<:Real}; β::Real, n::Int=1000)
 	# (gτ[1] + gτ[end] ≈ 1) || throw(ArgumentError("sum of the first and last elementes should be 1"))
