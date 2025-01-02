@@ -1,6 +1,6 @@
 abstract type AbstractTunnelingTerm{P<:AbstractParticle} end
 
-particletype(::Type{<:AbstractTunnelingTerm{P}}) where {P} = P
+particletype(::Type{<:AbstractTunnelingTerm{P}}) where {P<:AbstractParticle} = P
 particletype(x::AbstractTunnelingTerm) = particletype(typeof(x))
 
 positions(x::AbstractTunnelingTerm) = x.positions
@@ -15,7 +15,7 @@ Base.:-(s::AbstractTunnelingTerm) = (-1) * s
 """
 	struct Tunneling{P, T<Number}
 """
-struct Tunneling{P, T<Number} <: AbstractTunnelingTerm{P}
+struct Tunneling{P, T} <: AbstractTunnelingTerm{P} 
 	positions::Tuple{Int, Int}
 	coeff::T
 end

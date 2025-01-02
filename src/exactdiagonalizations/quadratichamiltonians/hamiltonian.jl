@@ -29,7 +29,7 @@ changepositions(x::QuadraticHamiltonian, m::AbstractDict{Int, Int}) = QuadraticH
 
 Return the coefficient matrix for free fermion model
 """
-function cmatrix(x::QuadraticHamiltonian{P, T}, L::Int) where {T<:Number}
+function cmatrix(x::QuadraticHamiltonian{P, T}, L::Int) where {P, T<:Number}
 	@assert length(x) <= L
 	m = zeros(T, L, L)
 	for item in x.data

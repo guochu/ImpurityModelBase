@@ -1,2 +1,2 @@
-include("discretebaths.jl")
 include("quadratichamiltonians/quadratichamiltonians.jl")
+include("freeimpuritymodels/freeimpuritymodels.jl")

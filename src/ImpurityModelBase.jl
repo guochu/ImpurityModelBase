@@ -3,8 +3,7 @@ module ImpurityModelBase
 # spectrum density wrapper and some predefined spectrum functions
 export AbstractBoundedFunction, AbstractSpectrumFunction
 export BoundedFunction, SpectrumFunction, bounded, spectrum
-export lowerbound, upperbound, semicircular, Leggett
-export DiscreteSpectrum, frequencies, spectrumvalues
+export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
 export DiracDelta, quadgkwrapper, spectrumshift
 
 # definition of bosonic and fermionic bath, thermal distributions
@@ -12,6 +11,16 @@ export AbstractParticle, Boson, Fermion, particletype
 export AbstractBath, AbstractBosonicBath, AbstractFermionicBath, Bath, Vacuum
 export FermionicBath, FermionicVacuum, fermionicbath, thermaloccupation, fermidirac
 export BosonicBath, BosonicVacuum, bosonicbath, boseeinstein, bath, vacuum
+
+# discrete bath
+export DiscreteBath, DiscreteVacuum, AbstractDiscreteBosonicBath, AbstractDiscreteFermionicBath
+export discretebosonicbath, discretefermionicbath, discretebath, discretevacuum
+export frequencies, spectrumvalues, num_sites
+
+
+# exact diagonalizations
+export num_bands, OneBandOneBath, BoundaryDriving
+export separablestate, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 
 # Fourier transformations
 export Gt_to_Gw, Gw_to_Gt, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw
@@ -42,7 +51,10 @@ include("spectrumfuncs/spectrumfuncs.jl")
 
 # baths
 include("bath.jl")
+include("discretebath.jl")
 
+# exact diagonalizations
+include("exactdiagonalizations/exactdiagonalizations.jl")
 
 # fourier transformations
 include("fouriertransforms/fouriertransforms.jl")

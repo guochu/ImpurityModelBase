@@ -8,7 +8,7 @@ particletype(::Type{<:AbstractBath{P}}) where {P<:AbstractParticle} = P
 particletype(x::AbstractBath) = particletype(typeof(x))
 
 """
-	struct FermionicBath{F <: AbstractSpectrumFunction}
+	struct Bath{F <: AbstractSpectrumFunction}
 
 Fermionic bath container, includes a bath spectrum density,
 the inverse temperature β and the chemical potential μ

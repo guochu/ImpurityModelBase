@@ -5,7 +5,10 @@ include("spectrumfuncs/spectrumfuncs.jl")
 
 # baths
 include("bath.jl")
+include("discretebath.jl")
 
+# exact diagonalizations
+include("exactdiagonalizations/exactdiagonalizations.jl")
 
 # fourier transformations
 include("fouriertransforms/fouriertransforms.jl")
