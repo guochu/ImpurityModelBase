@@ -19,7 +19,10 @@ export frequencies, spectrumvalues, num_sites
 
 
 # exact diagonalizations
-export num_bands, OneBandOneBath, BoundaryDriving
+export Tunneling, tunneling, fermionictunneling, bosonictunneling, QuadraticHamiltonian
+export freefermions_cache, freefermions_timeevo
+export Gτ, freefermions_Gτ, greater_lesser, freefermions_greater_lesser
+export num_bands, OneBandOneBath, BoundaryDriving, cmatrix
 export separablestate, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 
 # Fourier transformations
