@@ -15,7 +15,7 @@ function toulouse_Gw(f::AbstractSpectrumFunction, ω::Real; ϵ_d::Real, μ::Real
     g(ϵ) = ω+μ-ϵ+im*δ
 	return 1.0/(ω+im*δ-ϵ_d-quadgkwrapper(f/g))
 end
-toulouse_Gw(bath::FermionicBath, ω::Real; kwargs...) = toulouse_Gw(bath.spectrum, ω; μ=bath.μ, kwargs...)
+toulouse_Gw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Gw(bath.spectrum, ω; μ=bath.μ, kwargs...)
 
 """
     toulouse_Gt(spectrum::AbstractSpectrumFunction, t::Real; ϵ_d, μ, wmax, wmin, δ)
@@ -31,7 +31,7 @@ function toulouse_Gt(spectrum::AbstractSpectrumFunction, t::Real; ϵ_d::Real, μ
     A = quadgkwrapper(bounded(ω -> (toulouse_Gw(spectrum, ω; ϵ_d=ϵ_d, μ=μ, δ=δ)-1.0/(ω+im*δ))*exp(-im*ω*t), wmin, wmax))
     return A/(2π)-im
 end
-toulouse_Gt(bath::FermionicBath, t::Real; kwargs...) = toulouse_Gt(bath.spectrum, t; μ=bath.μ, kwargs...)
+toulouse_Gt(bath::AbstractFermionicBath, t::Real; kwargs...) = toulouse_Gt(bath.spectrum, t; μ=bath.μ, kwargs...)
 
 
 """

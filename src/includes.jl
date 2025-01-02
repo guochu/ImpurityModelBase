@@ -4,7 +4,7 @@ using QuadGK, Interpolations, LinearAlgebra
 include("spectrumfuncs/spectrumfuncs.jl")
 
 # baths
-include("bath/bath.jl")
+include("bath.jl")
 
 
 # fourier transformations

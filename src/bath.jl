@@ -91,7 +91,8 @@ end
 thermaloccupation(::Type{Fermion}, β::Real, μ::Real, ϵ::Real) = fermidirac(β, μ, ϵ)
 
 """
-	thermaloccupation(bath::BosonicBath, energy::Real)
+	thermaloccupation(bath::AbstractBosonicBath, energy::Real)
+	thermaloccupation(bath::AbstractFermionicBath, energy::Real)
 
 return n(ϵ)
 """
