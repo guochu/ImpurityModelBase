@@ -3,13 +3,15 @@ module ImpurityModelBase
 # spectrum density wrapper and some predefined spectrum functions
 export AbstractBoundedFunction, AbstractSpectrumFunction
 export BoundedFunction, SpectrumFunction, bounded, spectrum
-export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
+export lowerbound, upperbound, semicircular, Leggett
+export DiscreteSpectrum, frequencies, spectrumvalues
 export DiracDelta, quadgkwrapper, spectrumshift
 
 # definition of bosonic and fermionic bath, thermal distributions
-export AbstractBath, AbstractFermionicBath, AbstractBosonicBath
+export AbstractParticle, Boson, Fermion, particletype
+export AbstractBath, AbstractBosonicBath, AbstractFermionicBath, Bath, Vacuum
 export FermionicBath, FermionicVacuum, fermionicbath, thermaloccupation, fermidirac
-export BosonicBath, BosonicVacuum, bosonicbath, boseeinstein
+export BosonicBath, BosonicVacuum, bosonicbath, boseeinstein, bath, vacuum
 
 # Fourier transformations
 export Gt_to_Gw, Gw_to_Gt, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw
@@ -33,7 +35,7 @@ export AbstractPredictionScheme, LinearPrediction, linear_predict
 # bethe lattice
 # export bethe_Gw_to_Δw, bethe_Giw_to_Δiw
 
-using QuadGK, Interpolations
+using QuadGK, Interpolations, LinearAlgebra
 
 # spectrum functions
 include("spectrumfuncs/spectrumfuncs.jl")

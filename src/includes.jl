@@ -1,4 +1,4 @@
-using QuadGK, Interpolations
+using QuadGK, Interpolations, LinearAlgebra
 
 # spectrum functions
 include("spectrumfuncs/spectrumfuncs.jl")

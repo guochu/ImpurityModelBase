@@ -24,13 +24,15 @@ end
 
 lowerbound(x::DiscreteSpectrum) = x.ws[1]
 upperbound(x::DiscreteSpectrum) = x.ws[end]
+frequencies(x::DiscreteSpectrum) = x.ws
+spectrumvalues(x::DiscreteSpectrum) = x.fs
 
 (x::DiscreteSpectrum)(ω::Real) = x.interp(ω)
 (x::DiscreteSpectrum)(ω::Union{Vector, AbstractRange}) = x.interp.(ω)
 
 # quadgkwrapper(m::DiscreteSpectrum; kwargs...) = _quadgk(m, lowerbound(m), upperbound(m); kwargs...)
 function quadgkwrapper(m::DiscreteSpectrum)
-	ws, fs = xvalues(m.data), fvalues(m.data)
+	ws, fs = frequencies(m.data), spectrumvalues(m.data)
 	r = zero(eltype(fs))
 	for i in 1:length(ws)-1
 		dw = ws[i+1] - ws[i]
@@ -39,4 +41,4 @@ function quadgkwrapper(m::DiscreteSpectrum)
 	end
 	return r
 end
-spectrumshift(m::DiscreteSpectrum, μ::Real) = DiscreteSpectrum(xvalues(m.data) .+ μ, fvalues(m.data))
+spectrumshift(m::DiscreteSpectrum, μ::Real) = DiscreteSpectrum(frequencies(m) .+ μ, spectrumvalues(m))

@@ -16,7 +16,7 @@ end
 function toulouse_Giw(spectrum::AbstractSpectrumFunction; β::Real, ϵ_d::Real, μ::Real=0, n::Int=1000)
     return [toulouse_Giw(spectrum, x; ϵ_d=ϵ_d, μ=μ) for x in ifrequencies(β, n)]
 end
-toulouse_Giw(bath::AbstractFermionicBath, ω::Real; kwargs...) = toulouse_Giw(bath.spectrum, ω; μ=bath.μ, kwargs...)
+toulouse_Giw(bath::FermionicBath, ω::Real; kwargs...) = toulouse_Giw(bath.spectrum, ω; μ=bath.μ, kwargs...)
 
 
 """
@@ -33,7 +33,7 @@ function toulouse_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ
     end
     res = -(res/β-0.5)
 end
-toulouse_Gτ(bath::AbstractFermionicBath, τ::Real; kwargs...) = toulouse_Gτ(bath.spectrum, τ; β=bath.β, μ=bath.μ, kwargs...)
+toulouse_Gτ(bath::FermionicBath, τ::Real; kwargs...) = toulouse_Gτ(bath.spectrum, τ; β=bath.β, μ=bath.μ, kwargs...)
 function toulouse_Gτ(spectrum::AbstractSpectrumFunction; β::Real, Nτ::Int, ϵ_d::Real, μ::Real=0., n::Int=1000)
     δτ = β / Nτ
     gτ = zeros(Float64, Nτ+1)
@@ -46,7 +46,7 @@ function toulouse_Gτ(spectrum::AbstractSpectrumFunction; β::Real, Nτ::Int, ϵ
     gτ[end] = 1 - gτ[1]
     return gτ
 end
-toulouse_Gτ(bath::AbstractFermionicBath; Nτ::Int, kwargs...) = toulouse_Gτ(bath.spectrum; β=bath.β, μ=bath.μ, Nτ=Nτ, kwargs...)
+toulouse_Gτ(bath::FermionicBath; Nτ::Int, kwargs...) = toulouse_Gτ(bath.spectrum; β=bath.β, μ=bath.μ, Nτ=Nτ, kwargs...)
 
 # function toulouse_Δiw(spectrum::AbstractSpectrumFunction; β::Real, n::Int=1000)
 #     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
@@ -70,7 +70,7 @@ function toulouse_Δiw(f::AbstractSpectrumFunction; β::Real, n::Int=1000)
 
     return [ff(x) for x in ifrequencies(β, n)]
 end
-toulouse_Δiw(bath::AbstractFermionicBath; n::Int=1000) = toulouse_Δiw(bath.spectrum, β=bath.β, n=n)
+toulouse_Δiw(bath::FermionicBath; n::Int=1000) = toulouse_Δiw(bath.spectrum, β=bath.β, n=n)
 
 # function toulouse_Δτ(spectrum::AbstractSpectrumFunction; β::Real, N::Int)
 #     f, lb, ub = spectrum.f, lowerbound(spectrum), upperbound(spectrum)
@@ -94,6 +94,6 @@ function toulouse_Δτ(f::AbstractSpectrumFunction; β::Real, Nτ::Int)
     end 
     return [ff(i*δτ) for i in 0:Nτ]
 end
-toulouse_Δτ(bath::AbstractFermionicBath; Nτ::Int) = toulouse_Δτ(bath.spectrum, β=bath.β, Nτ=Nτ)
+toulouse_Δτ(bath::FermionicBath; Nτ::Int) = toulouse_Δτ(bath.spectrum, β=bath.β, Nτ=Nτ)
 
 
