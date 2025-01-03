@@ -1,3 +1,9 @@
+struct Toulouse{B<:AbstractDiscreteBath}
+	bath::B
+	ϵ_d::Float64
+end
+Toulouse(b::AbstractDiscreteBath; ϵ_d::Real) = Toulouse(b, convert(Float64, ϵ_d))
+
 """
 	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 
@@ -17,6 +23,8 @@ function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	ns = [fermidirac(β, 0, λs[k]) for k in 1:length(λs)]
 	return τ -> _fermionic_Gτ_util(U, λs, ns, 1, 1, τ)
 end
+toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
+toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
 function toulouse_Gτ(h::AbstractDiscreteFermionicBath, τs::AbstractVector{<:Real}; kwargs...)
 	f = toulouse_Gτ(h; kwargs...)
 	return f.(τs)
@@ -34,6 +42,8 @@ function _fermionic_Gτ_util(U, λs, ns, i::Int, j::Int, t::Real)
 	return r_g
 end
 
+
+cmatrix(m::Toulouse) = toulouse_cmatrix(m.bath, ϵ_d=m.ϵ_d)
 function toulouse_cmatrix(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	n = num_sites(b)
 	m = zeros(Float64, n+1, n+1)
@@ -47,6 +57,8 @@ function toulouse_cmatrix(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	return m
 end
 
+toulouse_Gt(m::Toulouse) = toulouse_Gt(m.bath, ϵ_d=m.ϵ_d)
+toulouse_Gt(m::Toulouse, ts::AbstractVector{<:Real}) = toulouse_Gt(m.bath, ts, ϵ_d=m.ϵ_d)
 function toulouse_Gt(b::AbstractDiscreteFermionicBath; kwargs...)
 	f = toulouse_greater_lesser(b; kwargs...)
 	return t -> begin
@@ -57,4 +69,14 @@ end
 function toulouse_Gt(b::AbstractDiscreteFermionicBath, ts::AbstractVector{<:Real}; kwargs...)
 	f = toulouse_Gt(b; kwargs...)
 	return f.(ts)
+end
+
+function separablestate(m::Toulouse, nsys::Real)
+	N = num_sites(m.bath) + 1
+	ρ = zeros(Float64, N, N)
+	ρ[1, 1] = nsys
+
+	Lj = num_sites(m.bath)
+	ρ[2:N, 2:N] = thermalstate(bj)
+	return ρ
 end
