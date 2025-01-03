@@ -39,7 +39,7 @@ Return quadratic observables at time t
 """
 function freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::QuadraticCMatrixCache=freefermions_cache(h))
 	t2 = -im*t
-	λs = [exp(λ*t2) for λ in f.λs]
-	exp_h = f.U * Diagonal(λs) * adjoint(f.U)
+	λs = [exp(λ*t2) for λ in cache.λs]
+	exp_h = cache.U * Diagonal(λs) * adjoint(cache.U)
 	return exp_h * ρ₀ * exp_h'
 end

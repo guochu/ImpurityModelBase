@@ -7,6 +7,7 @@ end
 num_bands(m::BoundaryDriving) = size(m.hsys, 1)
 num_sites(m::BoundaryDriving) = num_bands(m) + num_sites(m.leftbath) + num_sites(m.rightbath)
 Base.eltype(::Type{BoundaryDriving{B, M}}) where {B, M} = eltype(M)
+Base.eltype(x::BoundaryDriving) = eltype(typeof(x))
 
 function cmatrix(m::BoundaryDriving)
 	hsys, leftbath, rightbath = m.hsys, m.leftbath, m.rightbath
@@ -73,13 +74,4 @@ end
 function rightbathsites(m::BoundaryDriving)
 	L = num_bands(m) + num_sites(m.leftbath)
 	return L+1:L+num_sites(m.rightbath)
-end
-
-function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
-	fs = spectrumvalues(b)
-	for (j, v) in zip(bsites, fs)
-		h[band, j] = v
-		h[j, band] = v
-	end
-	return h
 end

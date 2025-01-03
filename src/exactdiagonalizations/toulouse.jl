@@ -3,7 +3,10 @@ struct Toulouse{B<:AbstractDiscreteBath}
 	ϵ_d::Float64
 end
 Toulouse(b::AbstractDiscreteBath; ϵ_d::Real) = Toulouse(b, convert(Float64, ϵ_d))
+Base.eltype(::Type{Toulouse{B}}) where B = Float64
+Base.eltype(x::Toulouse) = eltype(typeof(x))
 
+num_sites(m::Toulouse) = num_sites(m.bath) + 1
 """
 	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 
@@ -71,12 +74,46 @@ function toulouse_Gt(b::AbstractDiscreteFermionicBath, ts::AbstractVector{<:Real
 	return f.(ts)
 end
 
+
+function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
+	return freefermions_greater_lesser(h, β=b.β, μ=b.μ, i=1)
+end
+function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath, ts::AbstractVector{<:Real}; kwargs...)
+	f = toulouse_greater_lesser(b; kwargs...)
+	r = f.(ts)
+	return map(x->x[1], r), map(x->x[2], r)
+end
+
 function separablestate(m::Toulouse, nsys::Real)
 	N = num_sites(m.bath) + 1
 	ρ = zeros(Float64, N, N)
 	ρ[1, 1] = nsys
 
 	Lj = num_sites(m.bath)
-	ρ[2:N, 2:N] = thermalstate(bj)
+	ρ[2:N, 2:N] = thermalstate(m.bath)
 	return ρ
+end
+
+function thermalstate(m::Toulouse)
+	# β, μ = m.bath.β, m.bath.μ
+	h = cmatrix(m)
+	evals, U = eigen(Hermitian(h))
+	evals = [thermaloccupation(bath, item) for item in evals]
+	return U * Diagonal(evals) * U'
+end
+
+function particlecurrent_cmatrix(m::Toulouse)
+	N = num_sites(m)
+	return _particlecurrent_util!(zeros(eltype(m), N, N), m.bath, bathsites(m), 1)
+end
+
+bathsites(m::Toulouse) = 2:num_sites(m)
+
+function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
+	fs = spectrumvalues(b)
+	for (j, v) in zip(bsites, fs)
+		h[j, band] = v
+	end
+	return h
 end

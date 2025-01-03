@@ -1,13 +1,3 @@
-function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
-	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
-	return freefermions_greater_lesser(h, β=b.β, μ=b.μ, i=1)
-end
-function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath, ts::AbstractVector{<:Real}; kwargs...)
-	f = toulouse_greater_lesser(b; kwargs...)
-	r = f.(ts)
-	return map(x->x[1], r), map(x->x[2], r)
-end
-
 """
 	freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int; kwargs...) 
 	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i)
