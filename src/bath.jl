@@ -96,8 +96,7 @@ thermaloccupation(::Type{Fermion}, β::Real, μ::Real, ϵ::Real) = fermidirac(β
 
 return n(ϵ)
 """
-thermaloccupation(bath::AbstractBosonicBath, ϵ::Real) = boseeinstein(bath.β, bath.μ, ϵ)
-thermaloccupation(bath::AbstractFermionicBath, ϵ::Real) = fermidirac(bath.β, bath.μ, ϵ)
+thermaloccupation(bath::AbstractBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
 
 
 """

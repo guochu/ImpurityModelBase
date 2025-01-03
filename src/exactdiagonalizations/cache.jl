@@ -20,6 +20,16 @@ end
 
 # initializers
 # do transpose here
+
+"""
+	freefermions_cache(h::AbstractMatrix)
+
+h is the coefficient matrix, namely, 
+h = [h₁₁ c₁†c₁, h₁₂ c₁†c₂, h₁₃ c₁†c₃...; h₂₁ c₂†c₁, h₂₂ c₂†c₂, h₂₃ c₂†c₃; ...]
+
+time evolution for the coefficient matrix h of free fermions is dρ/dt = -i [h^t, ρ],
+where ρ is the quadratic observables
+"""
 freefermions_cache(h::AbstractMatrix) = QuadraticCMatrixCache(convert(Matrix{ComplexF64}, transpose(h)))
 
 """

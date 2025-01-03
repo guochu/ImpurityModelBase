@@ -15,8 +15,9 @@ include("auxiliary.jl")
 
 include("fourier.jl")
 
-include("freefermions.jl")
+include("freefermion.jl")
 
+include("exactsolutions.jl")
 
 include("interactingbosons/util.jl")
 include("interactingbosons/noninteracting.jl")

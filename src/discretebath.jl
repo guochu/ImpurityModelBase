@@ -49,8 +49,7 @@ end
 const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
 const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
 
-thermaloccupation(bath::AbstractDiscreteBosonicBath, ϵ::Real) = boseeinstein(bath.β, bath.μ, ϵ)
-thermaloccupation(bath::AbstractDiscreteFermionicBath, ϵ::Real) = fermidirac(bath.β, bath.μ, ϵ)
+thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
 
 
 
@@ -112,7 +111,7 @@ If |Vn| = 0 for some n, the corresponding Vn and Xn are removed.
 Reference "How to discretize a quantum bath for real-time evolution".
 Eqs.(10a, 10b) 
 """
-function spectrum_couplings(freqs::Vector{<:Real}, f::Function; atol::Real=1.0e-6, kwargs...)
+function spectrum_couplings(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, kwargs...)
 	@assert atol > 0
 	L = length(freqs)
 	omegas = Float64[]
@@ -134,11 +133,21 @@ function spectrum_couplings(freqs::Vector{<:Real}, f::Function; atol::Real=1.0e-
 	return omegas, couplings
 end
 
-function discretebath(::Type{P}, freqs::Vector{<:Real}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, kwargs...) where {P<:AbstractParticle}
+function discretebath(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, kwargs...) where {P<:AbstractParticle}
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return  discretebath(P, omegas, couplings; β=β, μ=μ)
 end
-function discretevacuum(::Type{P}, freqs::Vector{<:Real}, f::Function; atol::Real=1.0e-6, μ::Real=0, kwargs...) where {P<:AbstractParticle}
+function discretebath(b::AbstractBath; δw::Real=0.1, kwargs...)
+	f = b.spectrum
+	freqs = lowerbound(f):δw:upperbound(f)
+	return discretebath(particletype(b), freqs, f; β=b.β, μ=b.μ, kwargs...)
+end
+function discretevacuum(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, μ::Real=0, kwargs...) where {P<:AbstractParticle}
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return discretevacuum(P, omegas, couplings; μ=μ) 
+end
+function discretevacuum(b::AbstractBath; δw::Real=0.1, kwargs...)
+	f = b.spectrum
+	freqs = lowerbound(f):δw:upperbound(f)
+	return discretevacuum(particletype(b), freqs, f; μ=b.μ, kwargs...)
 end
