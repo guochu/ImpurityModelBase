@@ -21,6 +21,7 @@ export frequencies, spectrumvalues, num_sites
 # exact diagonalizations
 export freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
 export toulouse_greater_lesser
+export BoundaryDriving, cmatrix, separablestate, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 
 # Fourier transformations
 export Gt_to_Gw, Gw_to_Gt, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw
