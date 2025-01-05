@@ -34,8 +34,8 @@ end
 function separablestate(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	(size(ρ_sys) == size(m.hsys)) || throw(DimensionMismatch("Hamiltonian size mismatch with density matrix size"))
 	leftbath, rightbath = m.leftbath, m.rightbath
-	L = size(ρ_sys)
-	N = num_sites(leftbath) + L + num_sites(rightbath)
+	L = num_bands(m)
+	N = num_sites(m)
 	ρ = zeros(eltype(ρ_sys), N, N)
 	ρ[1:L, 1:L] = ρ_sys
 

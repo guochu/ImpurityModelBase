@@ -86,7 +86,7 @@ function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath, ts::AbstractV
 end
 
 function separablestate(m::Toulouse, nsys::Real)
-	N = num_sites(m.bath) + 1
+	N = num_sites(m) 
 	ρ = zeros(Float64, N, N)
 	ρ[1, 1] = nsys
 
