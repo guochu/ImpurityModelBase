@@ -64,7 +64,7 @@ function leftparticlecurrent_cmatrix(m::BoundaryDriving)
 end 
 function rightparticlecurrent_cmatrix(m::BoundaryDriving)
 	N = num_sites(m)
-	return _particlecurrent_util!(zeros(eltype(m), N, N), m.rightbath, rightbathsites(m), 1)
+	return _particlecurrent_util!(zeros(eltype(m), N, N), m.rightbath, rightbathsites(m), num_bands(m))
 end
 
 function leftbathsites(m::BoundaryDriving) 
