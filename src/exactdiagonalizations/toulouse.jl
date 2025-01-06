@@ -105,7 +105,7 @@ end
 
 function particlecurrent_cmatrix(m::Toulouse)
 	N = num_sites(m)
-	return _particlecurrent_util!(zeros(eltype(m), N, N), m.bath, bathsites(m), 1)
+	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
 end
 
 bathsites(m::Toulouse) = 2:num_sites(m)
@@ -113,7 +113,7 @@ bathsites(m::Toulouse) = 2:num_sites(m)
 function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
 	fs = spectrumvalues(b)
 	for (j, v) in zip(bsites, fs)
-		h[j, band] = v
+		h[j, band] = -2*im*v
 	end
 	return h
 end
