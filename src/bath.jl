@@ -44,7 +44,9 @@ const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractSpectrumFunction}
 const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractSpectrumFunction}
 
 FermionicVacuum(f::AbstractSpectrumFunction; kwargs...) = Vacuum(Fermion, f; kwargs...)
+fermionicvacuum(f::AbstractSpectrumFunction; kwargs...) = FermionicVacuum(f; kwargs...)
 BosonicVacuum(f::AbstractSpectrumFunction; kwargs...) = Vacuum(Boson, f; kwargs...)
+bosonicvacuum(f::AbstractSpectrumFunction; kwargs...) = BosonicVacuum(f; kwargs...)
 
 
 const AbstractBosonicBath = Union{BosonicBath{F}, BosonicVacuum{F}} where {F<:AbstractSpectrumFunction}
