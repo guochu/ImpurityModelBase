@@ -25,7 +25,21 @@ const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractSpectrumFunction}
 const FermionicBath{F} = Bath{Fermion, F} where {F<:AbstractSpectrumFunction}
 
 BosonicBath(f::AbstractSpectrumFunction; kwargs...) = Bath(Boson, f; kwargs...)
+"""
+	bosonicbath(f; β, μ) 
+
+Return a bosonic bath with β and μ
+"""
+bosonicbath(f::AbstractSpectrumFunction; kwargs...) = BosonicBath(f; kwargs...)
 FermionicBath(f::AbstractSpectrumFunction; kwargs...) = Bath(Fermion, f; kwargs...)
+"""
+	fermionicbath(f; β, μ) 
+
+Return a fermionic bath with β and μ
+"""
+fermionicbath(f::AbstractSpectrumFunction; kwargs...) = FermionicBath(f; kwargs...)
+
+
 
 """
 	struct FermionicVacuum{F <: AbstractSpectrumFunction}
@@ -99,23 +113,6 @@ thermaloccupation(::Type{Fermion}, β::Real, μ::Real, ϵ::Real) = fermidirac(β
 return n(ϵ)
 """
 thermaloccupation(bath::AbstractBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
-
-
-"""
-	bosonicbath(f; β, μ) 
-
-Return a bosonic bath with β and μ
-"""
-bosonicbath(f::AbstractSpectrumFunction; β::Real=Inf, μ::Real=0) = (β == Inf) ? BosonicVacuum(f, μ=μ) : BosonicBath(f, β=β, μ=μ)
-
-
-"""
-	fermionicbath(f; β, μ) 
-
-Return a fermionic bath with β and μ
-"""
-fermionicbath(f::AbstractSpectrumFunction; β::Real=Inf, μ::Real=0) = (β == Inf) ? FermionicVacuum(f, μ=μ) : FermionicBath(f, β=β, μ=μ)
-
 
 bath(::Type{Boson}, f::AbstractSpectrumFunction; kwargs...) = bosonicbath(f; kwargs...)
 bath(::Type{Fermion}, f::AbstractSpectrumFunction; kwargs...) = fermionicbath(f; kwargs...)

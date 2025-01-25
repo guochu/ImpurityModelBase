@@ -15,7 +15,7 @@ export BosonicBath, BosonicVacuum, bosonicbath
 
 # discrete bath
 export DiscreteBath, DiscreteVacuum, AbstractDiscreteBosonicBath, AbstractDiscreteFermionicBath
-export discretebosonicbath, discretefermionicbath, discretebath, discretevacuum
+export discretebosonicbath, discretefermionicbath, discretebosonicvacuum, discretefermionicvacuum, discretebath, discretevacuum
 export frequencies, spectrumvalues, num_sites
 
 

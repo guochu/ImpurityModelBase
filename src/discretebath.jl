@@ -25,6 +25,21 @@ function DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{
 	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), convert(Float64, β), convert(Float64, μ))
 end 
 
+DiscreteBosonicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
+"""
+	discretebosonicbath(ws, fs; β, μ) 
+
+Return a bosonic bath with β and μ
+"""
+discretebosonicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
+
+DiscreteFermionicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
+"""
+	discretefermionicbath(ws, fs; β, μ) 
+
+Return a fermionic bath with β and μ
+"""
+discretefermionicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
 
 """
 	struct DiscreteVacuum{P<:AbstractParticle}
@@ -45,12 +60,16 @@ function DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVecto
 	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), convert(Float64, μ))
 end 
 
+DiscreteBosonicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)
+discretebosonicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBosonicVacuum(Boson, ws, fs; kwargs...)
+DiscreteFermionicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Fermion, ws, fs; kwargs...)
+discretefermionicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteFermionicVacuum(Fermion, ws, fs; kwargs...)
+
 
 const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
 const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
 
 thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
-
 
 
 function Base.getproperty(m::DiscreteBath, s::Symbol)
@@ -70,25 +89,6 @@ function Base.getproperty(m::DiscreteVacuum, s::Symbol)
 		return getfield(m, s)
 	end
 end
-
-"""
-	discretebosonicbath(ws, fs; β, μ) 
-
-Return a bosonic bath with β and μ
-"""
-function discretebosonicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real=Inf, μ::Real=0)
-	(β == Inf) ? DiscreteVacuum(Boson, ws, fs, μ=μ) : DiscreteBath(Boson, ws, fs, β=β, μ=μ)
-end 
-
-
-"""
-	discretefermionicbath(ws, fs; β, μ) 
-
-Return a fermionic bath with β and μ
-"""
-function discretefermionicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real=Inf, μ::Real=0) 
-	(β == Inf) ? DiscreteVacuum(Fermion, ws, fs, μ=μ) : DiscreteBath(Fermion, ws, fs, β=β, μ=μ)
-end 
 
 discretebath(::Type{Boson}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 discretebath(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
@@ -135,7 +135,7 @@ end
 
 function discretebath(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, kwargs...) where {P<:AbstractParticle}
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
-	return  discretebath(P, omegas, couplings; β=β, μ=μ)
+	return discretebath(P, omegas, couplings; β=β, μ=μ)
 end
 function discretebath(b::AbstractBath; δw::Real=0.1, kwargs...)
 	f = b.spectrum
