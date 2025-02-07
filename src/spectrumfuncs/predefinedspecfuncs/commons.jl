@@ -18,7 +18,7 @@ semicircular(; t::Real=1) = semicircular(t)
 	Leggett(; α::Real, d::Real, ωc::Real)
 
 phenomelogical bath spectrum density,
-J(ω) = (α/(2ωc))(ωᵈ/ωcᵈ)e^(-ω/ωc),	 
+J(ω) = (α ωc/2)(ωᵈ/ωcᵈ)e^(-ω/ωc),	 
 often used for bosons
 """
 function Leggett(; α::Real=1, d::Real=1, ωc::Real=1)

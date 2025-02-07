@@ -22,3 +22,7 @@ include("exactsolutions.jl")
 include("interactingbosons/util.jl")
 include("interactingbosons/noninteracting.jl")
 include("interactingbosons/interacting.jl")
+
+
+
+include("holstein.jl")
