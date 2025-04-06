@@ -29,7 +29,7 @@ spectrum_func() = spectrum_func(10)
 	@test bath.β == β
 	@test bath.T == 4
 	@test bath.μ == 0
-	@test thermaloccupation(bath, 0.3) == 1 / (exp(bath.β * (0.3 - bath.μ)) + 1)
+	@test thermaloccupation(bath, 0.3) ≈ 1 / (exp(bath.β * (0.3 - bath.μ)) + 1)
 
 end
 
@@ -54,6 +54,6 @@ end
 	@test bath.β == β
 	@test bath.T == 4
 	@test bath.μ == 0
-	@test thermaloccupation(bath, 0.3) == 1 / (exp(bath.β * (0.3 - bath.μ)) - 1)
+	@test thermaloccupation(bath, 0.3) ≈ 1 / (exp(bath.β * (0.3 - bath.μ)) - 1)
 
 end

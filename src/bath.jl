@@ -73,15 +73,15 @@ Boson-einstein distribution for a bosonic bath
 with β, μ at energy ϵ
 """
 function boseeinstein(β::Real, μ::Real, ϵ::Real)
-	n_k = 0.
 	(ϵ > μ) || throw(ArgumentError("energy must be larger than μ"))
-	return 1 / (exp(safe_mult(β, ϵ - μ)) - 1)
-	# if β == Inf
-	# 	return 0.
-	# else
-	# 	return 1 / (exp(β * (ϵ - μ)) - 1)
-	# end
+	x = exp(-safe_mult(β, ϵ - μ))
+	return x / (1 - x)
 end
+
+# function boseeinstein(β::Real, μ::Real, ϵ::Real)
+# 	(ϵ > μ) || throw(ArgumentError("energy must be larger than μ"))
+# 	return 1 / (exp(safe_mult(β, ϵ - μ)) - 1)
+# end
 thermaloccupation(::Type{Boson}, β::Real, μ::Real, ϵ::Real) = boseeinstein(β, μ, ϵ)
 
 """
@@ -91,19 +91,18 @@ Return Fermi-Dirac distribution for a fermionic bath
 with β, μ at energy ϵ
 """
 function fermidirac(β::Real, μ::Real, ϵ::Real)
-	return 1.0/(1.0+exp(safe_mult(β, ϵ-μ)))
-	# if β == Inf
-	# 	if ϵ > μ
-	# 		return 0.0
-	# 	elseif ϵ < μ
-	# 		return 1.0
-	# 	else
-	# 		return 0.5
-	# 	end
-	# else
-	# 	1.0/(1.0+exp(β * (ϵ-μ) ))
-	# end
+	if ϵ >= μ
+		x = exp(-safe_mult(β, ϵ-μ))
+		return x/(1+x)
+	else
+		return 1.0/(1.0+exp(safe_mult(β, ϵ-μ)))
+	end
 end
+
+# function fermidirac(β::Real, μ::Real, ϵ::Real)
+# 	x = exp(-safe_mult(β, ϵ-μ))
+# 	return x/(1+x)
+# end
 thermaloccupation(::Type{Fermion}, β::Real, μ::Real, ϵ::Real) = fermidirac(β, μ, ϵ)
 
 """
