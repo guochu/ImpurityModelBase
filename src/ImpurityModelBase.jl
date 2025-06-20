@@ -20,7 +20,9 @@ export frequencies, spectrumvalues, num_sites
 
 
 # exact diagonalizations
-export freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
+export eigencache, freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
+export timeevo, itimeevo, operator_timeevo, operator_itimeevo
+export correlation_2op_1t, correlation_2op_1τ
 export Toulouse, toulouse_greater_lesser, cmatrix, particlecurrent_cmatrix, separablestate
 export BoundaryDriving, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 

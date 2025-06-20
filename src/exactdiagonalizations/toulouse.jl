@@ -22,9 +22,10 @@ function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	c = μ * one(h)
 	c[1, 1] = 0
 	ham = h - c
-	λs, U = eigen(Hermitian(ham))
-	ns = [fermidirac(β, 0, λs[k]) for k in 1:length(λs)]
-	return τ -> _fermionic_Gτ_util(U, λs, ns, 1, 1, τ)
+	# λs, U = eigen(Hermitian(ham))
+	cache = eigencache(ham)
+	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
+	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
 end
 toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
 toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
@@ -34,7 +35,8 @@ function toulouse_Gτ(h::AbstractDiscreteFermionicBath, τs::AbstractVector{<:Re
 end
 
 
-function _fermionic_Gτ_util(U, λs, ns, i::Int, j::Int, t::Real)
+function _fermionic_Gτ_util(cache::EigenCache, ns, i::Int, j::Int, t::Real)
+	λs, U = cache.λs, cache.U
 	r_g = zero(eltype(U))
 	for k in 1:size(U, 1)
 		ss = U[i, k] * conj(U[j, k])
@@ -98,9 +100,9 @@ end
 function thermalstate(m::Toulouse)
 	# β, μ = m.bath.β, m.bath.μ
 	h = cmatrix(m)
-	evals, U = eigen(Hermitian(h))
-	evals = [thermaloccupation(bath, item) for item in evals]
-	return U * Diagonal(evals) * U'
+	cache = eigencache(h)
+	evals = [thermaloccupation(bath, item) for item in cache.λs]
+	return cache.U * Diagonal(evals) * cache.U'
 end
 
 function particlecurrent_cmatrix(m::Toulouse)

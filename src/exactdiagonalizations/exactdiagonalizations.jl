@@ -1,6 +1,7 @@
 include("cache.jl")
 include("greenfunctions.jl")
 include("toulouse.jl")
+include("correlations.jl")
 
 function thermalstate(b::AbstractDiscreteBath)
 	L = num_sites(b)

@@ -15,6 +15,8 @@ spectrum_func() = DiracDelta(ω=1, α=0.5)
 		H, a, adag = noninteracting_operators(ϵ_d, ω₀=1, α=0.5, d=100)
 		g2 = gf_imag(H, a, adag, β, N)
 		@test norm(g1 - g2) / norm(g1) < tol
+		g2′ = correlation_2op_1τ(H, a, adag, 0:δτ:β, β=β)
+		@test norm(g1 - g2′) / norm(g1) < tol
 	end
 end
 
@@ -36,6 +38,11 @@ end
 		@test norm(g1 - g1′) / norm(g1) < tol
 		@test norm(g2 - g2′) / norm(g2) < tol
 
+		d1 = -im .* correlation_2op_1t(H, a, adag, exp(-β * H), 0:δt:t, reverse = false)
+		d2 = im .* correlation_2op_1t(H, adag, a, exp(-β * H), 0:δt:t, reverse = true)
+
+		@test norm(g1 - d1) / norm(g1) < tol
+		@test norm(g2 - d2) / norm(g2) < tol		
 	end
 	
 end
