@@ -1,4 +1,8 @@
 
+function correlation_2op_1t(h::AbstractMatrix, A::AbstractMatrix, B::AbstractMatrix, times::AbstractVector{<:Real}, cache::EigenCache=eigencache(h); β::Real, reverse::Bool=false) 
+	return correlation_2op_1t(h, A, B, thermalstate(cache, β=β), times, cache, reverse=reverse)
+end
+
 """
 	correlation_2op_1t
 	compute <a(t)b> if revere=false and <a b(t)> if reverse=true

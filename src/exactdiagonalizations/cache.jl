@@ -59,3 +59,8 @@ function _generic_ed_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Number
 	exp_h = cache.U * Diagonal(λs) * adjoint(cache.U)
 	return exp_h * ρ₀ * exp_h'
 end
+
+function thermalstate(cache::EigenCache; β::Real)
+	U, λs = cache.U, cache.λs
+	return U * Diagonal(exp.(-β .* λs)) * U'
+end
