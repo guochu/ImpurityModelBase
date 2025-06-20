@@ -41,7 +41,7 @@ end
 			@test norm(g2 - g2′) / norm(g2) < tol
 
 			d1 = -im .* correlation_2op_1t(H, a, adag, exp(-β * H), 0:δt:t, reverse = false)
-			d2 = im .* correlation_2op_1t(H, adag, a, exp(-β * H), 0:δt:t, reverse = true)
+			d2 = im .* correlation_2op_1t(H, adag, a, 0:δt:t, reverse = true, β=β)
 
 			@test norm(g1 - d1) / norm(g1) < tol
 			@test norm(g2 - d2) / norm(g2) < tol
