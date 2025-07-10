@@ -16,8 +16,8 @@ end
 DiracDelta(;ω::Real=0, α::Real=1, lb::Real=-Inf, ub::Real=Inf) = DiracDelta(ω, α=α, lb=lb, ub=ub)
 
 
-Base.similar(x::DiracDelta, ω::Real; α::Real=x.α, lb::Real=x.lb, ub::Real=x.ub) = DiracDelta(ω, α=α lb=lb, ub=ub)
-Base.similar(x::DiracDelta; ω::Real=x.ω, α::Real=x.α, lb::Real=x.lb, ub::Real=x.ub) = DiracDelta(ω, α=α lb=lb, ub=ub)
+Base.similar(x::DiracDelta, ω::Real; α::Real=x.α, lb::Real=x.lb, ub::Real=x.ub) = DiracDelta(ω, α=α, lb=lb, ub=ub)
+Base.similar(x::DiracDelta; ω::Real=x.ω, α::Real=x.α, lb::Real=x.lb, ub::Real=x.ub) = DiracDelta(ω, α=α, lb=lb, ub=ub)
 
 
 
