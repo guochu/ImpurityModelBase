@@ -34,11 +34,12 @@ struct BoundedFunction{F} <: AbstractBoundedFunction
 end
 function BoundedFunction(f; lb::Real=-Inf, ub::Real=Inf) 
 	(lb < ub) || throw(ArgumentError("lb must be less than ub"))
-	return SpectrumFunction(f, convert(Float64, lb), convert(Float64, ub))
+	return BoundedFunction(f, convert(Float64, lb), convert(Float64, ub))
 end	
 bounded(f, lb::Real, ub::Real) = BoundedFunction(f, lb=lb, ub=ub)
 bounded(f; kwargs...) = BoundedFunction(f; kwargs...)
-
+# Base.similar(x::BoundedFunction, f; lb::Real=x.lb, ub::Real=x.ub) = BoundedFunction(f, lb=lb, ub=ub)
+# Base.similar(x::BoundedFunction; f=x.f, lb::Real=x.lb, ub::Real=x.ub) = BoundedFunction(f, lb=lb, ub=ub)
 
 """
 	SpectrumFunction{F}
@@ -58,6 +59,9 @@ function SpectrumFunction(f; lb::Real=-Inf, ub::Real=Inf)
 end	
 spectrum(f, lb::Real, ub::Real) = SpectrumFunction(f, lb=lb, ub=ub)
 spectrum(f; kwargs...) = SpectrumFunction(f; kwargs...)
+Base.similar(x::SpectrumFunction, f; lb::Real=x.lb, ub::Real=x.ub) = SpectrumFunction(f, lb=lb, ub=ub)
+Base.similar(x::SpectrumFunction; f=x.f, lb::Real=x.lb, ub::Real=x.ub) = SpectrumFunction(f, lb=lb, ub=ub)
+
 
 spectrumshift(m::SpectrumFunction, μ::Real) = spectrum(ϵ->m.f(ϵ+μ), lowerbound(m)-μ, upperbound(m)-μ)
 
