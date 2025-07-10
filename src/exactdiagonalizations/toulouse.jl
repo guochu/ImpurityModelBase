@@ -109,6 +109,10 @@ function particlecurrent_cmatrix(m::Toulouse)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
 end
+function heatcurrent_cmatrix(m::Toulouse)
+	N = num_sites(m)
+	return _heatcurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
+end
 
 bathsites(m::Toulouse) = 2:num_sites(m)
 
@@ -116,6 +120,14 @@ function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsit
 	fs = spectrumvalues(b)
 	for (j, v) in zip(bsites, fs)
 		h[j, band] = -2*im*v
+	end
+	return h
+end
+
+function _heatcurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
+	ws, fs = frequencies(b), spectrumvalues(b)
+	for (j, w, v) in zip(bsites, ws, fs)
+		h[j, band] = -2*im*w*v
 	end
 	return h
 end

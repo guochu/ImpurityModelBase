@@ -66,6 +66,14 @@ function rightparticlecurrent_cmatrix(m::BoundaryDriving)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.rightbath, rightbathsites(m), num_bands(m))
 end
+function leftheatcurrent_cmatrix(m::BoundaryDriving)
+	N = num_sites(m)
+	return _heatcurrent_util!(zeros(ComplexF64, N, N), m.leftbath, leftbathsites(m), 1)
+end 
+function rightheatcurrent_cmatrix(m::BoundaryDriving)
+	N = num_sites(m)
+	return _heatcurrent_util!(zeros(ComplexF64, N, N), m.rightbath, rightbathsites(m), num_bands(m))
+end
 
 function leftbathsites(m::BoundaryDriving) 
 	L = num_bands(m)

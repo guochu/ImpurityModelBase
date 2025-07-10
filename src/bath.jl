@@ -19,6 +19,9 @@ struct Bath{P<:AbstractParticle, F <: AbstractSpectrumFunction} <: AbstractBath{
 	μ::Float64
 end
 Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractSpectrumFunction} = Bath{P, F}(f, convert(Float64, β), convert(Float64, μ))
+Base.similar(x::Bath, ::Type{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}; f::AbstractSpectrumFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 
 
 const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractSpectrumFunction}
@@ -53,6 +56,9 @@ struct Vacuum{P<:AbstractParticle, F <: AbstractSpectrumFunction} <: AbstractBat
 	μ::Float64	
 end
 Vacuum(::Type{P}, f::F; μ::Real=0) where {P<:AbstractParticle, F<:AbstractSpectrumFunction} = Vacuum{P, F}(f, convert(Float64, μ))
+Base.similar(x::Vacuum, ::Type{P}, f::AbstractSpectrumFunction; μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}; f::AbstractSpectrumFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
 
 const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractSpectrumFunction}
 const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractSpectrumFunction}
