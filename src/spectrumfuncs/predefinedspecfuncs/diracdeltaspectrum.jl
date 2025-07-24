@@ -3,7 +3,7 @@
 
 Dirac delta spectrum function with a lower and upper bound
 """
-struct DiracDelta <: AbstractSpectrumFunction
+struct DiracDelta <: AbstractBoundedFunction
 	ω::Float64
 	α::Float64
 	lb::Float64

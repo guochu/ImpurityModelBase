@@ -1,8 +1,7 @@
 module ImpurityModelBase
 
 # spectrum density wrapper and some predefined spectrum functions
-export AbstractBoundedFunction, AbstractSpectrumFunction
-export BoundedFunction, SpectrumFunction, bounded, spectrum
+export AbstractBoundedFunction, BoundedFunction, bounded, spectrum
 export lowerbound, upperbound, semicircular, Leggett, DiscreteSpectrum
 export DiracDelta, quadgkwrapper, spectrumshift
 

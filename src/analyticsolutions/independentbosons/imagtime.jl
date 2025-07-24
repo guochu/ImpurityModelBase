@@ -1,6 +1,6 @@
 
 """
-    independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β, ϵ_d, U, bands, Δ)
+    independentbosons_Gτ(spectrum::AbstractBoundedFunction, τ::Real; β, ϵ_d, U, bands, Δ)
 
 Matsubara Green's function in the imaginary-time axis for the independent bosons model
 
@@ -9,7 +9,7 @@ U is the interaction strength of the localized electron
 bands is the total number of bands, which can be 1 (noninteracting) 
 or 2 (interacting)
 """
-function independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β::Real, ϵ_d::Real, U::Real=0, bands::Int=1, Δ::Real=_compute_Δ(spectrum))
+function independentbosons_Gτ(spectrum::AbstractBoundedFunction, τ::Real; β::Real, ϵ_d::Real, U::Real=0, bands::Int=1, Δ::Real=_compute_Δ(spectrum))
     (bands in (1, 2)) || throw(ArgumentError("bands must be 1 or 2"))
     μ′ = -ϵ_d + Δ
     if bands == 1
@@ -20,7 +20,7 @@ function independentbosons_Gτ(spectrum::AbstractSpectrumFunction, τ::Real; β:
         return fermion_Gτ(τ, β=β, μ=μ′, U=U′)*_exponent_f(spectrum, τ, β)
     end
 end
-function independentbosons_Gτ(spectrum::AbstractSpectrumFunction; β::Real, Nτ::Int, ϵ_d::Real, U::Real=0, bands::Int=1)
+function independentbosons_Gτ(spectrum::AbstractBoundedFunction; β::Real, Nτ::Int, ϵ_d::Real, U::Real=0, bands::Int=1)
     Δ = _compute_Δ(spectrum)
     δτ = β / Nτ
     gτ = zeros(Float64, Nτ+1)

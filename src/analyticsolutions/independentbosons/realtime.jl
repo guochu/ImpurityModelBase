@@ -1,9 +1,9 @@
 """
-    independentbosons_greater(spectrum::AbstractSpectrumFunction, t; β, ϵ_d, U, bands, Δ)
+    independentbosons_greater(spectrum::AbstractBoundedFunction, t; β, ϵ_d, U, bands, Δ)
 
 Greater Green's function in the real time axis for the independent bosons model
 """
-function independentbosons_greater(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0, 
+function independentbosons_greater(spectrum::AbstractBoundedFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0, 
                                     bands::Int=1, Δ::Real=_compute_Δ(spectrum))
     μ, U = _normalized_paras(-ϵ_d, U, Δ, bands)
     r::ComplexF64 = 0
@@ -16,11 +16,11 @@ function independentbosons_greater(spectrum::AbstractSpectrumFunction, t::Real; 
 end
 
 """
-    independentbosons_lesser(spectrum::AbstractSpectrumFunction, t; β, ϵ_d, U, bands, Δ)
+    independentbosons_lesser(spectrum::AbstractBoundedFunction, t; β, ϵ_d, U, bands, Δ)
 
 Lesser Green's function in the real time axis for the independent bosons model
 """
-function independentbosons_lesser(spectrum::AbstractSpectrumFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0,
+function independentbosons_lesser(spectrum::AbstractBoundedFunction, t::Real; β::Real, ϵ_d::Real, U::Real=0,
                                     bands::Int=1, Δ::Real=_compute_Δ(spectrum))
     μ, U = _normalized_paras(-ϵ_d, U, Δ, bands)
     r::ComplexF64 = 0

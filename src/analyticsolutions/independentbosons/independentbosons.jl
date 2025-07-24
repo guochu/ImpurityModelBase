@@ -1,9 +1,9 @@
-function _compute_Δ(s::AbstractSpectrumFunction)
+function _compute_Δ(s::AbstractBoundedFunction)
     g(ω) = 1/ω
     return quadgkwrapper(s * g)
 end
 
-function _exponent_f(f::AbstractSpectrumFunction, τ, β)
+function _exponent_f(f::AbstractBoundedFunction, τ, β)
     function g(ω)
         x = exp(-β*ω)
         return (1-exp(-τ*ω)+x-exp(-(β-τ)*ω))/((1-x)*ω^2)

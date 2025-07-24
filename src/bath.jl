@@ -8,69 +8,69 @@ particletype(::Type{<:AbstractBath{P}}) where {P<:AbstractParticle} = P
 particletype(x::AbstractBath) = particletype(typeof(x))
 
 """
-	struct Bath{F <: AbstractSpectrumFunction}
+	struct Bath{F <: AbstractBoundedFunction}
 
 Fermionic bath container, includes a bath spectrum density,
 the inverse temperature β and the chemical potential μ
 """
-struct Bath{P<:AbstractParticle, F <: AbstractSpectrumFunction} <: AbstractBath{P}
+struct Bath{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractBath{P}
 	f::F
 	β::Float64
 	μ::Float64
 end
-Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractSpectrumFunction} = Bath{P, F}(f, convert(Float64, β), convert(Float64, μ))
-Base.similar(x::Bath, ::Type{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
-Base.similar(x::Bath{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
-Base.similar(x::Bath{P}; f::AbstractSpectrumFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Bath{P, F}(f, convert(Float64, β), convert(Float64, μ))
+Base.similar(x::Bath, ::Type{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 
 
-const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractSpectrumFunction}
-const FermionicBath{F} = Bath{Fermion, F} where {F<:AbstractSpectrumFunction}
+const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractBoundedFunction}
+const FermionicBath{F} = Bath{Fermion, F} where {F<:AbstractBoundedFunction}
 
-BosonicBath(f::AbstractSpectrumFunction; kwargs...) = Bath(Boson, f; kwargs...)
+BosonicBath(f::AbstractBoundedFunction; kwargs...) = Bath(Boson, f; kwargs...)
 """
 	bosonicbath(f; β, μ) 
 
 Return a bosonic bath with β and μ
 """
-bosonicbath(f::AbstractSpectrumFunction; kwargs...) = BosonicBath(f; kwargs...)
-FermionicBath(f::AbstractSpectrumFunction; kwargs...) = Bath(Fermion, f; kwargs...)
+bosonicbath(f::AbstractBoundedFunction; kwargs...) = BosonicBath(f; kwargs...)
+FermionicBath(f::AbstractBoundedFunction; kwargs...) = Bath(Fermion, f; kwargs...)
 """
 	fermionicbath(f; β, μ) 
 
 Return a fermionic bath with β and μ
 """
-fermionicbath(f::AbstractSpectrumFunction; kwargs...) = FermionicBath(f; kwargs...)
+fermionicbath(f::AbstractBoundedFunction; kwargs...) = FermionicBath(f; kwargs...)
 
 
 
 """
-	struct FermionicVacuum{F <: AbstractSpectrumFunction}
+	struct FermionicVacuum{F <: AbstractBoundedFunction}
 
 Fermionic bath container, includes a bath spectrum density,
 the chemical potential μ
 the inverse temperature β=Inf
 """
-struct Vacuum{P<:AbstractParticle, F <: AbstractSpectrumFunction} <: AbstractBath{P}
+struct Vacuum{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractBath{P}
 	f::F
 	μ::Float64	
 end
-Vacuum(::Type{P}, f::F; μ::Real=0) where {P<:AbstractParticle, F<:AbstractSpectrumFunction} = Vacuum{P, F}(f, convert(Float64, μ))
-Base.similar(x::Vacuum, ::Type{P}, f::AbstractSpectrumFunction; μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
-Base.similar(x::Vacuum{P}, f::AbstractSpectrumFunction; β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
-Base.similar(x::Vacuum{P}; f::AbstractSpectrumFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Vacuum(::Type{P}, f::F; μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Vacuum{P, F}(f, convert(Float64, μ))
+Base.similar(x::Vacuum, ::Type{P}, f::AbstractBoundedFunction; μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
 
-const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractSpectrumFunction}
-const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractSpectrumFunction}
+const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractBoundedFunction}
+const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractBoundedFunction}
 
-FermionicVacuum(f::AbstractSpectrumFunction; kwargs...) = Vacuum(Fermion, f; kwargs...)
-fermionicvacuum(f::AbstractSpectrumFunction; kwargs...) = FermionicVacuum(f; kwargs...)
-BosonicVacuum(f::AbstractSpectrumFunction; kwargs...) = Vacuum(Boson, f; kwargs...)
-bosonicvacuum(f::AbstractSpectrumFunction; kwargs...) = BosonicVacuum(f; kwargs...)
+FermionicVacuum(f::AbstractBoundedFunction; kwargs...) = Vacuum(Fermion, f; kwargs...)
+fermionicvacuum(f::AbstractBoundedFunction; kwargs...) = FermionicVacuum(f; kwargs...)
+BosonicVacuum(f::AbstractBoundedFunction; kwargs...) = Vacuum(Boson, f; kwargs...)
+bosonicvacuum(f::AbstractBoundedFunction; kwargs...) = BosonicVacuum(f; kwargs...)
 
 
-const AbstractBosonicBath = Union{BosonicBath{F}, BosonicVacuum{F}} where {F<:AbstractSpectrumFunction}
-const AbstractFermionicBath = Union{FermionicBath{F}, FermionicVacuum{F}} where {F<:AbstractSpectrumFunction}
+const AbstractBosonicBath = Union{BosonicBath{F}, BosonicVacuum{F}} where {F<:AbstractBoundedFunction}
+const AbstractFermionicBath = Union{FermionicBath{F}, FermionicVacuum{F}} where {F<:AbstractBoundedFunction}
 
 """
 	boseeinstein(β, μ, ϵ)
@@ -126,10 +126,10 @@ return n(ϵ)
 """
 thermaloccupation(bath::AbstractBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
 
-bath(::Type{Boson}, f::AbstractSpectrumFunction; kwargs...) = bosonicbath(f; kwargs...)
-bath(::Type{Fermion}, f::AbstractSpectrumFunction; kwargs...) = fermionicbath(f; kwargs...)
-vacuum(::Type{Boson}, f::AbstractSpectrumFunction; kwargs...) = BosonicVacuum(f; kwargs...)
-vacuum(::Type{Fermion}, f::AbstractSpectrumFunction; kwargs...) = FermionicVacuum(f; kwargs...)
+bath(::Type{Boson}, f::AbstractBoundedFunction; kwargs...) = bosonicbath(f; kwargs...)
+bath(::Type{Fermion}, f::AbstractBoundedFunction; kwargs...) = fermionicbath(f; kwargs...)
+vacuum(::Type{Boson}, f::AbstractBoundedFunction; kwargs...) = BosonicVacuum(f; kwargs...)
+vacuum(::Type{Fermion}, f::AbstractBoundedFunction; kwargs...) = FermionicVacuum(f; kwargs...)
 
 function Base.getproperty(m::Bath, s::Symbol)
 	if s == :T
