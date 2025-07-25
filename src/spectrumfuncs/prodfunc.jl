@@ -22,6 +22,9 @@ Base.:/(x::DiracDelta, y::Function) = DeltaMultF(x, ϵ->1/y(ϵ))
 Base.:*(x::DeltaMultF, y::Function) = DeltaMultF(x.δ, ϵ->x.f(ϵ)*y(ϵ))
 Base.:/(x::DeltaMultF, y::Function) = DeltaMultF(x.δ, ϵ->x.f(ϵ)/y(ϵ))
 
+function spectrumshift(m::DeltaMultF, μ::Real)
+	return DeltaMultF(spectrumshift(m.δ, μ), ϵ->m.f(ϵ+μ))
+end
 
 function quadgkwrapper(m::DeltaMultF; kwargs...)
 	ω₀, α = m.δ.ω, m.δ.α
