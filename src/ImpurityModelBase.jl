@@ -18,6 +18,10 @@ export discretebosonicbath, discretefermionicbath, discretebosonicvacuum, discre
 export frequencies, spectrumvalues, num_sites
 
 
+# BCS bath
+export BCSBath, bcsbath, BCSVacuum, bcsvacuum
+
+
 # exact diagonalizations
 export eigencache, freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
 export timeevo, itimeevo, operator_timeevo, operator_itimeevo
@@ -56,6 +60,9 @@ include("spectrumfuncs/spectrumfuncs.jl")
 # baths
 include("bath.jl")
 include("discretebath.jl")
+
+# bcs baths
+include("bcsbath.jl")
 
 # exact diagonalizations
 include("exactdiagonalizations/exactdiagonalizations.jl")

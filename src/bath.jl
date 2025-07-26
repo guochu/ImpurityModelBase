@@ -19,9 +19,9 @@ struct Bath{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractBath{P
 	μ::Float64
 end
 Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Bath{P, F}(f, convert(Float64, β), convert(Float64, μ))
-Base.similar(x::Bath, ::Type{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
-Base.similar(x::Bath{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
-Base.similar(x::Bath{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath, ::Type{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
+Base.similar(x::Bath{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 
 
 const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractBoundedFunction}
@@ -56,9 +56,9 @@ struct Vacuum{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractBath
 	μ::Float64	
 end
 Vacuum(::Type{P}, f::F; μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Vacuum{P, F}(f, convert(Float64, μ))
-Base.similar(x::Vacuum, ::Type{P}, f::AbstractBoundedFunction; μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
-Base.similar(x::Vacuum{P}, f::AbstractBoundedFunction; β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
-Base.similar(x::Vacuum{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum, ::Type{P}, f::AbstractBoundedFunction; μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}, f::AbstractBoundedFunction; μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.similar(x::Vacuum{P}; f::AbstractBoundedFunction=x.f, μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
 
 const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractBoundedFunction}
 const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractBoundedFunction}

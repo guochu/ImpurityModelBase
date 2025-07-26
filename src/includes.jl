@@ -7,6 +7,9 @@ include("spectrumfuncs/spectrumfuncs.jl")
 include("bath.jl")
 include("discretebath.jl")
 
+# bcs baths
+include("bcsbath.jl")
+
 # exact diagonalizations
 include("exactdiagonalizations/exactdiagonalizations.jl")
 
