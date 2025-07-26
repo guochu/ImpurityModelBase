@@ -13,7 +13,7 @@ Base.similar(x::BCSBath; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real
 
 
 bcsbath(f::AbstractBoundedFunction; kwargs...) = BCSBath(f; kwargs...)
-
+bcsbath(bath::FermionicBath; Δ::Real=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
 
 
 struct BCSVacuum{F <: AbstractBoundedFunction} <: AbstractBath{Fermion}
@@ -26,6 +26,7 @@ Base.similar(x::BCSVacuum, f::AbstractBoundedFunction; μ::Real=x.μ, Δ::Real=x
 Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Real=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
 
 bcsvacuum(f::AbstractBoundedFunction; kwargs...) = BCSVacuum(f; kwargs...)
+bcsvacuum(bath::FermionicVacuum; Δ::Real=0) = bcsvacuum(bath.spectrum, μ=bath.μ, Δ=Δ)
 
 const AbstractBCSBath = Union{BCSBath{F}, BCSVacuum{F}} where {F<:AbstractBoundedFunction}
 
