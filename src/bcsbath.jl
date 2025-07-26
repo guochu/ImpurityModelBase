@@ -27,6 +27,7 @@ Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Re
 
 bcsvacuum(f::AbstractBoundedFunction; kwargs...) = BCSVacuum(f; kwargs...)
 
+const AbstractBCSBath = Union{BCSBath{F}, BCSVacuum{F}} where {F<:AbstractBoundedFunction}
 
 
 function Base.getproperty(m::BCSBath, s::Symbol)

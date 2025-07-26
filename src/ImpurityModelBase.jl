@@ -19,7 +19,7 @@ export frequencies, spectrumvalues, num_sites
 
 
 # BCS bath
-export BCSBath, bcsbath, BCSVacuum, bcsvacuum
+export BCSBath, bcsbath, BCSVacuum, bcsvacuum, AbstractBCSBath
 
 
 # exact diagonalizations
