@@ -22,7 +22,7 @@ struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBath{Fermio
 	μ::Float64
 	Δ::T	
 end
-BCSVacuum(f::F, Δ::T=0; μ::Real=0) where {F<:AbstractBoundedFunction, T<:Number} = BCSVacuum{F, float(T)}(f, float(μ), float(Δ))
+BCSVacuum(f::F, Δ::T; μ::Real=0) where {F<:AbstractBoundedFunction, T<:Number} = BCSVacuum{F, float(T)}(f, float(μ), float(Δ))
 BCSVacuum(f::F; Δ::Number=0, μ::Real=0) where {F<:AbstractBoundedFunction} = BCSVacuum(f, Δ, μ=μ)
 Base.similar(x::BCSVacuum, f::AbstractBoundedFunction; μ::Real=x.μ, Δ::Real=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
 Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Real=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
