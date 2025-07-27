@@ -9,12 +9,12 @@ end
 
 BCSBath(f::F, Δ::T; β::Real, μ::Real=0) where {F<:AbstractBoundedFunction, T<:Number} = BCSBath{F, float(T)}(f, float(β), float(μ), float(Δ))
 BCSBath(f::F; β::Real, Δ::Number=0, μ::Real=0) where {F<:AbstractBoundedFunction} = BCSBath(f, Δ, β=β, μ=μ)
-Base.similar(x::BCSBath, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ, Δ::Real=x.Δ) = BCSBath(f, β=β, μ=μ, Δ=Δ)
-Base.similar(x::BCSBath; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ, Δ::Real=x.Δ) = BCSBath(f, β=β, μ=μ, Δ=Δ)
+Base.similar(x::BCSBath, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ, Δ::Number=x.Δ) = BCSBath(f, β=β, μ=μ, Δ=Δ)
+Base.similar(x::BCSBath; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ, Δ::Number=x.Δ) = BCSBath(f, β=β, μ=μ, Δ=Δ)
 
 
 bcsbath(f::AbstractBoundedFunction; kwargs...) = BCSBath(f; kwargs...)
-bcsbath(bath::FermionicBath; Δ::Real=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
+bcsbath(bath::FermionicBath; Δ::Number=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
 
 
 struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBath{Fermion}
@@ -24,11 +24,11 @@ struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBath{Fermio
 end
 BCSVacuum(f::F, Δ::T; μ::Real=0) where {F<:AbstractBoundedFunction, T<:Number} = BCSVacuum{F, float(T)}(f, float(μ), float(Δ))
 BCSVacuum(f::F; Δ::Number=0, μ::Real=0) where {F<:AbstractBoundedFunction} = BCSVacuum(f, Δ, μ=μ)
-Base.similar(x::BCSVacuum, f::AbstractBoundedFunction; μ::Real=x.μ, Δ::Real=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
-Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Real=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
+Base.similar(x::BCSVacuum, f::AbstractBoundedFunction; μ::Real=x.μ, Δ::Number=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
+Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Number=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
 
 bcsvacuum(f::AbstractBoundedFunction; kwargs...) = BCSVacuum(f; kwargs...)
-bcsvacuum(bath::FermionicVacuum; Δ::Real=0) = bcsvacuum(bath.spectrum, μ=bath.μ, Δ=Δ)
+bcsvacuum(bath::FermionicVacuum; Δ::Number=0) = bcsvacuum(bath.spectrum, μ=bath.μ, Δ=Δ)
 
 const AbstractBCSBath = Union{BCSBath{F}, BCSVacuum{F}} where {F<:AbstractBoundedFunction}
 
