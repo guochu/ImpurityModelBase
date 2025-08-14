@@ -27,9 +27,19 @@ function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
 	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
 end
+function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
+	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
+	# ham = h - μ .* LinearAlgebra.I
+	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
+	β, μ = b.β, b.μ
+	# λs, U = eigen(Hermitian(ham))
+	cache = eigencache(h)
+	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
+	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
+end
 toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
 toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
-function toulouse_Gτ(h::AbstractDiscreteFermionicBath, τs::AbstractVector{<:Real}; kwargs...)
+function toulouse_Gτ(h::Union{AbstractDiscreteFermionicBath, AbstractDiscreteBCSBath}, τs::AbstractVector{<:Real}; kwargs...)
 	f = toulouse_Gτ(h; kwargs...)
 	return f.(τs)
 end
@@ -59,6 +69,46 @@ function toulouse_cmatrix(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 		m[1, 1+i] = fs[i]
 		m[1+i, 1] = fs[i]
 	end
+	return m
+end
+
+"""
+	toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
+
+The mode are ordered as â₁†â-₁†â₂†â-₂† ⋯ âₖ†â-ₖ†  â₁â-₁â₂â-₂ ⋯ âₖâ-ₖ
+"""
+function toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
+	n = num_sites(b)
+	L = n + 1
+	Δ = b.Δ
+
+	m = zeros(typeof(Δ), 4L, 4L)
+	m[1, 1] = ϵ_d
+	m[2, 2] = ϵ_d
+	m[2L+1, 2L+1] = 1 - ϵ_d
+	m[2L+2, 2L+2] = 1 - ϵ_d
+	ws, fs = frequencies(b), spectrumvalues(b)
+
+	for i in 1:n
+		m[2i+1, 2i+1] = ws[i]
+		m[2i+2, 2i+2] = ws[i]
+		m[1, 2i+1] = fs[i]
+		m[2i+1, 1] = fs[i]
+		m[2, 2i+2] = fs[i]
+		m[2i+2, 2] = fs[i]
+
+
+		m[2L+2i+1, 2L+2i+1] = 1-ws[i]
+		m[2L+2i+2, 2L+2i+2] = 1-ws[i]
+		m[2L+1, 2L+2i+1] = 1-fs[i]
+		m[2L+2i+1, 2L+1] = 1-fs[i]
+		m[2L+2, 2L+2i+2] = 1-fs[i]
+		m[2L+2i+2, 2L+2] = 1-fs[i]
+
+		m[2i+1, 2L+2i+2] = -Δ
+		m[2L+2i+2, 2i+1] = -conj(Δ)
+	end
+
 	return m
 end
 

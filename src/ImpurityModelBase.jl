@@ -20,6 +20,7 @@ export frequencies, spectrumvalues, num_sites
 
 # BCS bath
 export BCSBath, bcsbath, BCSVacuum, bcsvacuum, AbstractBCSBath
+export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum, AbstractDiscreteBCSBath
 
 
 # exact diagonalizations
@@ -58,11 +59,7 @@ using QuadGK, Interpolations, LinearAlgebra
 include("spectrumfuncs/spectrumfuncs.jl")
 
 # baths
-include("bath.jl")
-include("discretebath.jl")
-
-# bcs baths
-include("bcsbath.jl")
+include("baths/baths.jl")
 
 # exact diagonalizations
 include("exactdiagonalizations/exactdiagonalizations.jl")
