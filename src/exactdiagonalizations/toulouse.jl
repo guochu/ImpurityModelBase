@@ -75,7 +75,7 @@ end
 """
 	toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 
-The mode are ordered as â₁†â-₁†â₂†â-₂† ⋯ âₖ†â-ₖ†  â₁â-₁â₂â-₂ ⋯ âₖâ-ₖ
+The fermion modes are ordered as â₁†â-₁†â₂†â-₂† ⋯ âₖ†â-ₖ†  â₁â-₁â₂â-₂ ⋯ âₖâ-ₖ
 """
 function toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 	n = num_sites(b)
