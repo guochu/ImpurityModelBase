@@ -27,7 +27,8 @@ export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum, A
 export eigencache, freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
 export timeevo, itimeevo, operator_timeevo, operator_itimeevo
 export correlation_2op_1t, correlation_2op_1τ
-export Toulouse, toulouse_greater_lesser, cmatrix, particlecurrent_cmatrix, heatcurrent_cmatrix, separablestate
+export Toulouse, toulouse_greater_lesser, toulouse_neq_greater_lesser
+export cmatrix, particlecurrent_cmatrix, heatcurrent_cmatrix, separablestate
 export BoundaryDriving, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 export leftheatcurrent_cmatrix, rightheatcurrent_cmatrix
 
