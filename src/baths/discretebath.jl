@@ -22,7 +22,7 @@ function DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{
 	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
 	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
 	issorted(ws) || throw("frequencies should be sorted")
-	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), convert(Float64, β), convert(Float64, μ))
+	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(β), float(μ))
 end 
 
 DiscreteBosonicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
@@ -57,7 +57,7 @@ function DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVecto
 	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
 	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
 	issorted(ws) || throw("frequencies should be sorted")
-	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), convert(Float64, μ))
+	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(μ))
 end 
 
 DiscreteBosonicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)

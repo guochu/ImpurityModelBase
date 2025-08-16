@@ -18,7 +18,7 @@ struct Bath{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractBath{P
 	β::Float64
 	μ::Float64
 end
-Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Bath{P, F}(f, convert(Float64, β), convert(Float64, μ))
+Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:AbstractBoundedFunction} = Bath{P, F}(f, float(β), float(μ))
 Base.similar(x::Bath, ::Type{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 Base.similar(x::Bath{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 Base.similar(x::Bath{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
