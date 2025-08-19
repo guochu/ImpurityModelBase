@@ -24,7 +24,7 @@ function _fermionic_eq_gf_util(cache::EigenCache, i::Int, j::Int, β::Real, μ::
 			exp_t = exp(-im * evals[k] * t)
 			n_k = fermidirac(β, μ, evals[k])
 			r_g += ss * (1 - n_k) * exp_t
-			r_l += ss * n_k * exp_t
+			r_l += conj(ss) * n_k * exp_t
 		end
 		return -im * r_g, im * r_l
 	end
@@ -48,7 +48,6 @@ function freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, t
 	f1, f2 = freefermions_greater_lesser(h, ρ₀; kwargs...)
 	return f1.(ts), f2.(ts)
 end
-
 
 # HU = Uλs
 # U brings H into diagonal

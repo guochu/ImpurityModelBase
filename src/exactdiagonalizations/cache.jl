@@ -17,7 +17,7 @@ function EigenCache(h::AbstractMatrix{T}) where {T<:Number}
 	return EigenCache(h2, U, λs)
 end
 eigencache(h::AbstractMatrix) = EigenCache(h)
-
+Base.conj(x::EigenCache) = EigenCache(conj(x.m), conj(x.U), x.λs)
 
 # initializers
 # do transpose here
