@@ -6,6 +6,7 @@ struct Fermion <: AbstractParticle end
 abstract type AbstractBath{P<:AbstractParticle} end
 particletype(::Type{<:AbstractBath{P}}) where {P<:AbstractParticle} = P
 particletype(x::AbstractBath) = particletype(typeof(x))
+Base.eltype(x::AbstractBath) = eltype(typeof(x))
 
 """
 	struct Bath{F <: AbstractBoundedFunction}
@@ -22,7 +23,7 @@ Bath(::Type{P}, f::F; β::Real, μ::Real=0) where {P<:AbstractParticle, F<:Abstr
 Base.similar(x::Bath, ::Type{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 Base.similar(x::Bath{P}, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
 Base.similar(x::Bath{P}; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ) where {P} = Bath(P, f, β=β, μ=μ)
-
+Base.eltype(::Type{Bath{P, F}}) where {P, F} = Float64
 
 const BosonicBath{F} = Bath{Boson, F} where {F<:AbstractBoundedFunction}
 const FermionicBath{F} = Bath{Fermion, F} where {F<:AbstractBoundedFunction}
@@ -59,6 +60,7 @@ Vacuum(::Type{P}, f::F; μ::Real=0) where {P<:AbstractParticle, F<:AbstractBound
 Base.similar(x::Vacuum, ::Type{P}, f::AbstractBoundedFunction; μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
 Base.similar(x::Vacuum{P}, f::AbstractBoundedFunction; μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
 Base.similar(x::Vacuum{P}; f::AbstractBoundedFunction=x.f, μ::Real=x.μ) where {P} = Vacuum(P, f, μ=μ)
+Base.eltype(::Type{Vacuum{P, F}}) where {P, F} = Float64
 
 const BosonicVacuum{F} = Vacuum{Boson, F} where {F<:AbstractBoundedFunction}
 const FermionicVacuum{F} = Vacuum{Fermion, F} where {F<:AbstractBoundedFunction}

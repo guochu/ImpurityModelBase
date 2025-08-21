@@ -1,9 +1,12 @@
 include("cache.jl")
-include("greenfunctions.jl")
-include("toulouse.jl")
+include("bcscache.jl")
+include("operators.jl")
 include("correlations.jl")
 
-function thermalstate(b::AbstractDiscreteBath)
+include("greenfunctions.jl")
+include("toulouse.jl")
+
+function thermocdm(b::AbstractDiscreteBath)
 	L = num_sites(b)
 	ρ = zeros(Float64, L, L)
 	for (i, ϵ) in enumerate(frequencies(b))
@@ -21,10 +24,10 @@ function cmatrix(b::AbstractDiscreteBath)
 	return h
 end
 
-function thermalstate(b::AbstractDiscreteBCSBath)
+function thermocdm(b::AbstractDiscreteBCSBath)
 	h = cmatrix(b)
 	cache = eigencache(h)
-	return thermalstate(cache, β=b.β)
+	return thermocdm(cache, β=b.β, μ=b.μ)
 end
 
 function cmatrix(b::AbstractDiscreteBCSBath)

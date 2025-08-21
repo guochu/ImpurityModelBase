@@ -18,6 +18,7 @@ function DiscreteBCSBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real},
 	DiscreteBCSBath{float(T)}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(β), float(μ), float(Δ))
 end 
 DiscreteBCSBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real, μ::Real=0, Δ::Number=0) = DiscreteBCSBath(ws, fs, Δ, β=β, μ=μ)
+Base.eltype(::Type{DiscreteBCSBath{T}}) where {T} = T
 
 """
 	DiscreteBCSBath(ws, fs; β, μ, Δ) 
@@ -47,7 +48,7 @@ function DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real
 end 
 DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Real=0, Δ::Number=0) = DiscreteBCSVacuum(ws, fs, Δ, μ=μ)
 discretebcsvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSVacuum(ws, fs; kwargs...)
-
+Base.eltype(::Type{DiscreteBCSVacuum{T}}) where {T} = T
 
 function Base.getproperty(m::DiscreteBCSBath, s::Symbol)
 	if s == :T
@@ -68,7 +69,7 @@ function Base.getproperty(m::DiscreteBCSVacuum, s::Symbol)
 end
 
 
-const AbstractDiscreteBCSBath = Union{DiscreteBCSBath{<:Number}, DiscreteBCSVacuum{<:Number}}
+const AbstractDiscreteBCSBath = Union{DiscreteBCSBath, DiscreteBCSVacuum}
 
 
 function discretebcsbath(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, Δ::Number=0, kwargs...)

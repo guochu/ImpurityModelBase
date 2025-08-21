@@ -19,10 +19,12 @@ include("freefermion.jl")
 
 include("exactsolutions.jl")
 
+include("exactdiagonalizations.jl")
+
 include("interactingbosons/util.jl")
 include("interactingbosons/noninteracting.jl")
 include("interactingbosons/interacting.jl")
 
 
 
-include("holstein.jl")
+### include("holstein.jl")

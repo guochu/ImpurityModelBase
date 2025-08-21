@@ -5,6 +5,7 @@ particletype(x::AbstractDiscreteBath) = particletype(typeof(x))
 frequencies(b::AbstractDiscreteBath) = b.ws
 spectrumvalues(b::AbstractDiscreteBath) = b.fs
 num_sites(x::AbstractDiscreteBath) = length(frequencies(x))
+Base.eltype(x::AbstractDiscreteBath) = eltype(typeof(x))
 
 """
 	struct DiscreteBath{P<:AbstractParticle}
@@ -24,6 +25,7 @@ function DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{
 	issorted(ws) || throw("frequencies should be sorted")
 	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(β), float(μ))
 end 
+Base.eltype(::Type{DiscreteBath{P}}) where {P} = Float64
 
 DiscreteBosonicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 """
@@ -59,6 +61,7 @@ function DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVecto
 	issorted(ws) || throw("frequencies should be sorted")
 	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(μ))
 end 
+Base.eltype(::Type{DiscreteVacuum{P}}) where {P} = Float64
 
 DiscreteBosonicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)
 discretebosonicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBosonicVacuum(Boson, ws, fs; kwargs...)

@@ -31,7 +31,7 @@ function cmatrix(m::BoundaryDriving)
 end
 
 
-function separablestate(m::BoundaryDriving, ρ_sys::AbstractMatrix)
+function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	(size(ρ_sys) == size(m.hsys)) || throw(DimensionMismatch("Hamiltonian size mismatch with density matrix size"))
 	leftbath, rightbath = m.leftbath, m.rightbath
 	L = num_bands(m)
@@ -42,19 +42,20 @@ function separablestate(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	pos = L
 	for (band, bj) in ((1, leftbath), (L, rightbath))
 		Lj = num_sites(bj)
-		ρ[pos+1:pos+Lj, pos+1:pos+Lj] = thermalstate(bj)
+		ρ[pos+1:pos+Lj, pos+1:pos+Lj] = thermocdm(bj)
 		pos += Lj
 	end
 	return ρ
 end
 
-function thermalstate(m::BoundaryDriving)
+function thermocdm(m::BoundaryDriving)
 	β, μ = m.leftbath.β, m.leftbath.μ
-	((β==m.rightbath.β) && (μ==m.rightbath.μ)) || throw(ArgumentError("thermalstate requires all the baths to have the same β and μ"))
+	((β==m.rightbath.β) && (μ==m.rightbath.μ)) || throw(ArgumentError("thermocdm requires all the baths to have the same β and μ"))
 	h = boundarydriving_cmatrix(m)
-	evals, U = eigen(Hermitian(h))
-	evals = [thermaloccupation(leftbath, item) for item in evals]
-	return U * Diagonal(evals) * U'
+	return thermocdm(particletype(m.leftbath, eigencache(h), β=β, μ=μ))
+	# evals, U = eigen(Hermitian(h))
+	# evals = [thermaloccupation(leftbath, item) for item in evals]
+	# return U * Diagonal(evals) * U'
 end
 
 

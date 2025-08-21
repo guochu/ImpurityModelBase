@@ -31,14 +31,15 @@ h = [h₁₁ c₁†c₁, h₁₂ c₁†c₂, h₁₃ c₁†c₃...; h₂₁ c
 time evolution for the coefficient matrix h of free fermions is dρ/dt = -i [h^t, ρ],
 where ρ is the quadratic observables
 """
-freefermions_cache(h::AbstractMatrix) = eigencache(transpose(h)) 
+# freefermions_cache(h::AbstractMatrix) = eigencache(transpose(h)) 
+cdmcache(h::AbstractMatrix) = eigencache(transpose(h))
 
 """
 	freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache=freefermions_cache(h))
 
 Return quadratic observables at time t
 """
-freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=freefermions_cache(h)) = _generic_ed_timeevo(ρ₀, h, -im*t, cache)
+# freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=freefermions_cache(h)) = _generic_ed_timeevo(ρ₀, h, -im*t, cache)
 
 # function freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=freefermions_cache(h))
 # 	t2 = -im*t
@@ -47,11 +48,11 @@ freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::E
 # 	return exp_h * ρ₀ * exp_h'
 # end
 
-timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, -im*t, cache)
-itimeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, τ::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, -τ, cache)
+timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Number, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, t, cache)
+# itimeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, τ::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, -τ, cache)
 
-operator_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, im*t, cache)
-operator_itimeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, τ::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, τ, cache)
+# operator_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, im*t, cache)
+# operator_itimeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, τ::Real, cache::EigenCache=eigencache(h)) = _generic_ed_timeevo(ρ₀, h, τ, cache)
 
 
 function _generic_ed_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Number, cache::EigenCache)
@@ -60,7 +61,19 @@ function _generic_ed_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Number
 	return exp_h * ρ₀ * exp_h'
 end
 
-function thermalstate(cache::EigenCache; β::Real)
+function thermocdm(::Type{P}, cache::EigenCache; β::Real, μ::Real=0) where {P <: AbstractParticle}
 	U, λs = cache.U, cache.λs
-	return U * Diagonal(exp.(-β .* λs)) * U'
+	# println("eigenvalues...")
+	# println(cache.m)
+	# println(λs)
+	# λs2 = exp.(-β .* λs)
+	n = [thermaloccupation(P, β, μ, ϵ) for ϵ in λs]
+	# λs2 ./= sum(λs2)
+	# println("occupations....")
+	# println(n)
+	return transpose(U * Diagonal(n) * U')
+
 end
+fermionicthermocdm(cache::EigenCache; kwargs...) = thermocdm(Fermion, cache; kwargs...)
+bosonicthermocdm(cache::EigenCache; kwargs...) = thermocdm(Boson, cache; kwargs...)
+

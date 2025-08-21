@@ -3,10 +3,57 @@ struct Toulouse{B<:AbstractDiscreteBath{Fermion}}
 	ϵ_d::Float64
 end
 Toulouse(b::AbstractDiscreteBath{Fermion}; ϵ_d::Real) = Toulouse(b, convert(Float64, ϵ_d))
-Base.eltype(::Type{Toulouse{B}}) where B = Float64
+Base.eltype(::Type{Toulouse{B}}) where B = eltype(B)
 Base.eltype(x::Toulouse) = eltype(typeof(x))
 
 num_sites(m::Toulouse) = num_sites(m.bath) + 1
+
+function hamiltonian(h::Toulouse{<:AbstractDiscreteFermionicBath})
+	T = eltype(h)
+	data = Vector{AdagATerm{T}}[]
+	L = num_sites(h)
+	ϵ_d = h.ϵ_d
+	push!(data, adaga(1, 1, coeff=ϵ_d))
+	bath = h.bath
+	ws, fs = frequencies(bath), spectrumvalues(bath)
+	for i in 1:L-1
+		push!(data, adaga(1+i, 1+i, coeff=ws[i]))
+		t = adaga(1, 1+i, coeff=fs[i])
+		push!(data, t)
+		push!(data, t')
+	end
+	return NormalQuadraticHamiltonian(L, data)
+end
+function hamiltonian(h::Toulouse{<:AbstractDiscreteBCSBath})
+	T = eltype(h)
+	data = Vector{QuadraticTerm{T}}[]
+
+	L = num_sites(h)
+	bath = h.bath
+	ws, fs = frequencies(bath), spectrumvalues(bath)	
+	Δ = bath.Δ
+	ϵ_d = h.ϵ_d
+
+	push!(data, adaga(1,1, coeff=ϵ_d))
+	push!(data, adaga(2,2, coeff=ϵ_d))
+
+	for i in 1:n-1
+		push!(data, adaga(2i+1,2i+1, coeff=ws[i]))
+		push!(data, adaga(2i+2, 2i+2, coeff=ws[i]))
+		t = adaga(1, 2i+1, coeff=fs[i])
+		push!(data, t)
+		push!(data, t')
+		t = adaga(2, 2i+2, coeff=fs[i])
+		push!(data, t)
+		push!(data, t')
+
+		t = adagadag(2i+1, 2L+2i+2, coeff=Δ)
+		push!(data, t)
+		push!(data, t')
+	end
+	return GenericQuadraticHamiltonian(2L, data)
+end
+
 """
 	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 
@@ -140,7 +187,7 @@ end
 
 function toulouse_neq_greater_lesser(b::Toulouse; nsys::Real=0)
 	h = cmatrix(b)
-	ρ = separablestate(b, nsys)
+	ρ = separablecdm(b, nsys)
 	return freefermions_greater_lesser(h, ρ, i=1)
 end 
 function toulouse_neq_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real}; nsys::Real=0) 
@@ -148,19 +195,19 @@ function toulouse_neq_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real}; ns
 	return f1.(ts), f2.(ts)
 end
 
-function separablestate(m::Toulouse{<:AbstractDiscreteFermionicBath}, nsys::Real)
+function separablecdm(m::Toulouse{<:AbstractDiscreteFermionicBath}, nsys::Real)
 	N = num_sites(m) 
 	ρ = zeros(Float64, N, N)
 	ρ[1, 1] = nsys
 
 	Lj = num_sites(m.bath)
-	ρ[2:N, 2:N] = thermalstate(m.bath)
+	ρ[2:N, 2:N] = thermocdm(m.bath)
 	return ρ
 end
 
-function separablestate(m::Toulouse{<:AbstractDiscreteBCSBath}, nsys::Real)
+function separablecdm(m::Toulouse{<:AbstractDiscreteBCSBath}, nsys::Real)
 	L = num_sites(m) 
-	ρ₀ = thermalstate(m.bath)
+	ρ₀ = thermocdm(m.bath)
 
 	ρ = zeros(eltype(ρ₀), 4L, 4L)
 	ρ[1, 1] = nsys
@@ -175,13 +222,13 @@ function separablestate(m::Toulouse{<:AbstractDiscreteBCSBath}, nsys::Real)
 	return ρ
 end
 
-function thermalstate(m::Toulouse)
+function thermocdm(m::Toulouse)
 	# β, μ = m.bath.β, m.bath.μ
 	h = cmatrix(m)
 	cache = eigencache(h)
 	# evals = [thermaloccupation(m.bath, item) for item in cache.λs]
 	# return cache.U * Diagonal(evals) * cache.U'
-	return thermalstate(cache, β=m.bath.β)
+	return thermocdm(cache, β=m.bath.β, μ=m.bath.μ)
 end
 
 function particlecurrent_cmatrix(m::Toulouse)

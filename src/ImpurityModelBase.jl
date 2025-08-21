@@ -24,12 +24,12 @@ export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum, A
 
 
 # exact diagonalizations
-export eigencache, freefermions_cache, freefermions_timeevo, freefermions_greater_lesser
-export timeevo, itimeevo, operator_timeevo, operator_itimeevo
-export correlation_2op_1t, correlation_2op_1τ
+export eigencache, cdmcache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
+export bcs_cdmcache, bcs_cmatrix
+export timeevo, correlation_2op_1t, correlation_2op_1τ
 export Toulouse, toulouse_greater_lesser, toulouse_neq_greater_lesser
-export cmatrix, particlecurrent_cmatrix, heatcurrent_cmatrix, separablestate
-export BoundaryDriving, thermalstate, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
+export cmatrix, particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm
+export BoundaryDriving, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 export leftheatcurrent_cmatrix, rightheatcurrent_cmatrix
 
 # Fourier transformations
@@ -45,9 +45,9 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
-export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
-export holstein_G0w_to_Gw, holstein_G0w_to_Σw, bethe_holstein_dmft_iteration
-export holstein_Gt, holstein_Gw, holstein_Σw
+# export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
+# export holstein_G0w_to_Gw, holstein_G0w_to_Σw, bethe_holstein_dmft_iteration
+# export holstein_Gt, holstein_Gw, holstein_Σw
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict

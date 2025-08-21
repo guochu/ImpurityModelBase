@@ -1,7 +1,8 @@
 
-function correlation_2op_1t(h::AbstractMatrix, A::AbstractMatrix, B::AbstractMatrix, times::AbstractVector{<:Real}, cache::EigenCache=eigencache(h); β::Real, reverse::Bool=false) 
-	return correlation_2op_1t(h, A, B, thermalstate(cache, β=β), times, cache, reverse=reverse)
-end
+# function correlation_2op_1t(h::AbstractMatrix, A::AbstractMatrix, B::AbstractMatrix, times::AbstractVector{<:Real}, cache::EigenCache=eigencache(h); 
+# 							β::Real, reverse::Bool=false) 
+# 	return correlation_2op_1t(h, A, B, thermocdm(cache, β=β), times, cache, reverse=reverse)
+# end
 
 """
 	correlation_2op_1t
@@ -10,7 +11,7 @@ end
 function correlation_2op_1t(h::AbstractMatrix, A::AbstractMatrix, B::AbstractMatrix, ρ::AbstractMatrix, times::AbstractVector{<:Real}, 
 							cache::EigenCache=eigencache(h); reverse::Bool=false)
 	tr_ρ = tr(ρ)
-	return reverse ? [tr(A * operator_timeevo(B, h, t, cache) * ρ) / tr_ρ  for t in times] : [tr(operator_timeevo(A, h, t, cache) * B * ρ) / tr_ρ  for t in times]	
+	return reverse ? [tr(A * timeevo(B, h, im*t, cache) * ρ) / tr_ρ  for t in times] : [tr(timeevo(A, h, im*t, cache) * B * ρ) / tr_ρ  for t in times]	
 end
 
 """
