@@ -119,7 +119,7 @@ end
 
 			mm = bcs_cmatrix(m, m2)
 			@test mm ≈ cmatrix(h) atol=atol
-			cdm = bcsthermocdm(eigencache(mm), β=β)
+			cdm = bcs_thermocdm(eigencache(mm), β=β)
 
 			tr_dm = tr(dm)
 
@@ -232,6 +232,7 @@ end
 	t = 0.7
 	δt = 0.1
 	ts = collect(0:δt:t)
+
 	for T in (Float64, ComplexF64)
 		for μ in (0.5, 0, -0.5)
 			for L in 1:4
@@ -285,60 +286,65 @@ end
 		end
 	end	
 
-	# # bcs 
-	# μ = 0
-	# for T in (Float64, ComplexF64)
-	# 	for L in 1:4
-	# 		# hamiltonian
-	# 		m = random_hermitian(T, L)
-	# 		m2 = rand(T, L, L)
-	# 		mm = bcs_cmatrix(m, m2)
-	# 		ham = random_genericquadratichamiltonian(m, m2)
+	# bcs 
+	μ = 0
+	for T in (Float64, ComplexF64)
+		for L in 1:4
+			# hamiltonian
+			m = random_hermitian(T, L)
+			m2 = rand(T, L, L)
+			mm = bcs_cmatrix(m, m2)
+			ham = random_genericquadratichamiltonian(m, m2)
 
-	# 		h = fermionoperator(ham)
-	# 		# time evolution
-	# 		cache1 = eigencache(h)
-	# 		cache2 = eigencache(mm)
+			h = fermionoperator(ham)
+			# time evolution
+			cache1 = eigencache(h)
+			cache2 = eigencache(2*mm)
 
 
-	# 		dm = random_dm(T, 2^L)
-	# 		cdm = generic_quadratic_obs(dm)
+			dm = random_dm(T, 2^L)
+			cdm = generic_quadratic_obs(dm)
 
-	# 		for i in 1:L, j in 1:L
-	# 			a_i = fermionaoperator(L, i)
-	# 			adag_j = fermionadagoperator(L, j)
-	# 			g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
-	# 			l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
+			for i in 1:L, j in 1:L
+				a_i = fermionaoperator(L, i)
+				adag_j = fermionadagoperator(L, j)
 
-	# 			g2, l2 = freefermions_greater_lesser(m, cdm, ts, i, j, cache2)
+				g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
+				l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
 
-	# 			@test g1 ≈ g2 atol=1.0e-8
-	# 			@test l1 ≈ l2 atol=1.0e-8
-	# 		end
+				g2, l2 = freefermions_greater_lesser(mm, cdm, ts, i, j, cache2)
 
-	# 		# # equilibrium green's function
-	# 		# dm = thermodm(ham, β=β, μ=μ)
-	# 		# cdm = normal_quadratic_obs(dm)
+				@test g1 ≈ g2 atol=atol
+				@test l1 ≈ l2 atol=atol
 
-	# 		# for i in 1:L, j in 1:L
-	# 		# 	a_i = fermionaoperator(L, i)
-	# 		# 	adag_j = fermionadagoperator(L, j)
-	# 		# 	g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
-	# 		# 	l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
+				adag_i = a_i'
+				g3 = -im .* correlation_2op_1t(h, adag_i, adag_j, dm, ts, cache1, reverse = false)
+				l3 = im .* correlation_2op_1t(h, adag_j, adag_i, dm, ts, cache1, reverse = true)
 
-	# 		# 	g2, l2 = freefermions_greater_lesser(m, cdm, ts, i, j, cache2)
+				g4, l4 = freefermions_greater_lesser(mm, cdm, ts, L+i, j, cache2)
+				@test g3 ≈ g4 atol=atol
+				@test l3 ≈ l4 atol=atol				
+			end
 
-	# 		# 	@test g1 ≈ g2 atol=1.0e-8
-	# 		# 	@test l1 ≈ l2 atol=1.0e-8
+			# equilibrium green's function
+			dm = thermodm(ham, β=β, μ=μ)
+			cdm = generic_quadratic_obs(dm)
+			@test cdm ≈ bcs_thermocdm(eigencache(mm), β=β, μ=μ)
 
-	# 		# 	g3, l3 = freefermions_greater_lesser(m, ts, i, j, cache2, β=β, μ=μ)
+			for i in 1:L, j in 1:L
+				a_i = fermionaoperator(L, i)
+				adag_j = fermionadagoperator(L, j)
+				g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
+				l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
 
-	# 		# 	@test g1 ≈ g3 atol=1.0e-8
-	# 		# 	@test l1 ≈ l3 atol=1.0e-8
+				g2, l2 = freefermions_greater_lesser(mm, cdm, ts, i, j, cache2)
 
-	# 		# end
+				@test g1 ≈ g2 atol=atol
+				@test l1 ≈ l2 atol=atol
+			end
 
-	# 	end
-	# end	
+		end
+	end	
+
 
 end

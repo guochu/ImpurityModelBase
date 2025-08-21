@@ -1,4 +1,5 @@
-function bcsthermocdm(cache::EigenCache; β::Real, μ::Real=0)
+# the major (perhaps the only) difference between a normal bath and a bcs bath 
+function bcs_thermocdm(cache::EigenCache; β::Real, μ::Real=0)
 	(μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
 	U, λs = cache.U, cache.λs
 	# println("eigenvalues...")

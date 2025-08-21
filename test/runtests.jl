@@ -10,7 +10,7 @@ Random.seed!(12354)
 # util
 include("ed.jl")
 
-### auxiliary
+
 include("auxiliary.jl")
 include("fourier.jl")
 include("freefermion.jl")

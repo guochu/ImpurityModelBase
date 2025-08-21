@@ -3,11 +3,11 @@
 	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i)
 Real-time greater and lesser Green's functions
 """
-function freefermions_greater_lesser(h::AbstractMatrix, i::Int=1, j::Int=i, cache::EigenCache=eigencache(h); β::Real, μ::Real=0) 
+function freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real, μ::Real=0) 
 	# @assert ishermitian(h)
 	return _fermionic_eq_gf_util(cache, i, j, β, μ)
 end
-function freefermions_greater_lesser(h::AbstractMatrix, ts::AbstractVector{<:Real}, i::Int=1, j::Int=i, cache::EigenCache=eigencache(h); kwargs...) 
+function freefermions_greater_lesser(h::AbstractMatrix, ts::AbstractVector{<:Real}, i::Int, j::Int=i, cache::EigenCache=eigencache(h); kwargs...) 
 	f = freefermions_greater_lesser(h, i, j, cache; kwargs...)
 	r = f.(ts)
 	return map(x->x[1], r), map(x->x[2], r)
@@ -63,8 +63,12 @@ end
 # 	return r_g
 # end
 
+"""
+	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h))
 
-function freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int=1, j::Int=i, cache::EigenCache=eigencache(h))
+Applies for both normal and bcs baths
+"""
+function freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h))
 	(size(h) == size(ρ₀)) || throw(DimensionMismatch("Hamiltonian size mismatch with density matrix"))
 	U = cache.U
 	ρ₁ = one(ρ₀) - transpose(ρ₀)
