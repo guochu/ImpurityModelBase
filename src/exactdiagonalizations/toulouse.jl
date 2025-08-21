@@ -177,7 +177,7 @@ toulouse_greater_lesser(b::Toulouse) = toulouse_greater_lesser(b.bath, ϵ_d=b.ϵ
 toulouse_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real}) = toulouse_greater_lesser(b.bath, ts, ϵ_d=b.ϵ_d)
 function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
 	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
-	return freefermions_greater_lesser(h, β=b.β, μ=b.μ, i=1)
+	return freefermions_greater_lesser(h, 1, β=b.β, μ=b.μ)
 end
 function toulouse_greater_lesser(b::AbstractDiscreteFermionicBath, ts::AbstractVector{<:Real}; kwargs...)
 	f = toulouse_greater_lesser(b; kwargs...)
@@ -188,7 +188,7 @@ end
 function toulouse_neq_greater_lesser(b::Toulouse; nsys::Real=0)
 	h = cmatrix(b)
 	ρ = separablecdm(b, nsys)
-	return freefermions_greater_lesser(h, ρ, i=1)
+	return freefermions_greater_lesser(h, ρ, 1)
 end 
 function toulouse_neq_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real}; nsys::Real=0) 
 	f1, f2 = toulouse_neq_greater_lesser(b, nsys=nsys)

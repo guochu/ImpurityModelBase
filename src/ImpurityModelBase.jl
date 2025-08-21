@@ -24,11 +24,15 @@ export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum, A
 
 
 # exact diagonalizations
+export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, adagadag, AATerm, aa, QuarticTerm, interaction
+export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadraticHamiltonian, QuadraticHamiltonian
+export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm
+
 export eigencache, cdmcache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
-export bcs_cdmcache, bcs_cmatrix
+export bcs_cdmcache, bcs_cmatrix, bcsthermocdm
 export timeevo, correlation_2op_1t, correlation_2op_1τ
 export Toulouse, toulouse_greater_lesser, toulouse_neq_greater_lesser
-export cmatrix, particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm
+export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm
 export BoundaryDriving, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 export leftheatcurrent_cmatrix, rightheatcurrent_cmatrix
 

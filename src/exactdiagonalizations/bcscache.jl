@@ -44,6 +44,9 @@ function bcs_cdm(h::AbstractMatrix, g::AbstractMatrix)
 	return m
 end
 
+"""
+	bcs_cdmcache(h::AbstractMatrix)
+"""
 bcs_cdmcache(h::AbstractMatrix) = eigencache(2*transpose(h))
 
 function bcs_symmetrize!(h::AbstractMatrix)

@@ -12,11 +12,8 @@ include("ed.jl")
 
 ### auxiliary
 include("auxiliary.jl")
-
 include("fourier.jl")
-
 include("freefermion.jl")
-
 include("exactsolutions.jl")
 
 include("exactdiagonalizations.jl")
