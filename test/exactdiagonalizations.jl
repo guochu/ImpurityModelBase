@@ -78,151 +78,151 @@ function generic_quadratic_obs(dm::AbstractMatrix)
 	return bcs_cdm(obs, obs2)	
 end
 
-# @testset "thermal state" begin
-# 	atol = 1.0e-8
-# 	β = 1.4
+@testset "thermal state" begin
+	atol = 1.0e-8
+	β = 1.4
 
-# 	# normal
-# 	for T in (Float64, ComplexF64)
-# 		for μ in (0.5, 0, -0.5)
-# 			for L in 1:4
-# 				m = random_hermitian(T, L)
+	# normal
+	for T in (Float64, ComplexF64)
+		for μ in (0.5, 0, -0.5)
+			for L in 1:4
+				m = random_hermitian(T, L)
 
-# 				h = random_normalquadratichamiltonian(m)
-# 				@test m ≈ cmatrix(h) atol = atol
-# 				dm = thermodm(h, β=β, μ=μ)
-# 				cdm = fermionicthermocdm(eigencache(m), β=β, μ=μ)
-# 				# println("cdm ", cdm)
-# 				tr_dm = tr(dm)
-# 				ob1 = zeros(T, L, L)
-# 				ob2 = zeros(T, L, L)
-# 				for i in 1:L, j in 1:L
-# 					t = adaga(i, j)
-# 					x1 = cmatrix(L, t)
-# 					ob1[i, j] = sum(x1 .*  cdm)
-# 					x2 = fermionoperator(L, t)
-# 					ob2[i, j] = tr(x2 * dm) / tr_dm
-# 				end
+				h = random_normalquadratichamiltonian(m)
+				@test m ≈ cmatrix(h) atol = atol
+				dm = thermodm(h, β=β, μ=μ)
+				cdm = fermionicthermocdm(eigencache(m), β=β, μ=μ)
+				# println("cdm ", cdm)
+				tr_dm = tr(dm)
+				ob1 = zeros(T, L, L)
+				ob2 = zeros(T, L, L)
+				for i in 1:L, j in 1:L
+					t = adaga(i, j)
+					x1 = cmatrix(L, t)
+					ob1[i, j] = sum(x1 .*  cdm)
+					x2 = fermionoperator(L, t)
+					ob2[i, j] = tr(x2 * dm) / tr_dm
+				end
 
-# 				@test ob1 ≈ ob2 atol=atol
-# 			end
-# 		end
-# 	end
+				@test ob1 ≈ ob2 atol=atol
+			end
+		end
+	end
 
-# 	# bcs
-# 	for T in (Float64, ComplexF64)
-# 		for L in 1:4
-# 			m = random_hermitian(T, L)
-# 			m2 = rand(T, L, L)
-# 			h = random_genericquadratichamiltonian(m, m2)
-# 			dm = thermodm(h, β=β)
+	# bcs
+	for T in (Float64, ComplexF64)
+		for L in 1:4
+			m = random_hermitian(T, L)
+			m2 = rand(T, L, L)
+			h = random_genericquadratichamiltonian(m, m2)
+			dm = thermodm(h, β=β)
 
-# 			mm = bcs_cmatrix(m, m2)
-# 			@test mm ≈ cmatrix(h) atol=atol
-# 			cdm = bcsthermocdm(eigencache(mm), β=β)
+			mm = bcs_cmatrix(m, m2)
+			@test mm ≈ cmatrix(h) atol=atol
+			cdm = bcsthermocdm(eigencache(mm), β=β)
 
-# 			tr_dm = tr(dm)
+			tr_dm = tr(dm)
 
-# 			ob1 = zeros(T, L, L)
-# 			ob2 = zeros(T, L, L)
-# 			for i in 1:L, j in 1:L
-# 				t = adaga(i, j)
-# 				x1 = cmatrix(L, t, normal=false)
-# 				ob1[i, j] = sum(x1 .*  cdm)
-# 				x2 = fermionoperator(L, t)
-# 				ob2[i, j] = tr(x2 * dm) / tr_dm
-# 			end
-# 			@test ob1 ≈ ob2 atol=atol
-# 			# fill!(ob1, 0)
-# 			# fill!(ob2, 0)
+			ob1 = zeros(T, L, L)
+			ob2 = zeros(T, L, L)
+			for i in 1:L, j in 1:L
+				t = adaga(i, j)
+				x1 = cmatrix(L, t, normal=false)
+				ob1[i, j] = sum(x1 .*  cdm)
+				x2 = fermionoperator(L, t)
+				ob2[i, j] = tr(x2 * dm) / tr_dm
+			end
+			@test ob1 ≈ ob2 atol=atol
+			# fill!(ob1, 0)
+			# fill!(ob2, 0)
 
-# 			for i in 1:L, j in 1:L
-# 				t = adagadag(i, j)
-# 				x1 = cmatrix(L, t)
-# 				ob1[i, j] = sum(x1 .*  cdm)
-# 				x2 = fermionoperator(L, t)
-# 				ob2[i, j] = tr(x2 * dm) / tr_dm
-# 			end		
-# 			@test ob1 ≈ ob2 atol=atol
+			for i in 1:L, j in 1:L
+				t = adagadag(i, j)
+				x1 = cmatrix(L, t)
+				ob1[i, j] = sum(x1 .*  cdm)
+				x2 = fermionoperator(L, t)
+				ob2[i, j] = tr(x2 * dm) / tr_dm
+			end		
+			@test ob1 ≈ ob2 atol=atol
 
-# 			for i in 1:L, j in 1:L
-# 				t = aa(i, j)
-# 				x1 = cmatrix(L, t)
-# 				ob1[i, j] = sum(x1 .*  cdm)
-# 				x2 = fermionoperator(L, t)
-# 				ob2[i, j] = tr(x2 * dm) / tr_dm
-# 			end		
-# 			@test ob1 ≈ ob2 atol=atol
-# 		end
-# 	end
-# end
+			for i in 1:L, j in 1:L
+				t = aa(i, j)
+				x1 = cmatrix(L, t)
+				ob1[i, j] = sum(x1 .*  cdm)
+				x2 = fermionoperator(L, t)
+				ob2[i, j] = tr(x2 * dm) / tr_dm
+			end		
+			@test ob1 ≈ ob2 atol=atol
+		end
+	end
+end
 
-# @testset "real time evolution" begin
-# 	atol=1.0e-8
+@testset "real time evolution" begin
+	atol=1.0e-8
 
-# 	β = 10
-# 	dt = 0.7
-# 	n = 5
+	β = 10
+	dt = 0.7
+	n = 5
 
-# 	# normal
-# 	for T in (Float64, ComplexF64)
-# 		for μ in (0.5, 0, -0.5)
-# 			for L in 1:4
-# 				dm = random_dm(T, 2^L)
+	# normal
+	for T in (Float64, ComplexF64)
+		for μ in (0.5, 0, -0.5)
+			for L in 1:4
+				dm = random_dm(T, 2^L)
 
-# 				cdm = normal_quadratic_obs(dm)
+				cdm = normal_quadratic_obs(dm)
 
-# 				# hamiltonian
-# 				m = random_hermitian(T, L)
+				# hamiltonian
+				m = random_hermitian(T, L)
 
-# 				ham = random_normalquadratichamiltonian(m)
-# 				h = fermionoperator(ham)
-# 				# time evolution
-# 				cache1 = eigencache(h)
-# 				cache2 = cdmcache(m)
-# 				for k in 1:n
-# 					t = k * dt
-# 					rho1 = timeevo(dm, h, -im*t, cache1)
-# 					rho2_cdm = timeevo(cdm, m, im*t, cache2)
-# 					rho1_cdm = normal_quadratic_obs(rho1)
+				ham = random_normalquadratichamiltonian(m)
+				h = fermionoperator(ham)
+				# time evolution
+				cache1 = eigencache(h)
+				cache2 = cdmcache(m)
+				for k in 1:n
+					t = k * dt
+					rho1 = timeevo(dm, h, -im*t, cache1)
+					rho2_cdm = timeevo(cdm, m, im*t, cache2)
+					rho1_cdm = normal_quadratic_obs(rho1)
 
-# 					@test rho1_cdm ≈ rho2_cdm atol=1.0e-8
-# 				end
+					@test rho1_cdm ≈ rho2_cdm atol=atol
+				end
 
-# 			end
-# 		end
-# 	end
+			end
+		end
+	end
 
-# 	# bcs
-# 	for T in (Float64, ComplexF64)
-# 		for L in 1:4
-# 			dm = random_dm(T, 2^L)
+	# bcs
+	for T in (Float64, ComplexF64)
+		for L in 1:4
+			dm = random_dm(T, 2^L)
 
-# 			cdm = generic_quadratic_obs(dm)
+			cdm = generic_quadratic_obs(dm)
 
-# 			# hamiltonian
-# 			m = random_hermitian(T, L)
-# 			m2 = rand(T, L, L)
-# 			mm = bcs_cmatrix(m, m2)
+			# hamiltonian
+			m = random_hermitian(T, L)
+			m2 = rand(T, L, L)
+			mm = bcs_cmatrix(m, m2)
 
-# 			ham = random_genericquadratichamiltonian(m, m2)
-# 			h = fermionoperator(ham)
+			ham = random_genericquadratichamiltonian(m, m2)
+			h = fermionoperator(ham)
 
-# 			# time evolution
-# 			cache1 = eigencache(h)
-# 			cache2 = bcs_cdmcache(mm)
-# 			for k in 1:n
-# 				t = k * dt
-# 				rho1 = timeevo(dm, h, -im*t, cache1)
-# 				rho2_cdm = timeevo(cdm, m, im*t, cache2)
-# 				rho1_cdm = generic_quadratic_obs(rho1)
+			# time evolution
+			cache1 = eigencache(h)
+			cache2 = bcs_cdmcache(mm)
+			for k in 1:n
+				t = k * dt
+				rho1 = timeevo(dm, h, -im*t, cache1)
+				rho2_cdm = timeevo(cdm, m, im*t, cache2)
+				rho1_cdm = generic_quadratic_obs(rho1)
 
-# 				@test rho1_cdm ≈ rho2_cdm atol=1.0e-8
-# 			end
+				@test rho1_cdm ≈ rho2_cdm atol=atol
+			end
 
-# 		end
-# 	end
-# end
+		end
+	end
+end
 
 @testset "real-time Green's functions" begin
 	# normal
@@ -256,8 +256,8 @@ end
 
 					g2, l2 = freefermions_greater_lesser(m, cdm, ts, i, j, cache2)
 
-					@test g1 ≈ g2 atol=1.0e-8
-					@test l1 ≈ l2 atol=1.0e-8
+					@test g1 ≈ g2 atol=atol
+					@test l1 ≈ l2 atol=atol
 				end
 
 				# equilibrium green's function
@@ -272,13 +272,13 @@ end
 
 					g2, l2 = freefermions_greater_lesser(m, cdm, ts, i, j, cache2)
 
-					@test g1 ≈ g2 atol=1.0e-8
-					@test l1 ≈ l2 atol=1.0e-8
+					@test g1 ≈ g2 atol=atol
+					@test l1 ≈ l2 atol=atol
 
 					g3, l3 = freefermions_greater_lesser(m, ts, i, j, cache2, β=β, μ=μ)
 
-					@test g1 ≈ g3 atol=1.0e-8
-					@test l1 ≈ l3 atol=1.0e-8
+					@test g1 ≈ g3 atol=atol
+					@test l1 ≈ l3 atol=atol
 
 				end
 			end
