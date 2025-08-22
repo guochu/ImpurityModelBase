@@ -183,7 +183,7 @@ end
 				for k in 1:n
 					t = k * dt
 					rho1 = timeevo(dm, h, -im*t, cache1)
-					rho2_cdm = timeevo(cdm, m, im*t, cache2)
+					rho2_cdm = timeevo(cdm, cache2.m, im*t, cache2)
 					rho1_cdm = normal_quadratic_obs(rho1)
 
 					@test rho1_cdm ≈ rho2_cdm atol=atol
@@ -214,7 +214,7 @@ end
 			for k in 1:n
 				t = k * dt
 				rho1 = timeevo(dm, h, -im*t, cache1)
-				rho2_cdm = timeevo(cdm, m, im*t, cache2)
+				rho2_cdm = timeevo(cdm, cache2.m, im*t, cache2)
 				rho1_cdm = generic_quadratic_obs(rho1)
 
 				@test rho1_cdm ≈ rho2_cdm atol=atol
