@@ -28,8 +28,8 @@ export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, a
 export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadraticHamiltonian, QuadraticHamiltonian
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm
 
-export eigencache, cdmcache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
-export bcs_cdmcache, bcs_cmatrix, bcs_thermocdm
+export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
+export bcs_cmatrix, bcs_thermocdm
 export timeevo, correlation_2op_1t, correlation_2op_1τ
 export Toulouse, toulouse_greater_lesser, toulouse_neq_greater_lesser
 export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm

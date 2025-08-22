@@ -179,7 +179,7 @@ end
 				h = fermionoperator(ham)
 				# time evolution
 				cache1 = eigencache(h)
-				cache2 = cdmcache(m)
+				cache2 = eigencache(transpose(m))
 				for k in 1:n
 					t = k * dt
 					rho1 = timeevo(dm, h, -im*t, cache1)
@@ -210,7 +210,7 @@ end
 
 			# time evolution
 			cache1 = eigencache(h)
-			cache2 = bcs_cdmcache(mm)
+			cache2 = eigencache(2*transpose(mm))
 			for k in 1:n
 				t = k * dt
 				rho1 = timeevo(dm, h, -im*t, cache1)

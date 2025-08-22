@@ -32,7 +32,7 @@ time evolution for the coefficient matrix h of free fermions is dρ/dt = -i [h^t
 where ρ is the quadratic observables
 """
 # freefermions_cache(h::AbstractMatrix) = eigencache(transpose(h)) 
-cdmcache(h::AbstractMatrix) = eigencache(transpose(h))
+# cdmcache(h::AbstractMatrix) = eigencache(transpose(h))
 
 """
 	freefermions_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Real, cache=freefermions_cache(h))
