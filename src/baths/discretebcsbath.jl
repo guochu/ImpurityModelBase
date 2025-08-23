@@ -50,6 +50,8 @@ DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Re
 discretebcsvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSVacuum(ws, fs; kwargs...)
 Base.eltype(::Type{DiscreteBCSVacuum{T}}) where {T} = T
 
+num_sites(b::Union{DiscreteBCSBath, DiscreteBCSVacuum}) = 2*length(frequencies(b))
+
 function Base.getproperty(m::DiscreteBCSBath, s::Symbol)
 	if s == :T
 		return 1 / m.β

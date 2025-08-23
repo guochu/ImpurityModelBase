@@ -20,7 +20,7 @@ println("------------------------------------")
 		b1 = bath(Fermion, spec, β=β, μ=μ)
 		b2 = discretebath(b1, δw=dw)
 
-		g₁ = toulouse_Gτ(b2, τs, ϵ_d=ϵ_d)
+		g₁ = toulouse_Gτ(Toulouse(b2, ϵ_d=ϵ_d), τs)
 		g₂ = [real(toulouse_Gτ(b1, τ, ϵ_d = ϵ_d)) for τ in τs]
 
 		@test norm(g₁ - g₂) / norm(g₁) < rtol
@@ -45,7 +45,7 @@ end
 		b1 = bath(Fermion, spec, β=β, μ=0.)
 		b2 = discretebath(b1, δw=dw)
 		gf1 = [toulouse_Gt(spec, tj, ϵ_d = ϵ_d, wmax=100) for tj in ts]
-		gf2 = toulouse_Gt(b2, ts, ϵ_d = ϵ_d)
+		gf2 = toulouse_Gt(Toulouse(b2, ϵ_d = ϵ_d), ts)
 		@test norm(gf1 - gf2) / norm(gf1) < rtol
 
 	end

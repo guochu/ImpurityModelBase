@@ -26,25 +26,23 @@ end
 
 function thermocdm(b::AbstractDiscreteBCSBath)
 	h = cmatrix(b)
-	cache = eigencache(2*h)
+	cache = eigencache(h)
 	return fermionicthermocdm(cache, β=b.β, μ=b.μ)
 end
 
 function cmatrix(b::AbstractDiscreteBCSBath)
-	L = num_sites(b)
+	L = div(num_sites(b), 2)
 	Δ = b.Δ
-	h = zeros(typeof(Δ), 4L, 4L)
+	h = zeros(typeof(Δ), 2L, 2L)
+	g = zero(h)
 	for (i, ϵ) in enumerate(frequencies(b))
 		h[2i-1, 2i-1] = ϵ
 		h[2i, 2i] = ϵ
-		
-		h[2L+2i-1, 2L+2i-1] = 1-ϵ
-		h[2L+2i, 2L+2i] = 1-ϵ	
 
-		h[2i-1, 2L+2i] = -Δ
-		h[2L+2i, 2i-1] = -conj(Δ)
+		g[2i-1, 2i] = -Δ
 	end	
-	return h
+
+	return bcs_cmatrix(h, g)
 end
 
 include("boundarydriving.jl")

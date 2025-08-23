@@ -10,6 +10,9 @@ Base.:/(s::AbstractTerm, m::Number) = s * (1 / m)
 Base.:+(s::AbstractTerm) = s
 Base.:-(s::AbstractTerm) = (-1) * s
 
+Base.convert(::Type{M}, x::M) where {M<:AbstractTerm} = x
+
+
 """
 	struct AdagATerm <: QuadraticTerm
 
@@ -82,6 +85,9 @@ function Base.adjoint(x::AATerm)
 	return AdagAdagTerm((j, i), coeff=conj(x.coeff))
 end
 
+Base.convert(::Type{QuadraticTerm{T}}, x::AdagATerm) where {T} = convert(AdagATerm{T}, x)
+Base.convert(::Type{QuadraticTerm{T}}, x::AdagAdagTerm) where {T} = convert(AdagAdagTerm{T}, x)
+Base.convert(::Type{QuadraticTerm{T}}, x::AATerm) where {T} = convert(AATerm{T}, x)
 
 # interacting term
 """
@@ -115,7 +121,11 @@ Base.eltype(::Type{<:AbstractHamiltonian{T}}) where {T<:Number} = T
 Base.eltype(x::AbstractHamiltonian) = eltype(typeof(x))
 abstract type QuadraticHamiltonian{T<:Number} <: AbstractHamiltonian{T} end
 num_sites(x::AbstractHamiltonian) = x.n
-
+function Base.:+(x::M, y::M) where {M<:AbstractHamiltonian}
+	data = vcat(x.data, y.data)
+	n = max(num_sites(x), num_sites(y))
+	return M(data, n)
+end
 
 struct NormalHamiltonian{T<:Number} <: AbstractHamiltonian{T}
 	data::Vector{NormalTerm{T}}

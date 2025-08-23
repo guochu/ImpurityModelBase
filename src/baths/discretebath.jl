@@ -4,7 +4,7 @@ particletype(x::AbstractDiscreteBath) = particletype(typeof(x))
 
 frequencies(b::AbstractDiscreteBath) = b.ws
 spectrumvalues(b::AbstractDiscreteBath) = b.fs
-num_sites(x::AbstractDiscreteBath) = length(frequencies(x))
+num_sites(x::AbstractDiscreteBath) = error("num_sites not implemented for bath type $(typeof(x))")
 Base.eltype(x::AbstractDiscreteBath) = eltype(typeof(x))
 
 """
@@ -73,7 +73,7 @@ const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Bo
 const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
 
 thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
-
+num_sites(b::Union{DiscreteBath, DiscreteVacuum}) = length(frequencies(b))
 
 function Base.getproperty(m::DiscreteBath, s::Symbol)
 	if s == :T
