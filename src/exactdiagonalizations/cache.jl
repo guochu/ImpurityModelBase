@@ -61,6 +61,8 @@ function _generic_ed_timeevo(ρ₀::AbstractMatrix, h::AbstractMatrix, t::Number
 	return exp_h * ρ₀ * exp_h'
 end
 
+thermocdm(::Type{P}, h::AbstractMatrix, cache::EigenCache=eigencache(h); kwargs...) where {P <: AbstractParticle} = thermocdm(P, cache; kwargs...)
+
 function thermocdm(::Type{P}, cache::EigenCache; β::Real, μ::Real=0) where {P <: AbstractParticle}
 	U, λs = cache.U, cache.λs
 	# println("eigenvalues...")

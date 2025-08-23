@@ -17,7 +17,7 @@ include("fourier.jl")
 include("freefermion.jl")
 include("exactsolutions.jl")
 
-include("exactdiagonalizations.jl")
+include("exactdiagonalizations/exactdiagonalizations.jl")
 
 include("interactingbosons/util.jl")
 include("interactingbosons/noninteracting.jl")

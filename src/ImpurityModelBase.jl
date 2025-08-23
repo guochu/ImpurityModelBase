@@ -29,9 +29,9 @@ export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadrat
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm
 
 export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
-export bcs_cmatrix, bcs_thermocdm
+export bcs_cmatrix
 export timeevo, correlation_2op_1t, correlation_2op_1τ
-export Toulouse, toulouse_greater_lesser, toulouse_neq_greater_lesser
+export Toulouse, hamiltonian, toulouse_greater_lesser, toulouse_neq_greater_lesser
 export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm
 export BoundaryDriving, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 export leftheatcurrent_cmatrix, rightheatcurrent_cmatrix
