@@ -1,3 +1,17 @@
+function freefermions_Gt(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); kwargs...)
+	f = freefermions_greater_lesser(h, i, j, cache; kwargs...)
+	function f′(t)
+		x1, x2 = f(t)
+		return x1 - x2
+	end
+	return f′
+end
+function freefermions_Gt(h::AbstractMatrix, ts::AbstractVector{<:Real}, i::Int, j::Int=i, cache::EigenCache=eigencache(h); kwargs...)
+	f = freefermions_Gt(h, i, j, cache; kwargs...)
+	return f.(ts)
+end
+
+
 """
 	freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int; kwargs...) 
 	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i)
@@ -29,6 +43,7 @@ function _fermionic_eq_gf_util(cache::EigenCache, i::Int, j::Int, β::Real, μ::
 	end
 	return f	
 end
+
 
 # ### neq Green's functions
 # function freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix; i::Int=1, j::Int=i)
@@ -62,6 +77,21 @@ end
 # 	end
 # 	return r_g
 # end
+
+
+function freefermions_Gt(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h))
+	f = freefermions_greater_lesser(h, ρ₀, i, j, cache)
+	function f′(t)
+		x1, x2 = f(t)
+		return x1 - x2
+	end
+	return f′	
+end
+function freefermions_Gt(h::AbstractMatrix, ρ₀::AbstractMatrix, ts::AbstractVector{<:Real}, 
+									 i::Int=1, j::Int=i, cache::EigenCache=eigencache(h))
+	f = freefermions_Gt(h, ρ₀, i, j, cache)
+	return f.(ts)
+end
 
 """
 	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h))
@@ -100,4 +130,24 @@ function _fermionic_neq_gf_util(cache::EigenCache, ρ₁, ρ₂, i::Int, j::Int,
 		end
 	end
 	return -im * r_g, im * r_l
+end
+
+
+# Matsubara Green's functions
+function freefermions_Gτ(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real)
+	λs, U = cache.λs, cache.U
+	function f(τ)
+		r_g = zero(eltype(U))
+		for k in 1:size(U, 1)
+			ss = U[i, k] * conj(U[j, k]) 
+			n_k = fermidirac(β, 0, -λs[k])
+			r_g += ss * (n_k * exp(-λs[k] * τ))
+		end
+		return r_g
+	end
+	return f
+end
+function freefermions_Gτ(h::AbstractMatrix, τs::AbstractVector{<:Real}, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real)
+	f = freefermions_Gτ(h, i, j, cache, β=β)
+	return f.(τs)
 end

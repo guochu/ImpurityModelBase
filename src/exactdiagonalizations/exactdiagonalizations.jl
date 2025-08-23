@@ -26,8 +26,8 @@ end
 
 function thermocdm(b::AbstractDiscreteBCSBath)
 	h = cmatrix(b)
-	cache = eigencache(h)
-	return thermocdm(cache, β=b.β, μ=b.μ)
+	cache = eigencache(2*h)
+	return fermionicthermocdm(cache, β=b.β, μ=b.μ)
 end
 
 function cmatrix(b::AbstractDiscreteBCSBath)

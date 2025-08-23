@@ -1,25 +1,40 @@
-# the major (perhaps the only) difference between a normal bath and a bcs bath 
-function bcs_thermocdm(cache::EigenCache; β::Real, μ::Real=0)
-	(μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
-	U, λs = cache.U, cache.λs
-	# println("eigenvalues...")
-	# println(cache.m)
-	# println(λs)
+# # the major (perhaps the only) difference between a normal bath and a bcs bath 
+# function bcs_thermocdm(cache::EigenCache; β::Real, μ::Real=0)
+# 	(μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
+# 	U, λs = cache.U, cache.λs
+# 	# println("eigenvalues...")
+# 	# println(cache.m)
+# 	# println(λs)
 
-	L0 = size(U, 1)
-	L = div(L0, 2)
-	(2L == L0) || throw(ArgumentError("not a BCS cmatrix"))
-	n = zeros(eltype(λs), L0)
-	for i in 1:L
-		ϵ = λs[i] - λs[2L+1-i]
-		# println("energy is ", ϵ)
-		n[i] = thermaloccupation(Fermion, β, μ, ϵ)
-	end
-	for i in 1:L
-		n[2L+1-i] = 1 - n[i]
-	end
-	return transpose(U * Diagonal(n) * U')
-end
+# 	# L0 = size(U, 1)
+# 	# L = div(L0, 2)
+# 	# (2L == L0) || throw(ArgumentError("not a BCS cmatrix"))
+# 	# n = zeros(eltype(λs), L0)
+# 	# for i in 1:L
+# 	# 	ϵ = λs[i] - λs[2L+1-i]
+# 	# 	# println("energy is ", ϵ)
+# 	# 	n[i] = thermaloccupation(Fermion, β, μ, ϵ)
+# 	# end
+# 	# for i in 1:L
+# 	# 	n[2L+1-i] = 1 - n[i]
+# 	# end
+# 	n = bcs_occupation(λs, β=β, μ=μ)
+# 	return transpose(U * Diagonal(n) * U')
+# end
+
+# function bcs_occupation(λs::AbstractVector{<:Real}; β::Real, μ::Real=0)
+# 	L0 = length(λs)
+# 	L = div(L0, 2)
+# 	(2L == L0) || throw(ArgumentError("not BCS singular values"))
+# 	n = zeros(eltype(λs), L0)
+# 	for i in 1:L
+# 		isapprox(λs[i], -λs[2L+1-i], atol=1.0e-12) || throw(ArgumentError("BCS singular values should appear in opposite pairs"))
+# 		ϵ = λs[i] - λs[2L+1-i]
+# 		n[i] = thermaloccupation(Fermion, β, μ, ϵ)
+# 		n[2L+1-i] = 1 - n[i]
+# 	end
+# 	return n
+# end
 
 function bcs_cmatrix(h::AbstractMatrix{<:Number}, g::AbstractMatrix{<:Number})
 	(size(h) == size(g)) || throw(DimensionMismatch())
@@ -60,6 +75,7 @@ function bcs_symmetrize!(h::AbstractMatrix)
 	m = h[1:L, L+1:2L]
 	h[1:L, L+1:2L] = antisymmetrize!(m)
 	h[L+1:2L, 1:L] = m'
+	h .*= 2
 	return h
 end
 

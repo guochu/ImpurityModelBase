@@ -8,7 +8,11 @@ Base.eltype(x::Toulouse) = eltype(typeof(x))
 
 num_sites(m::Toulouse) = num_sites(m.bath) + 1
 
-function hamiltonian(h::Toulouse{<:AbstractDiscreteFermionicBath})
+const NormalToulouse = Toulouse{T} where {T<:AbstractDiscreteFermionicBath}
+const BCSToulouse =Toulouse{T} where {T<:AbstractDiscreteBCSBath}
+
+# hamiltonian and cmatrix
+function hamiltonian(h::NormalToulouse)
 	T = eltype(h)
 	data = Vector{AdagATerm{T}}[]
 	L = num_sites(h)
@@ -24,7 +28,7 @@ function hamiltonian(h::Toulouse{<:AbstractDiscreteFermionicBath})
 	end
 	return NormalQuadraticHamiltonian(L, data)
 end
-function hamiltonian(h::Toulouse{<:AbstractDiscreteBCSBath})
+function hamiltonian(h::BCSToulouse)
 	T = eltype(h)
 	data = Vector{QuadraticTerm{T}}[]
 
@@ -53,57 +57,6 @@ function hamiltonian(h::Toulouse{<:AbstractDiscreteBCSBath})
 	end
 	return GenericQuadraticHamiltonian(2L, data)
 end
-
-"""
-	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
-
-The Matsubara Green's function for the Toulouse model
-Gᵢⱼ(τ, τ′) = -Tr[âᵢ(τ)â†ⱼ(τ′)exp(-β(Ĥ-μN̂)⟩]
-Gᵢⱼ(τ) = Gᵢⱼ(τ, 0)
-"""
-function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
-	# @assert ishermitian(h)
-	# ham = h - μ .* LinearAlgebra.I
-	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
-	β, μ = b.β, b.μ
-	c = μ * one(h)
-	c[1, 1] = 0
-	ham = h - c
-	# λs, U = eigen(Hermitian(ham))
-	cache = eigencache(ham)
-	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
-	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
-end
-function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
-	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
-	# ham = h - μ .* LinearAlgebra.I
-	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
-	β, μ = b.β, b.μ
-	# λs, U = eigen(Hermitian(ham))
-	cache = eigencache(h)
-	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
-	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
-end
-toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
-toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
-function toulouse_Gτ(h::AbstractDiscreteBath{Fermion}, τs::AbstractVector{<:Real}; kwargs...)
-	f = toulouse_Gτ(h; kwargs...)
-	return f.(τs)
-end
-
-
-function _fermionic_Gτ_util(cache::EigenCache, ns, i::Int, j::Int, t::Real)
-	λs, U = cache.λs, cache.U
-	r_g = zero(eltype(U))
-	for k in 1:size(U, 1)
-		ss = U[i, k] * conj(U[j, k])
-		exp_t = exp(-λs[k] * t)
-		n_k = ns[k]
-		r_g += ss * (1 - n_k) * exp_t
-	end
-	return r_g
-end
-
 
 cmatrix(m::Toulouse) = toulouse_cmatrix(m.bath, ϵ_d=m.ϵ_d)
 function toulouse_cmatrix(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
@@ -159,6 +112,107 @@ function toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 	return m
 end
 
+
+# thermal state
+function thermocdm(m::NormalToulouse)
+	h = cmatrix(m)
+	cache = eigencache(h)
+	return fermionicthermocdm(cache, β=m.bath.β, μ=m.bath.μ)
+end
+function thermocdm(m::BCSToulouse)
+	h = cmatrix(m)
+	cache = eigencache(h)
+	return bcs_thermocdm(cache, β=m.bath.β, μ=m.bath.μ)
+end
+
+# separable state
+function separablecdm(m::NormalToulouse, nsys::Real)
+	N = num_sites(m) 
+	ρ = zeros(Float64, N, N)
+	ρ[1, 1] = nsys
+
+	Lj = num_sites(m.bath)
+	ρ[2:N, 2:N] = thermocdm(m.bath)
+	return ρ
+end
+
+function separablecdm(m::BCSToulouse, nsys::Real)
+	L = num_sites(m) 
+	ρ₀ = thermocdm(m.bath)
+
+	ρ = zeros(eltype(ρ₀), 4L, 4L)
+	ρ[1, 1] = nsys
+	ρ[2, 2] = nsys
+	ρ[2L+1, 2L+1] = 1-nsys
+	ρ[2L+2, 2L+2] = 1-nsys	
+
+
+	N = num_sites(m.bath)
+	ρ[3:2L, 3:2L] = ρ₀[1:2N, 1:2N]
+	ρ[2L+3:4L, 2L+3:4L] = ρ₀[2N+1:4N, 2N+1:4N]
+	return ρ
+end
+
+# green functions
+
+"""
+	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+
+The Matsubara Green's function for the Toulouse model
+Gᵢⱼ(τ, τ′) = -Tr[âᵢ(τ)â†ⱼ(τ′)exp(-β(Ĥ-μN̂)⟩]
+Gᵢⱼ(τ) = Gᵢⱼ(τ, 0)
+"""
+function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+	# @assert ishermitian(h)
+	# ham = h - μ .* LinearAlgebra.I
+	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
+	β, μ = b.β, b.μ
+	c = μ * one(h)
+	c[1, 1] = 0
+	ham = h - c
+	# λs, U = eigen(Hermitian(ham))
+	# cache = eigencache(ham)
+	# ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
+	# return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
+	return freefermions_Gτ(ham, 1, 1, β=β)
+end
+# function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
+# 	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
+# 	# ham = h - μ .* LinearAlgebra.I
+# 	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
+# 	β, μ = b.β, b.μ
+# 	# λs, U = eigen(Hermitian(ham))
+# 	cache = eigencache(h)
+# 	ns = [fermidirac(β, 0, cache.λs[k]) for k in 1:length(cache.λs)]
+# 	return τ -> _fermionic_Gτ_util(cache, ns, 1, 1, τ)
+# end
+function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
+	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
+	# ham = h - μ .* LinearAlgebra.I
+	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
+	return freefermions_Gτ(ham, 1, 1, β=b.β)
+end
+toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
+toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
+function toulouse_Gτ(h::AbstractDiscreteBath{Fermion}, τs::AbstractVector{<:Real}; kwargs...)
+	f = toulouse_Gτ(h; kwargs...)
+	return f.(τs)
+end
+
+
+function _fermionic_Gτ_util(cache::EigenCache, ns, i::Int, j::Int, t::Real)
+	λs, U = cache.λs, cache.U
+	r_g = zero(eltype(U))
+	for k in 1:size(U, 1)
+		ss = U[i, k] * conj(U[j, k])
+		exp_t = exp(-λs[k] * t)
+		n_k = ns[k]
+		r_g += ss * (1 - n_k) * exp_t
+	end
+	return r_g
+end
+
+
 toulouse_Gt(m::Toulouse) = toulouse_Gt(m.bath, ϵ_d=m.ϵ_d)
 toulouse_Gt(m::Toulouse, ts::AbstractVector{<:Real}) = toulouse_Gt(m.bath, ts, ϵ_d=m.ϵ_d)
 function toulouse_Gt(b::AbstractDiscreteFermionicBath; kwargs...)
@@ -191,56 +245,23 @@ function toulouse_neq_greater_lesser(b::Toulouse; nsys::Real=0)
 	return freefermions_greater_lesser(h, ρ, 1)
 end 
 function toulouse_neq_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real}; nsys::Real=0) 
-	f1, f2 = toulouse_neq_greater_lesser(b, nsys=nsys)
-	return f1.(ts), f2.(ts)
+	f = toulouse_neq_greater_lesser(b, nsys=nsys)
+	r = f.(ts)
+	return map(x->x[1], r), map(x->x[2], r)
 end
 
-function separablecdm(m::Toulouse{<:AbstractDiscreteFermionicBath}, nsys::Real)
-	N = num_sites(m) 
-	ρ = zeros(Float64, N, N)
-	ρ[1, 1] = nsys
 
-	Lj = num_sites(m.bath)
-	ρ[2:N, 2:N] = thermocdm(m.bath)
-	return ρ
-end
-
-function separablecdm(m::Toulouse{<:AbstractDiscreteBCSBath}, nsys::Real)
-	L = num_sites(m) 
-	ρ₀ = thermocdm(m.bath)
-
-	ρ = zeros(eltype(ρ₀), 4L, 4L)
-	ρ[1, 1] = nsys
-	ρ[2, 2] = nsys
-	ρ[2L+1, 2L+1] = 1-nsys
-	ρ[2L+2, 2L+2] = 1-nsys	
-
-
-	N = num_sites(m.bath)
-	ρ[3:2L, 3:2L] = ρ₀[1:2N, 1:2N]
-	ρ[2L+3:4L, 2L+3:4L] = ρ₀[2N+1:4N, 2N+1:4N]
-	return ρ
-end
-
-function thermocdm(m::Toulouse)
-	# β, μ = m.bath.β, m.bath.μ
-	h = cmatrix(m)
-	cache = eigencache(h)
-	# evals = [thermaloccupation(m.bath, item) for item in cache.λs]
-	# return cache.U * Diagonal(evals) * cache.U'
-	return thermocdm(cache, β=m.bath.β, μ=m.bath.μ)
-end
-
-function particlecurrent_cmatrix(m::Toulouse)
+# currents
+function particlecurrent_cmatrix(m::NormalToulouse)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
 end
-function heatcurrent_cmatrix(m::Toulouse)
+function heatcurrent_cmatrix(m::NormalToulouse)
 	N = num_sites(m)
 	return _heatcurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
 end
 
-bathsites(m::Toulouse) = 2:num_sites(m)
+bathsites(m::NormalToulouse) = 2:num_sites(m)
 
 function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
 	fs = spectrumvalues(b)
