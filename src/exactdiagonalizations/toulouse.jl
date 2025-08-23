@@ -114,15 +114,10 @@ end
 
 
 # thermal state
-function thermocdm(m::NormalToulouse)
+function thermocdm(m::Toulouse)
 	h = cmatrix(m)
 	cache = eigencache(h)
 	return fermionicthermocdm(cache, β=m.bath.β, μ=m.bath.μ)
-end
-function thermocdm(m::BCSToulouse)
-	h = cmatrix(m)
-	cache = eigencache(h)
-	return bcs_thermocdm(cache, β=m.bath.β, μ=m.bath.μ)
 end
 
 # separable state
@@ -190,7 +185,7 @@ function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
 	# ham = h - μ .* LinearAlgebra.I
 	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)
-	return freefermions_Gτ(ham, 1, 1, β=b.β)
+	return freefermions_Gτ(h, 1, 1, β=b.β)
 end
 toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
 toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
