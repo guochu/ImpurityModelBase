@@ -1,3 +1,4 @@
+# BoundaryDriving does not support BCS or BEC type bath
 struct BoundaryDriving{B<:AbstractDiscreteBath, M<:AbstractMatrix}
 	hsys::M
 	leftbath::B
@@ -12,7 +13,7 @@ particletype(::Type{BoundaryDriving{B, M}}) where {B, M} = particletype(B)
 particletype(x::BoundaryDriving) = particletype(typeof(x))
 
 # hamiltonian and cmatrix
-function freehamiltonian(h::BoundaryDriving)
+function freehamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 	T = eltype(h)
 	data = AdagATerm{T}[]
 
@@ -30,16 +31,17 @@ function freehamiltonian(h::BoundaryDriving)
 		Lj = num_sites(bj)
 		ws = frequencies(bj)
 		for j in 1:Lj
-			push!(data, adaga(pos+j, pos+j, coeff=ws[j]))
+			wj = include_chemical ? ws[j] - bj.μ : ws[j]
+			push!(data, adaga(pos+j, pos+j, coeff=wj))
 		end
 		pos += Lj
 	end
 	return NormalQuadraticHamiltonian(num_sites(h), data)	
 end
-function hamiltonian(h::BoundaryDriving)
+function hamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 	leftbath, rightbath = h.leftbath, h.rightbath
 	L = num_bands(h)
-	ham = freehamiltonian(h)
+	ham = freehamiltonian(h, include_chemical=include_chemical)
 
 	pos = L
 	for (band, bj) in ((1, leftbath), (L, rightbath))
@@ -84,6 +86,13 @@ function thermocdm(m::BoundaryDriving)
 	h = cmatrix(m)
 	return thermocdm(particletype(m), eigencache(h), β=β, μ=μ)
 end
+function thermodm(m::BoundaryDriving)
+	(particletype(m) == Fermion) || throw(ArgumentError("only Fermion particletype supported"))
+	β, μ = m.leftbath.β, m.leftbath.μ
+	((β==m.rightbath.β) && (μ==m.rightbath.μ)) || throw(ArgumentError("thermodm requires all the baths to have the same β and μ"))
+	h = hamiltonian(m, include_chemical=true)
+	return thermodm(h, β=β)
+end
 
 # separable state
 function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
@@ -102,8 +111,13 @@ function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	end
 	return ρ
 end
-
-
+function separabledm(m::BoundaryDriving, sysdm::AbstractMatrix)
+	(size(sysdm, 1) == 2^(size(m.hsys, 1))) || throw(DimensionMismatch("Hamiltonian size mismatch with density operator size"))
+	leftbath, rightbath = m.leftbath, m.rightbath
+	ρ_l = thermodm(hamiltonian(leftbath, include_chemical=true), β=leftbath.β)
+	ρ_r = thermodm(hamiltonian(rightbath, include_chemical=true), β=rightbath.β)
+	return kron(sysdm, ρ_l, ρ_r)
+end
 
 # currents
 function leftparticlecurrent_cmatrix(m::BoundaryDriving)
