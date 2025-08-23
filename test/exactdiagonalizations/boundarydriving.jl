@@ -3,83 +3,109 @@ println("|        ED Boundary Driving       |")
 println("------------------------------------")
 
 
-# @testset "BoundaryDriving Green's functions, normal bath" begin
+@testset "BoundaryDriving Green's functions and currents" begin
 
-# 	atol=1.0e-8
+	atol=1.0e-8
 
-# 	βl = 10
-# 	βr = 1
-# 	μl = 0.5
+	βl = 10
+	βr = 1
+	μl = 0.5
+	μr = -0.5
 
-# 	δτ = 1
-# 	τs = collect(0:δτ:β)
-# 	δt = 0.7
-# 	t = 3.5
-# 	ts = collect(0:δt:t)
+	δt = 0.6
+	t = 1.8
+	ts = collect(0:δt:t)
 
-# 	# μ = 0
-# 	dw = 0.5
+	# μ = 0
+	dw = 1
 
-# 	ϵ_d = -0.5
 
-# 	for μ in (0.5, 0, -0.5)
-# 		b = discretebath(fermionicbath(semicircular(t=1), β=β, μ=μ), δw=dw)
-# 		model = Toulouse(b, ϵ_d = ϵ_d)
-# 		@test num_sites(model) == 5
+	leftbath = discretebath(fermionicbath(semicircular(t=1), β=βl, μ=μl), δw=dw)
+	rightbath = discretebath(fermionicbath(semicircular(t=1), β=βr, μ=μr), δw=dw)
 
-# 		ham = hamiltonian(model)
-# 		# @test cmatrix(ham) ≈ cmatrix(model) atol=atol
+	L = 2
+	for T in (Float64, ComplexF64)
 
-# 		h = fermionoperator(ham)
-# 		chemical = zero(h)
-# 		for i in 2:num_sites(model)
-# 			chemical .+= fermiondensityoperator(num_sites(model), i)
-# 		end
+		hsys = random_hermitian(T, L)
 
-# 		a = fermionaoperator(num_sites(model), 1)
-# 		adag = a'
+		model = BoundaryDriving(hsys, leftbath, rightbath)
+		@test num_sites(model) == 6
 
-# 		h1 = h - μ * chemical
-# 		cache1 = eigencache(h1)
-			
-# 		# Matsubara Green's function
-# 		g1 = correlation_2op_1τ(h1, a, adag, τs, cache1, β=β)
-# 		g2 = toulouse_Gτ(model, τs)
+		ham = hamiltonian(model)
+		h2 = cmatrix(ham)
+		@test h2 ≈ cmatrix(model) atol=atol
 
-# 		@test g1 ≈ g2 atol=atol
 
-# 		# equilibrium greater and lesser
-# 		hh = hamiltonian(model, include_chemical=true)
-# 		dm = thermodm(hh, β=β)
-# 		@test dm ≈ thermodm(model) atol=atol
-# 		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
-# 		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
+		i = 1
 
-# 		cdm = fermionicthermocdm(eigencache(cmatrix(hh)), β=β)
-# 		@test cdm ≈ thermocdm(model) atol=atol
-# 		@test normal_quadratic_obs(dm) ≈ cdm atol=atol
-# 		g2, l2 = freefermions_greater_lesser(cmatrix(ham), cdm, ts, 1, 1)
+		h1 = fermionoperator(ham)
+		a = fermionaoperator(num_sites(model), i)
+		adag = a'
 
-# 		@test g1 ≈ g2 atol=atol
-# 		@test l1 ≈ l2 atol=atol
 
-# 		g3, l3 = toulouse_greater_lesser(model, ts)
+		# nonequilibrium greater and lesser
 
-# 		@test g1 ≈ g3 atol=atol
-# 		@test l1 ≈ l3 atol=atol
+		rho_sys = random_dm(T, 2^L)
+		dm = separabledm(model, rho_sys)
+		cdm = separablecdm(model, normal_quadratic_obs(rho_sys))
+		@test normal_quadratic_obs(dm) ≈ cdm atol=atol
 
-# 		# nonequilibrium greater and lesser
-# 		dm = separabledm(model)
-# 		cdm = separablecdm(model)
-# 		@test normal_quadratic_obs(dm) ≈ cdm atol=atol
-
-# 		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
-# 		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
+		g1 = -im .* correlation_2op_1t(h1, a, adag, dm, ts, reverse = false)
+		l1 = im .* correlation_2op_1t(h1, adag, a, dm, ts, reverse = true)
 		
-# 		g2, l2 = toulouse_neq_greater_lesser(model, ts)	
+		g2, l2 = freefermions_greater_lesser(h2, cdm, ts, i, i)
 
-# 		@test g1 ≈ g2 atol=atol
-# 		@test l1 ≈ l2 atol=atol
-# 	end
+		@test g1 ≈ g2 atol=atol
+		@test l1 ≈ l2 atol=atol
 
-# end
+
+		# currents
+		cache1 = eigencache(h1)
+		cache2 = eigencache(transpose(h2))
+
+		rho1 = timeevo(dm, h1, -im*t, cache1)
+		rho2_cdm = timeevo(cdm, cache2.m, im*t, cache2)
+		rho1_cdm = normal_quadratic_obs(rho1)
+
+		@test rho1_cdm ≈ rho2_cdm atol=atol
+
+
+		ob_ham = leftparticlecurrent_hamiltonian(model)
+		ob_cdm = leftparticlecurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
+
+		ob_ham = rightparticlecurrent_hamiltonian(model)
+		ob_cdm = rightparticlecurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
+
+		ob_ham = leftheatcurrent_hamiltonian(model)
+		ob_cdm = leftheatcurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
+
+		ob_ham = rightheatcurrent_hamiltonian(model)
+		ob_cdm = rightheatcurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
+	end
+
+
+end

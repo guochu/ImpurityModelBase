@@ -7,7 +7,7 @@ end
 
 num_bands(m::BoundaryDriving) = size(m.hsys, 1)
 num_sites(m::BoundaryDriving) = num_bands(m) + num_sites(m.leftbath) + num_sites(m.rightbath)
-Base.eltype(::Type{BoundaryDriving{B, M}}) where {B, M} = eltype(M)
+Base.eltype(::Type{BoundaryDriving{B, M}}) where {B, M} = promote_type(eltype(B), eltype(M)) 
 Base.eltype(x::BoundaryDriving) = eltype(typeof(x))
 particletype(::Type{BoundaryDriving{B, M}}) where {B, M} = particletype(B)
 particletype(x::BoundaryDriving) = particletype(typeof(x))
@@ -144,4 +144,22 @@ end
 function rightbathsites(m::BoundaryDriving)
 	L = num_bands(m) + num_sites(m.leftbath)
 	return L+1:L+num_sites(m.rightbath)
+end
+
+
+function leftparticlecurrent_hamiltonian(m::BoundaryDriving)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _particlecurrent_hamiltonian_util!(h, m.leftbath, leftbathsites(m), 1)
+end 
+function rightparticlecurrent_hamiltonian(m::BoundaryDriving)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _particlecurrent_hamiltonian_util!(h, m.rightbath, rightbathsites(m), num_bands(m))
+end
+function leftheatcurrent_hamiltonian(m::BoundaryDriving)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _heatcurrent_hamiltonian_util!(h, m.leftbath, leftbathsites(m), 1)
+end 
+function rightheatcurrent_hamiltonian(m::BoundaryDriving)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _heatcurrent_hamiltonian_util!(h, m.rightbath, rightbathsites(m), num_bands(m))
 end

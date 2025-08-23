@@ -26,7 +26,7 @@ println("------------------------------------")
 		@test num_sites(model) == 5
 
 		ham = hamiltonian(model)
-		# @test cmatrix(ham) ≈ cmatrix(model) atol=atol
+		@test cmatrix(ham) ≈ cmatrix(model) atol=atol
 
 		h = fermionoperator(ham)
 		chemical = zero(h)
@@ -78,6 +78,60 @@ println("------------------------------------")
 
 		@test g1 ≈ g2 atol=atol
 		@test l1 ≈ l2 atol=atol
+	end
+end
+
+
+@testset "Toulouse model: currents" begin
+	# normal
+	atol=1.0e-8
+
+	β = 10
+	t = 3.5
+
+	# μ = 0
+	dw = 0.5
+
+	ϵ_d = -0.5
+
+	for μ in (0.5, 0, -0.5)
+		b = discretebath(fermionicbath(semicircular(t=1), β=β, μ=μ), δw=dw)
+		model = Toulouse(b, ϵ_d = ϵ_d)
+
+		ham = hamiltonian(model)
+		h1 = fermionoperator(ham)
+		h2 = cmatrix(model)
+
+		dm = separabledm(model)
+		cdm = separablecdm(model)
+
+		cache1 = eigencache(h1)
+		cache2 = eigencache(transpose(h2))
+
+
+		rho1 = timeevo(dm, h1, -im*t, cache1)
+		rho2_cdm = timeevo(cdm, cache2.m, im*t, cache2)
+		rho1_cdm = normal_quadratic_obs(rho1)
+
+		@test rho1_cdm ≈ rho2_cdm atol=atol
+
+		ob_ham = particlecurrent_hamiltonian(model)
+		ob_cdm = particlecurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
+
+		ob_ham = heatcurrent_hamiltonian(model)
+		ob_cdm = heatcurrent_cmatrix(model)
+		@test cmatrix(ob_ham) ≈ ob_cdm atol=atol
+		ob_m = fermionoperator(ob_ham)
+
+		x = tr(ob_m * rho1)
+		y = sum(ob_cdm .* rho2_cdm)
+		@test x ≈ y atol=atol
 	end
 end
 

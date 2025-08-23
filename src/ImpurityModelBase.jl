@@ -32,9 +32,12 @@ export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions
 export bcs_cmatrix
 export timeevo, correlation_2op_1t, correlation_2op_1τ
 export Toulouse, hamiltonian, toulouse_greater_lesser, toulouse_neq_greater_lesser
-export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm
+export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm, separabledm
+export particlecurrent_hamiltonian, heatcurrent_hamiltonian
 export BoundaryDriving, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix
 export leftheatcurrent_cmatrix, rightheatcurrent_cmatrix
+export leftparticlecurrent_hamiltonian, rightparticlecurrent_hamiltonian
+export leftheatcurrent_hamiltonian, rightheatcurrent_hamiltonian
 
 # Fourier transformations
 export Gt_to_Gw, Gw_to_Gt, Aw_to_Gτ, Gw_to_Aw, Δw_to_Jw

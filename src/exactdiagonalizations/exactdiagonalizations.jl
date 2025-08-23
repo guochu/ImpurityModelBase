@@ -14,7 +14,7 @@ function hamiltonian(b::AbstractDiscreteBath; include_chemical=false)
 		if include_chemical
 			ϵ = ϵ - b.μ
 		end
-		push!(data, adaga(i, j, coeff=ϵ))
+		push!(data, adaga(i, i, coeff=ϵ))
 	end
 	return NormalQuadraticHamiltonian(num_sites(b), data)	
 end

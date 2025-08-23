@@ -290,12 +290,16 @@ function thermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
 	if μ != zero(μ)
 		m = m - μ * fermiondensityoperator(num_sites(h))
 	end
-	return exp(-β .* m)
+	rho = exp(-β .* m)
+	rho ./= tr(rho)
+	return rho
 end
 function thermodm(cache::EigenCache; β::Real)
 	U, λs = cache.U, cache.λs
 	λs2 = exp.(-β .* λs)
-	return U * Diagonal(λs2) * U'
+	rho = U * Diagonal(λs2) * U'
+	rho ./= tr(rho)
+	return rho
 end
 
 # function get_paulistring(h::AdagATerm{T}) where {T}

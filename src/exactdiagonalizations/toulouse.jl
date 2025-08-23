@@ -337,3 +337,29 @@ function _heatcurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, 
 	end
 	return h
 end
+
+function particlecurrent_hamiltonian(m::NormalToulouse)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _particlecurrent_hamiltonian_util!(h, m.bath, bathsites(m), 1)
+end
+function heatcurrent_hamiltonian(m::NormalToulouse)
+	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
+	return _heatcurrent_hamiltonian_util!(h, m.bath, bathsites(m), 1)
+end
+
+function _particlecurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractDiscreteBath, bsites, band::Int)
+	fs = spectrumvalues(b)
+	for (j, v) in zip(bsites, fs)
+		t = adaga(j, band, coeff=-2*im*v)
+		push!(h, t)
+	end
+	return h	
+end
+function _heatcurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractDiscreteBath, bsites, band::Int)
+	ws, fs = frequencies(b), spectrumvalues(b)
+	for (j, w, v) in zip(bsites, ws, fs)
+		t = adaga(j, band, coeff=-2*im*w*v)
+		push!(h, t)
+	end
+	return h
+end
