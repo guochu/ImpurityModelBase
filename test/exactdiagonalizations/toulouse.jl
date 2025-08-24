@@ -172,13 +172,13 @@ end
 		@test g1 ≈ g2 atol=atol
 
 		# equilibrium greater and lesser
-		hh = hamiltonian(model)
-		dm = thermodm(hh, β=β)
+
+		dm = thermodm(ham, β=β)
 		@test dm ≈ thermodm(model) atol=atol
 		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
 		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
 
-		cdm = fermionicthermocdm(eigencache(cmatrix(hh)), β=β)
+		cdm = fermionicthermocdm(eigencache(cmatrix(ham)), β=β)
 		@test cdm ≈ thermocdm(model) atol=atol
 		@test generic_quadratic_obs(dm) ≈ cdm atol=atol
 		g2, l2 = freefermions_greater_lesser(cmatrix(ham), cdm, ts, 1, 1)
@@ -190,6 +190,17 @@ end
 
 		@test g1 ≈ g3 atol=atol
 		@test l1 ≈ l3 atol=atol
+
+		adag1 = fermionadagoperator(num_sites(ham), 1)
+		adag2 = fermionadagoperator(num_sites(ham), 2)
+
+		g4 = -im .* correlation_2op_1t(h, adag1, adag2, dm, ts, reverse = false)
+		l4 = im .* correlation_2op_1t(h, adag2, adag1, dm, ts, reverse = true)
+
+		g5, l5 = freefermions_greater_lesser(cmatrix(ham), cdm, ts, num_sites(ham)+1, 2)
+
+		@test g4 ≈ g5 atol=atol
+		@test l4 ≈ l5 atol=atol
 
 		# nonequilibrium greater and lesser
 		dm = separabledm(model)
