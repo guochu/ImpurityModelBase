@@ -330,6 +330,14 @@ end
 				g2 = freefermions_Gτ(mm, τs, i, j, cache2, β=β)
 
 				@test g1 ≈ g2 atol=atol
+
+				adag_i = a_i'
+
+				g1 = correlation_2op_1τ(h, adag_i, adag_j, τs, cache1, β=β)
+
+				g2 = freefermions_Gτ(mm, τs, L+i, j, cache2, β=β)
+
+				@test g1 ≈ g2 atol=atol
 			end
 		end
 	end	
