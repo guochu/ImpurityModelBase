@@ -6,7 +6,6 @@ include("correlations.jl")
 include("greenfunctions.jl")
 include("toulouse.jl")
 
-
 function hamiltonian(b::AbstractDiscreteBath; include_chemical=false)
 	T = eltype(b)
 	data = AdagATerm{T}[]
@@ -72,5 +71,7 @@ function cmatrix(b::AbstractDiscreteBCSBath)
 
 	return bcs_cmatrix(h, g)
 end
+
+include("bogoliubov.jl")
 
 include("boundarydriving.jl")
