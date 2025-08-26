@@ -84,7 +84,7 @@ end
 bogoliubov_cmatrix(h::BCSToulouse) = cmatrix(bogoliubov_hamiltonian(h))
 
 
-function bogoliubov_hamiltonian(bath::AbstractDiscreteBCSBath)
+function bogoliubov_hamiltonian(bath::DiscreteBCSBath)
 	ws = frequencies(bath)
 	Δ = bath.Δ
 	L = div(num_sites(bath), 2)
@@ -98,7 +98,7 @@ function bogoliubov_hamiltonian(bath::AbstractDiscreteBCSBath)
 	end
 	return ham
 end
-bogoliubov_cmatrix(h::AbstractDiscreteBCSBath) = cmatrix(bogoliubov_hamiltonian(h))
+bogoliubov_cmatrix(h::DiscreteBCSBath) = cmatrix(bogoliubov_hamiltonian(h))
 
 
 function bogoliubov_thermocdm(m::BCSToulouse)

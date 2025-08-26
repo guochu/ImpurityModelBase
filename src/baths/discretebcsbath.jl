@@ -1,10 +1,12 @@
+num_sites(x::AbstractDiscreteBCSBath) = 2 * length(frequencies(x))
+
 """
 	struct DiscreteBath{P<:AbstractParticle}
 
 Fermionic bath container, includes a bath spectrum density,
 the inverse temperature β and the chemical potential μ
 """
-struct DiscreteBCSBath{T<:Number} <: AbstractDiscreteBath{Fermion}
+struct DiscreteBCSBath{T<:Number} <: AbstractDiscreteBCSBath
 	ws::Vector{Float64}
 	fs::Vector{Float64}
 	β::Float64
@@ -34,7 +36,7 @@ Fermionic bath container, includes a bath spectrum density,
 the chemical potential μ
 the inverse temperature β=Inf
 """
-struct DiscreteBCSVacuum{T<:Number} <: AbstractDiscreteBath{Fermion}
+struct DiscreteBCSVacuum{T<:Number} <: AbstractDiscreteBCSBath
 	ws::Vector{Float64}
 	fs::Vector{Float64}
 	μ::Float64	
@@ -50,7 +52,7 @@ DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Re
 discretebcsvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSVacuum(ws, fs; kwargs...)
 Base.eltype(::Type{DiscreteBCSVacuum{T}}) where {T} = T
 
-num_sites(b::Union{DiscreteBCSBath, DiscreteBCSVacuum}) = 2*length(frequencies(b))
+# num_sites(b::Union{DiscreteBCSBath, DiscreteBCSVacuum}) = 2*length(frequencies(b))
 
 function Base.getproperty(m::DiscreteBCSBath, s::Symbol)
 	if s == :T
@@ -71,7 +73,7 @@ function Base.getproperty(m::DiscreteBCSVacuum, s::Symbol)
 end
 
 
-const AbstractDiscreteBCSBath = Union{DiscreteBCSBath, DiscreteBCSVacuum}
+# const AbstractDiscreteBCSBath = Union{DiscreteBCSBath, DiscreteBCSVacuum}
 
 
 function discretebcsbath(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, Δ::Number=0, kwargs...)

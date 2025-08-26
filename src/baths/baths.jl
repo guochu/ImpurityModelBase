@@ -1,3 +1,7 @@
+include("particles.jl")
+include("abstractbaths.jl")
+
+# normal baths
 include("bath.jl")
 include("discretebath.jl")
 

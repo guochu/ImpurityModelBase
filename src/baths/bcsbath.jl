@@ -1,6 +1,6 @@
 
 
-struct BCSBath{F <: AbstractBoundedFunction, T<:Number} <: AbstractBath{Fermion}
+struct BCSBath{F <: AbstractBoundedFunction, T<:Number} <: AbstractContinuousBCSBath
 	f::F
 	β::Float64
 	μ::Float64
@@ -17,7 +17,7 @@ bcsbath(f::AbstractBoundedFunction; kwargs...) = BCSBath(f; kwargs...)
 bcsbath(bath::FermionicBath; Δ::Number=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
 
 
-struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBath{Fermion}
+struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractContinuousBCSBath
 	f::F
 	μ::Float64
 	Δ::T	
@@ -30,8 +30,6 @@ Base.eltype(::Type{BCSVacuum{F, T}}) where {F, T} = T
 
 bcsvacuum(f::AbstractBoundedFunction; kwargs...) = BCSVacuum(f; kwargs...)
 bcsvacuum(bath::FermionicVacuum; Δ::Number=0) = bcsvacuum(bath.spectrum, μ=bath.μ, Δ=Δ)
-
-const AbstractBCSBath = Union{BCSBath{F}, BCSVacuum{F}} where {F<:AbstractBoundedFunction}
 
 
 function Base.getproperty(m::BCSBath, s::Symbol)

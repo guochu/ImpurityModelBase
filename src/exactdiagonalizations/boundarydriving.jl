@@ -1,5 +1,5 @@
 # BoundaryDriving does not support BCS or BEC type bath
-struct BoundaryDriving{B<:AbstractDiscreteBath, M<:AbstractMatrix}
+struct BoundaryDriving{B<:AbstractDiscreteNormalBath, M<:AbstractMatrix}
 	hsys::M
 	leftbath::B
 	rightbath::B

@@ -6,7 +6,7 @@ include("correlations.jl")
 include("greenfunctions.jl")
 include("toulouse.jl")
 
-function hamiltonian(b::AbstractDiscreteBath; include_chemical=false)
+function hamiltonian(b::AbstractDiscreteNormalBath; include_chemical=false)
 	T = eltype(b)
 	data = AdagATerm{T}[]
 	for (i, ϵ) in enumerate(frequencies(b))
@@ -33,7 +33,7 @@ function hamiltonian(b::AbstractDiscreteBCSBath)
 	return GenericQuadraticHamiltonian(num_sites(b), data)	
 end
 
-function thermocdm(b::AbstractDiscreteBath)
+function thermocdm(b::AbstractDiscreteNormalBath)
 	L = num_sites(b)
 	ρ = zeros(Float64, L, L)
 	for (i, ϵ) in enumerate(frequencies(b))
@@ -42,7 +42,7 @@ function thermocdm(b::AbstractDiscreteBath)
 	return ρ
 end
 
-function cmatrix(b::AbstractDiscreteBath)
+function cmatrix(b::AbstractDiscreteNormalBath)
 	L = num_sites(b)
 	h = zeros(Float64, L, L)
 	for (i, ϵ) in enumerate(frequencies(b))

@@ -2,7 +2,7 @@ struct Toulouse{B<:AbstractDiscreteBath{Fermion}}
 	bath::B
 	ϵ_d::Float64
 end
-Toulouse(b::AbstractDiscreteBath{Fermion}; ϵ_d::Real) = Toulouse(b, float(ϵ_d))
+Toulouse(b::AbstractDiscreteNormalBath{Fermion}; ϵ_d::Real) = Toulouse(b, float(ϵ_d))
 function Toulouse(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 	(b.μ == 0) || throw(ArgumentError("BCS bath should have μ=0"))
 	return Toulouse(b, float(ϵ_d))
@@ -10,7 +10,7 @@ end
 Base.eltype(::Type{Toulouse{B}}) where B = eltype(B)
 Base.eltype(x::Toulouse) = eltype(typeof(x))
 
-const NormalToulouse = Toulouse{T} where {T<:AbstractDiscreteFermionicBath}
+const NormalToulouse = Toulouse{T} where {T<:AbstractDiscreteNormalBath{Fermion}}
 const BCSToulouse =Toulouse{T} where {T<:AbstractDiscreteBCSBath}
 
 num_sites(m::NormalToulouse) = num_sites(m.bath) + 1
@@ -110,7 +110,7 @@ end
 # end
 
 cmatrix(m::Toulouse) = toulouse_cmatrix(m.bath, ϵ_d=m.ϵ_d)
-function toulouse_cmatrix(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+function toulouse_cmatrix(b::AbstractDiscreteNormalBath{Fermion}; ϵ_d::Real)
 	n = num_sites(b)
 	m = zeros(Float64, n+1, n+1)
 	m[1, 1] = ϵ_d
@@ -217,13 +217,13 @@ end
 # green functions
 
 """
-	toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+	toulouse_Gτ(b::AbstractDiscreteNormalBath{Fermion}; ϵ_d::Real)
 
 The Matsubara Green's function for the Toulouse model
 Gᵢⱼ(τ, τ′) = -Tr[âᵢ(τ)â†ⱼ(τ′)exp(-β(Ĥ-μN̂)⟩]
 Gᵢⱼ(τ) = Gᵢⱼ(τ, 0)
 """
-function toulouse_Gτ(b::AbstractDiscreteFermionicBath; ϵ_d::Real)
+function toulouse_Gτ(b::AbstractDiscreteNormalBath{Fermion}; ϵ_d::Real)
 	# @assert ishermitian(h)
 	# ham = h - μ .* LinearAlgebra.I
 	h = toulouse_cmatrix(b, ϵ_d=ϵ_d)

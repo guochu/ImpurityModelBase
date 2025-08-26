@@ -1,11 +1,10 @@
-abstract type AbstractDiscreteBath{P<:AbstractParticle} end
-particletype(::Type{<:AbstractDiscreteBath{P}}) where {P<:AbstractParticle} = P
-particletype(x::AbstractDiscreteBath) = particletype(typeof(x))
+# abstract type AbstractDiscreteBath{P<:AbstractParticle} end
+# particletype(::Type{<:AbstractDiscreteBath{P}}) where {P<:AbstractParticle} = P
+# particletype(x::AbstractDiscreteBath) = particletype(typeof(x))
 
 frequencies(b::AbstractDiscreteBath) = b.ws
 spectrumvalues(b::AbstractDiscreteBath) = b.fs
-num_sites(x::AbstractDiscreteBath) = error("num_sites not implemented for bath type $(typeof(x))")
-Base.eltype(x::AbstractDiscreteBath) = eltype(typeof(x))
+num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
 
 """
 	struct DiscreteBath{P<:AbstractParticle}
@@ -13,7 +12,7 @@ Base.eltype(x::AbstractDiscreteBath) = eltype(typeof(x))
 Fermionic bath container, includes a bath spectrum density,
 the inverse temperature β and the chemical potential μ
 """
-struct DiscreteBath{P<:AbstractParticle} <: AbstractDiscreteBath{P}
+struct DiscreteBath{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
 	ws::Vector{Float64}
 	fs::Vector{Float64}
 	β::Float64
@@ -50,7 +49,7 @@ Fermionic bath container, includes a bath spectrum density,
 the chemical potential μ
 the inverse temperature β=Inf
 """
-struct DiscreteVacuum{P<:AbstractParticle} <: AbstractDiscreteBath{P}
+struct DiscreteVacuum{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
 	ws::Vector{Float64}
 	fs::Vector{Float64}
 	μ::Float64	
@@ -69,11 +68,11 @@ DiscreteFermionicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; 
 discretefermionicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteFermionicVacuum(Fermion, ws, fs; kwargs...)
 
 
-const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
-const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
+# const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
+# const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
 
-thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
-num_sites(b::Union{DiscreteBath, DiscreteVacuum}) = length(frequencies(b))
+# thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
+# num_sites(b::Union{DiscreteBath, DiscreteVacuum}) = length(frequencies(b))
 
 function Base.getproperty(m::DiscreteBath, s::Symbol)
 	if s == :T
