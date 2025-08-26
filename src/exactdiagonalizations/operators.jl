@@ -295,14 +295,7 @@ function fermionicthermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
 	# return rho
 	return thermodm(m, β=β)
 end
-function thermodm(h::AbstractMatrix, cache::EigenCache=eigencache(h); β::Real)
-	U, λs = cache.U, cache.λs
-	λs2 = exp.(-β .* λs)
-	rho = U * Diagonal(λs2) * U'
-	rho ./= tr(rho)
-	return rho
-end
-
+thermodm(h::AbstractMatrix, cache::EigenCache=eigencache(h); β::Real) = thermodm(cache, β=β)
 function thermodm(cache::EigenCache; β::Real)
 	U, λs = cache.U, cache.λs
 	λs2 = exp.(-β .* λs)
