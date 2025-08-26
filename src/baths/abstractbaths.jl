@@ -15,6 +15,12 @@ abstract type AbstractDiscreteNormalBath{P} <: AbstractDiscreteBath{P} end
 abstract type AbstractDiscreteBCSBath <: AbstractDiscreteBath{Fermion} end
 abstract type AbstractDiscreteBECBath <: AbstractDiscreteBath{Boson} end
 
+const AbstractNormalBath{P} = Union{AbstractContinuousNormalBath{P}, AbstractDiscreteNormalBath{P}} where {P<:AbstractParticle}
+const AbstractFermionicNormalBath = AbstractNormalBath{Fermion}
+const AbstractBosonicNormalBath = AbstractNormalBath{Boson}
+const AbstractBCSBath = Union{AbstractContinuousBCSBath, AbstractDiscreteBCSBath}
+const AbstractBECBath = Union{AbstractContinuousBECBath, AbstractDiscreteBECBath}
+
 
 """
 	thermaloccupation(bath::AbstractBosonicBath, energy::Real)

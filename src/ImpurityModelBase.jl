@@ -8,6 +8,7 @@ export DiracDelta, quadgkwrapper, spectrumshift
 # definition of bosonic and fermionic bath, thermal distributions
 export AbstractParticle, Boson, Fermion, particletype
 export AbstractBath, AbstractNormalContinuousBath, AbstractContinuousBCSBath, AbstractDiscreteNormalBath, AbstractDiscreteBCSBath
+export AbstractNormalBath, AbstractFermionicNormalBath, AbstractBosonicNormalBath, AbstractBCSBath, AbstractBECBath
 export Bath, Vacuum, bath, vacuum, fermidirac, boseeinstein, thermaloccupation
 export FermionicBath, FermionicVacuum, fermionicvacuum, bosonicvacuum, fermionicbath
 export BosonicBath, BosonicVacuum, bosonicbath
@@ -19,7 +20,7 @@ export frequencies, spectrumvalues, num_sites
 
 
 # BCS bath
-export BCSBath, bcsbath, BCSVacuum, bcsvacuum, AbstractBCSBath
+export BCSBath, bcsbath, BCSVacuum, bcsvacuum
 export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum
 
 
