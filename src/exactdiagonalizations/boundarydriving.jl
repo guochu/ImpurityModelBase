@@ -86,12 +86,12 @@ function thermocdm(m::BoundaryDriving)
 	h = cmatrix(m)
 	return thermocdm(particletype(m), eigencache(h), β=β, μ=μ)
 end
-function thermodm(m::BoundaryDriving)
-	(particletype(m) == Fermion) || throw(ArgumentError("only Fermion particletype supported"))
+function fermionicthermodm(m::BoundaryDriving)
+	(particletype(m) == Fermion) || throw(ArgumentError("Fermion particletype assumed"))
 	β, μ = m.leftbath.β, m.leftbath.μ
 	((β==m.rightbath.β) && (μ==m.rightbath.μ)) || throw(ArgumentError("thermodm requires all the baths to have the same β and μ"))
 	h = hamiltonian(m, include_chemical=true)
-	return thermodm(h, β=β)
+	return fermionicthermodm(h, β=β)
 end
 
 # separable state
@@ -111,11 +111,12 @@ function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	end
 	return ρ
 end
-function separabledm(m::BoundaryDriving, sysdm::AbstractMatrix)
+function fermionicseparabledm(m::BoundaryDriving, sysdm::AbstractMatrix)
+	(particletype(m) == Fermion) || throw(ArgumentError("Fermion particletype assumed"))
 	(size(sysdm, 1) == 2^(size(m.hsys, 1))) || throw(DimensionMismatch("Hamiltonian size mismatch with density operator size"))
 	leftbath, rightbath = m.leftbath, m.rightbath
-	ρ_l = thermodm(hamiltonian(leftbath, include_chemical=true), β=leftbath.β)
-	ρ_r = thermodm(hamiltonian(rightbath, include_chemical=true), β=rightbath.β)
+	ρ_l = fermionicthermodm(hamiltonian(leftbath, include_chemical=true), β=leftbath.β)
+	ρ_r = fermionicthermodm(hamiltonian(rightbath, include_chemical=true), β=rightbath.β)
 	return kron(sysdm, ρ_l, ρ_r)
 end
 

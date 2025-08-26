@@ -48,7 +48,7 @@ println("------------------------------------")
 
 		# equilibrium greater and lesser
 		hh = hamiltonian(model, include_chemical=true)
-		dm = thermodm(hh, β=β)
+		dm = fermionicthermodm(hh, β=β)
 		@test dm ≈ thermodm(model) atol=atol
 		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
 		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
@@ -173,7 +173,7 @@ end
 
 		# equilibrium greater and lesser
 
-		dm = thermodm(ham, β=β)
+		dm = fermionicthermodm(ham, β=β)
 		@test dm ≈ thermodm(model) atol=atol
 		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
 		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)

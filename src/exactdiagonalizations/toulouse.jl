@@ -168,11 +168,11 @@ function thermocdm(m::BCSToulouse)
 end
 function thermodm(m::NormalToulouse)
 	h = hamiltonian(m, include_chemical=true)
-	return thermodm(h, β=m.bath.β)
+	return fermionicthermodm(h, β=m.bath.β)
 end
 function thermodm(m::BCSToulouse)
 	h = hamiltonian(m)
-	return thermodm(h, β=m.bath.β)
+	return fermionicthermodm(h, β=m.bath.β)
 end
 
 # separable state
@@ -188,7 +188,7 @@ function separablecdm(m::NormalToulouse, nsys::Real)
 end
 function separabledm(m::NormalToulouse)
 	h = freehamiltonian(m, include_chemical=true)
-	return thermodm(h, β=m.bath.β)
+	return fermionicthermodm(h, β=m.bath.β)
 end
 
 function separablecdm(m::BCSToulouse, nsys::Real)
@@ -211,7 +211,7 @@ function separablecdm(m::BCSToulouse, nsys::Real)
 end
 function separabledm(m::BCSToulouse)
 	h = freehamiltonian(m)
-	return thermodm(h, β=m.bath.β)
+	return fermionicthermodm(h, β=m.bath.β)
 end
 
 # green functions

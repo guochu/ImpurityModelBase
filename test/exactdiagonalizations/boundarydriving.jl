@@ -46,7 +46,7 @@ println("------------------------------------")
 		# nonequilibrium greater and lesser
 
 		rho_sys = random_dm(T, 2^L)
-		dm = separabledm(model, rho_sys)
+		dm = fermionicseparabledm(model, rho_sys)
 		cdm = separablecdm(model, normal_quadratic_obs(rho_sys))
 		@test normal_quadratic_obs(dm) ≈ cdm atol=atol
 

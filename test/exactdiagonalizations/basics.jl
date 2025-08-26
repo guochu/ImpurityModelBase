@@ -17,7 +17,7 @@ println("------------------------------------")
 
 				h = random_normalquadratichamiltonian(m)
 				@test m ≈ cmatrix(h) atol = atol
-				dm = thermodm(h, β=β, μ=μ)
+				dm = fermionicthermodm(h, β=β, μ=μ)
 				cdm = fermionicthermocdm(eigencache(m), β=β, μ=μ)
 				# println("cdm ", cdm)
 				tr_dm = tr(dm)
@@ -42,7 +42,7 @@ println("------------------------------------")
 			m = random_hermitian(T, L)
 			m2 = rand(T, L, L)
 			h = random_genericquadratichamiltonian(m, m2)
-			dm = thermodm(h, β=β)
+			dm = fermionicthermodm(h, β=β)
 
 			mm = bcs_cmatrix(m, m2)
 			@test mm ≈ cmatrix(h) atol=atol
@@ -187,7 +187,7 @@ end
 
 			# equilibrium green's function
 			for μ in (0.5, 0, -0.5)
-				dm = thermodm(ham, β=β, μ=μ)
+				dm = fermionicthermodm(ham, β=β, μ=μ)
 				cdm = normal_quadratic_obs(dm)
 
 				for i in 1:L, j in 1:L
@@ -252,7 +252,7 @@ end
 			end
 
 			# equilibrium green's function
-			dm = thermodm(ham, β=β, μ=μ)
+			dm = fermionicthermodm(ham, β=β, μ=μ)
 			cdm = generic_quadratic_obs(dm)
 			@test cdm ≈ fermionicthermocdm(cache2, β=β, μ=μ)
 

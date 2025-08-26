@@ -153,7 +153,7 @@ function Base.push!(x::AbstractHamiltonian, f::AbstractTerm)
 	push!(x.data, f)
 end 
 
-function QuadraticHamiltonian(n::Int, x::Vector{<:QuadraticTerm{T}}) where {T<:Number}
+function quadratichamiltonian(n::Int, x::Vector{<:QuadraticTerm{T}}) where {T<:Number}
 	if all(y->isa(y, AdagATerm), x)
 		return NormalQuadraticHamiltonian(n, convert(Vector{AdagATerm{T}}, x))
 	else
@@ -284,7 +284,7 @@ function fermiondensityoperator(L::Int)
 	end
 	return m
 end
-function thermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
+function fermionicthermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
 	m = fermionoperator(h)
 	# @assert m ≈ m' atol=1.0e-12
 	if μ != zero(μ)
