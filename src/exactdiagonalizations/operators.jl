@@ -230,7 +230,10 @@ end
 fermionadagoperator() = Array{Float64, 2}([0 0; 1 0])
 fermionaoperator() = adjoint(fermionadagoperator())
 JWoperator() = Array{Float64, 2}([1 0; 0 -1])
-
+function fermiondensityoperator()
+	adag = fermionadagoperator()
+	return adag * adag'
+end
 function fermionadagoperator(L::Int, pos::Int)
 	(1 <= pos <= L) || throw(BoundsError(1:L, pos))
 	σ₊ = fermionadagoperator()
