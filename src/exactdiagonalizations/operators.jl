@@ -227,10 +227,14 @@ end
 
 # const σ₊, σ₋, σz, JW, n̂ = spin_half_matrices()
 
+fermionadagoperator() = Array{Float64, 2}([0 0; 1 0])
+fermionaoperator() = adjoint(fermionadagoperator())
+JWoperator() = Array{Float64, 2}([1 0; 0 -1])
+
 function fermionadagoperator(L::Int, pos::Int)
 	(1 <= pos <= L) || throw(BoundsError(1:L, pos))
-	σ₊ = Array{Float64, 2}([0 0; 1 0])
-	JW = Array{Float64, 2}([1 0; 0 -1])
+	σ₊ = fermionadagoperator()
+	JW = JWoperator()
 	I2 = one(JW)
 	ops = Vector{Matrix{Float64}}(undef, L)
 	for i in 1:pos-1
@@ -302,6 +306,22 @@ function thermodm(cache::EigenCache; β::Real)
 	rho = U * Diagonal(λs2) * U'
 	rho ./= tr(rho)
 	return rho
+end
+
+
+# bosonic operators
+function bosonaoperator(; d::Int)
+	(d <= 1) && error("d must be larger than 1.")
+	a = zeros(Float64, d, d)
+	for i = 1:(d - 1)
+		a[i, i+1] = sqrt(i)
+	end
+	return a
+end
+bosonadagoperator(; d::Int) = adjoint(bosonaoperator(d=d))
+function bosondensityoperator(; d::Int) 
+	a = bosonaoperator(d=d)
+	return a' * a
 end
 
 # function get_paulistring(h::AdagATerm{T}) where {T}

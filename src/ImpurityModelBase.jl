@@ -28,6 +28,7 @@ export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum
 export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, adagadag, AATerm, aa, QuarticTerm, interaction
 export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadraticHamiltonian, quadratichamiltonian
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm, fermionicthermodm
+export bosonaoperator, bosonadagoperator, bosondensityoperator
 
 export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
 export bcs_cmatrix
