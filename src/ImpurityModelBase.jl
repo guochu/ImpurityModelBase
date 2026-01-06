@@ -32,7 +32,7 @@ export bosonaoperator, bosonadagoperator, bosondensityoperator
 
 export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
 export bcs_cmatrix
-export timeevo, correlation_2op_1t, correlation_2op_1τ
+export timeevo, correlation_2op_1t, correlation_2op_1τ, LindbladOperator, lindbladoperator
 export Toulouse, hamiltonian, toulouse_greater_lesser, toulouse_neq_greater_lesser
 export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm, separabledm
 export particlecurrent_hamiltonian, heatcurrent_hamiltonian
