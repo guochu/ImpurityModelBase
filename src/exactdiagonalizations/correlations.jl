@@ -71,9 +71,10 @@ function lindbladoperator(H::AbstractMatrix, jumpops::Vector)
 end
 
 function (op::LindbladOperator)(rho::AbstractMatrix)
-	d = size(op, 1)
+	m = op.m
+	d = size(m, 1)
 	d2 = d * d
-	r = reshape(op.m, d2, d2) * reshape(rho, d2)
+	r = reshape(m, d2, d2) * reshape(rho, d2)
 	return reshape(r, d, d)
 end
 
