@@ -255,6 +255,11 @@ function fermiondensityoperator(L::Int, pos::Int)
 	adag = fermionadagoperator(L, pos)
 	return adag * adag'
 end
+function fermionoccupationoperator(L::Int, pos::Int, n::Int)
+	(n in (0, 1)) || throw(ArgumentError("occupation must be 0 or 1"))
+	nop = fermiondensityoperator(L, pos)
+	(n == 1) ? nop : one(nop) - nop
+end
 
 function fermionoperator(L::Int, h::AdagATerm{T}) where {T<:Number} 
 	i, j = positions(h)
