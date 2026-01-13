@@ -331,6 +331,12 @@ function bosondensityoperator(; d::Int)
 	a = bosonaoperator(d=d)
 	return a' * a
 end
+function bosonoccupationoperator(n::Int; d::Int)
+	(0 <= n <= d-1) || throw(BoundsError(0:d-1, n))
+	r = zeros(d, d)
+	r[n+1, n+1] = 1
+	return r
+end
 
 # function get_paulistring(h::AdagATerm{T}) where {T}
 # 	r = Dict{Int, Matrix{T}}()
