@@ -85,6 +85,21 @@ function timeevo(rho::AbstractMatrix, L::LindbladOperator, t::Real)
 	return reshape(L2 * reshape(rho, d2), d, d)
 end
 
+const STEADY_STATE_TOL = 1.0e-10
+function steady_state(h::LindbladOperator)
+	m = h.m
+	d = size(m, 1)
+	d2 = d * d
+	m2 = reshape(m, d2, d2)
+	evs, evcs = eigen(m2, sortby=abs)
+	(abs(evs[1]) < STEADY_STATE_TOL) || println("steady state eigenvalue larger than $(STEADY_STATE_TOL)")
+	rho = reshape(evcs[:, 1], d, d)
+	x = rho[1] / abs(rho[1])
+	lmul!(1/x, rho)
+	rho ./= tr(rho)
+	return rho
+end
+
 function correlation_2op_1t(h::LindbladOperator, A::AbstractMatrix, B::AbstractMatrix, ρ::AbstractMatrix, times::AbstractVector{<:Real}; 
 							reverse::Bool=false)
 	tr_ρ = tr(ρ)

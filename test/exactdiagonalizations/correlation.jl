@@ -2,6 +2,19 @@ println("------------------------------------")
 println("|       Lindblad Correlation       |")
 println("------------------------------------")
 
+@testset "Lindblad steady state" begin
+	tol = 1.0e-10
+	for d in [2, 3]
+		H = randn(ComplexF64, d, d)
+		H = H + H'
+		jumps = [randn(ComplexF64, d, d) for i in 1:d]
+		L = lindbladoperator(H, jumps)
+		rho = steady_state(L)
+		@test maximum(abs.(rho - rho')) < tol
+		rho′ = L(rho)
+		@test maximum(abs.(rho′)) < tol
+	end
+end
 
 @testset "Correlations" begin
 	tol = 1.0e-6
@@ -10,7 +23,6 @@ println("------------------------------------")
 	for d in [2,3]
 		H = randn(ComplexF64, d, d)
 		H = H + H'
-		jumps = [randn(ComplexF64, d, d) for i in 1:d]
 		L = lindbladoperator(H, [])
 		rho = random_dm(ComplexF64, d)
 
