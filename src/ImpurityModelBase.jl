@@ -30,7 +30,7 @@ export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadrat
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm, fermionicthermodm
 export bosonaoperator, bosonadagoperator, bosondensityoperator, bosonoccupationoperator, fermionoccupationoperator
 
-export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser
+export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser, freefermions_Gτ
 export bcs_cmatrix
 export timeevo, correlation_2op_1t, correlation_2op_1τ, LindbladOperator, lindbladoperator, steady_state
 export Toulouse, hamiltonian, toulouse_greater_lesser, toulouse_neq_greater_lesser
