@@ -20,16 +20,16 @@ function independentbosons_Gτ(spectrum::AbstractBoundedFunction, τ::Real; β::
         return fermion_Gτ(τ, β=β, μ=μ′, U=U′)*_exponent_f(spectrum, τ, β)
     end
 end
-function independentbosons_Gτ(spectrum::AbstractBoundedFunction; β::Real, Nτ::Int, ϵ_d::Real, U::Real=0, bands::Int=1)
+function independentbosons_Gτ(spectrum::AbstractBoundedFunction; β::Real, Nτ::Int, ϵ_d::Real, δτ::Real=β/Nτ, U::Real=0, bands::Int=1)
     Δ = _compute_Δ(spectrum)
-    δτ = β / Nτ
+    # δτ = β / Nτ
     gτ = zeros(Float64, Nτ+1)
-    for i in 1:Nτ
+    for i in 1:Nτ+1
         τ = (i-1) * δτ
         tmp = independentbosons_Gτ(spectrum, τ, β=β, ϵ_d=ϵ_d, U=U, Δ=Δ, bands=bands)
         (abs(imag(tmp)) < 1.0e-8) || error("imaginary part of Gτ is too large")
         gτ[i] = real(tmp)
     end
-    gτ[end] = 1 - gτ[1]
+    # gτ[end] = 1 - gτ[1]
     return gτ
 end
