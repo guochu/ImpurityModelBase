@@ -49,6 +49,26 @@ function normal_quadratic_obs(dm::AbstractMatrix)
 	return obs
 end
 
+function prod_boson_dm(L::Int; d::Int) 
+	ns = [1 for i in 1:L]
+	for i in 2:2:L
+		ns[i] = 0
+	end
+	return bosonoccupationoperator(ns, d=d)
+end
+
+function boson_normal_quadratic_obs(dm::AbstractMatrix; d::Int)
+	L = round(Int, log(d, size(dm, 1)))
+	obs = zeros(eltype(dm), L, L)
+	tr_dm = tr(dm)
+	for i in 1:L, j in 1:L
+		t = adaga(i, j)
+		op = bosonoperator(L, t, d=d)
+		obs[i, j] = tr(op * dm) / tr_dm
+	end
+	return obs
+end
+
 function generic_quadratic_obs(dm::AbstractMatrix)
 	L = round(Int, log2(size(dm, 1)))
 	obs = zeros(eltype(dm), L, L)

@@ -5,7 +5,7 @@ println("------------------------------------")
 
 
 
-@testset "thermal state" begin
+@testset "fermionic thermal state" begin
 	atol = 1.0e-8
 	β = 1.4
 
@@ -84,7 +84,7 @@ println("------------------------------------")
 	end
 end
 
-@testset "real time evolution" begin
+@testset "fermionic real time evolution" begin
 	atol=1.0e-8
 
 	β = 10
@@ -149,7 +149,7 @@ end
 	end
 end
 
-@testset "real-time Green's functions" begin
+@testset "fermionic real-time Green's functions" begin
 	# normal
 	atol=1.0e-8
 
@@ -277,7 +277,7 @@ end
 	end	
 end
 
-@testset "Matsubara Green's functions" begin
+@testset "fermionic Matsubara Green's functions" begin
 	# normal
 	atol=1.0e-8
 
@@ -341,4 +341,170 @@ end
 			end
 		end
 	end	
+end
+
+## bosons
+
+@testset "bosonic thermal state" begin
+	atol = 1.0e-2
+	β = 20.
+	d = 6
+
+	# normal
+	for T in (Float64, ComplexF64)
+		for μ in ( 0, -0.1)
+			for L in 1:3
+				m = random_dm(T, L)
+
+				h = random_normalquadratichamiltonian(m)
+				@test m ≈ cmatrix(h) atol = atol
+				dm = bosonicthermodm(h, β=β, μ=μ, d=d)
+				cdm = bosonicthermocdm(eigencache(m), β=β, μ=μ)
+				# println("cdm ", cdm)
+				tr_dm = tr(dm)
+				ob1 = zeros(T, L, L)
+				ob2 = zeros(T, L, L)
+				for i in 1:L, j in 1:L
+					t = adaga(i, j)
+					x1 = cmatrix(L, t)
+					ob1[i, j] = sum(x1 .*  cdm)
+					x2 = bosonoperator(L, t, d=d)
+					ob2[i, j] = tr(x2 * dm) / tr_dm
+				end
+				@test norm(ob1 - ob2) / norm(ob1) < atol
+			end
+		end
+	end
+end
+
+@testset "bosonic real time evolution" begin
+	atol = 1.0e-2
+	d = 8
+
+	dt = 0.7
+	n = 5
+
+	# normal
+	for T in (Float64, ComplexF64)
+		for L in 1:3
+			dm = complex(prod_boson_dm(L, d=d))
+
+			cdm = boson_normal_quadratic_obs(dm, d=d)
+
+			# hamiltonian
+			m = random_dm(T, L)
+
+			ham = random_normalquadratichamiltonian(m)
+			h = bosonoperator(ham, d=d)
+			# time evolution
+			cache1 = eigencache(h)
+			cache2 = eigencache(transpose(m))
+			for k in 1:n
+				t = k * dt
+				rho1 = timeevo(dm, h, -im*t, cache1)
+				rho2_cdm = timeevo(cdm, cache2.m, im*t, cache2)
+				rho1_cdm = boson_normal_quadratic_obs(rho1, d=d)
+
+				@test rho1_cdm ≈ rho2_cdm atol=atol
+			end
+
+		end
+	end
+end
+
+@testset "bosonic real-time Green's functions" begin
+	# normal
+	atol=1.0e-8
+	rtol = 1.0e-2
+	d = 10
+	β = 25
+	t = 0.7
+	δt = 0.1
+	ts = collect(0:δt:t)
+
+	for T in (Float64, ComplexF64)
+		for L in 1:2
+			# hamiltonian
+			m = random_dm(T, L)
+			ham = random_normalquadratichamiltonian(m)
+
+			h = bosonoperator(ham, d=d)
+			# time evolution
+			cache1 = eigencache(h)
+			cache2 = eigencache(m)
+
+
+			dm = complex(prod_boson_dm(L, d=d))
+			cdm = boson_normal_quadratic_obs(dm, d=d)
+
+			for i in 1:L, j in 1:L
+				a_i = bosonaoperator(L, i, d=d)
+				adag_j = bosonadagoperator(L, j, d=d)
+				g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
+				l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
+
+				g2, l2 = freebosons_greater_lesser(m, cdm, ts, i, j, cache2)
+
+				@test norm(g1 - g2) < atol
+				@test norm(l1 - l2) < atol
+			end
+
+			# equilibrium green's function
+			for μ in (0, -0.1)
+				dm = bosonicthermodm(ham, β=β, μ=μ, d=d)
+				cdm = boson_normal_quadratic_obs(dm, d=d)
+
+				for i in 1:L, j in 1:L
+					a_i = bosonaoperator(L, i, d=d)
+					adag_j = bosonadagoperator(L, j, d=d)
+					g1 = -im .* correlation_2op_1t(h, a_i, adag_j, dm, ts, cache1, reverse = false)
+					l1 = im .* correlation_2op_1t(h, adag_j, a_i, dm, ts, cache1, reverse = true)
+
+					g2, l2 = freebosons_greater_lesser(m, cdm, ts, i, j, cache2)
+
+					@test norm(g1-g2)/norm(g2) < rtol
+					@test norm(l1-l2)/norm(l2) < rtol
+
+					g3, l3 = freebosons_greater_lesser(m, ts, i, j, cache2, β=β, μ=μ)
+
+					@test norm(g1 - g3) / norm(g3) < rtol
+					@test norm(l1 - l3) / norm(l3) < rtol
+
+				end
+			end
+		end
+	end	
+end
+
+@testset "bosonic Matsubara Green's functions" begin
+	# normal
+	rtol = 1.0e-2
+	d = 10
+	β = 20
+	δτ = 1
+	τs = collect(0:δτ:β)
+
+	for T in (Float64, ComplexF64)
+		for L in 1:2
+			# hamiltonian
+			m = random_dm(T, L)
+			ham = random_normalquadratichamiltonian(m)
+
+			h = bosonoperator(ham, d=d)
+			# time evolution
+			cache1 = eigencache(h)
+			cache2 = eigencache(m)
+
+			for i in 1:L, j in 1:L
+				a_i = bosonaoperator(L, i, d=d)
+				adag_j = bosonadagoperator(L, j, d=d)
+				g1 = correlation_2op_1τ(h, a_i, adag_j, τs, cache1, β=β)
+
+				g2 = freebosons_Gτ(m, τs, i, j, cache2, β=β)
+
+				@test norm(g1 - g2) / norm(g2) < rtol
+			end
+		end
+	end	
+
 end

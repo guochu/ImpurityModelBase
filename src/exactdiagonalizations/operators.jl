@@ -255,10 +255,19 @@ function fermiondensityoperator(L::Int, pos::Int)
 	adag = fermionadagoperator(L, pos)
 	return adag * adag'
 end
+function fermionoccupationoperator(n::Int)
+	(n in (0, 1)) || throw(ArgumentError("occupation must be 0 or 1"))
+	nop = fermiondensityoperator()
+	(n == 1) ? nop : one(nop) - nop
+end
 function fermionoccupationoperator(L::Int, pos::Int, n::Int)
 	(n in (0, 1)) || throw(ArgumentError("occupation must be 0 or 1"))
 	nop = fermiondensityoperator(L, pos)
 	(n == 1) ? nop : one(nop) - nop
+end
+function fermionoccupationoperator(ns::AbstractVector{Int})
+	ops = [fermionoccupationoperator(n) for n in ns]
+	return kron(ops...)
 end
 
 function fermionoperator(L::Int, h::AdagATerm{T}) where {T<:Number} 
@@ -317,7 +326,80 @@ function thermodm(cache::EigenCache; β::Real)
 end
 
 
-# bosonic operators
+### bosonic operators
+function bosonaoperator(L::Int, pos::Int; d::Int)
+	a = bosonaoperator(d=d)
+	Ia = one(a)
+	ops = [Ia for i in 1:L]
+	ops[pos] = a
+	return kron(ops...)
+end
+bosonadagoperator(L::Int, pos::Int; d::Int) = adjoint(bosonaoperator(L, pos, d=d))
+function bosondensityoperator(L::Int, pos::Int; d::Int)
+	adag = bosonadagoperator(L, pos, d=d)
+	return adag * adag'
+end
+function bosonoccupationoperator(L::Int, pos::Int, n::Int; d::Int)
+	(0 <= n < d ) || throw(BoundsError(0:d-1, n))
+	a = bosonoccupationoperator(n, d=d)
+	Ia = one(a)
+	ops = [Ia for i in 1:L]
+	ops[pos] = a
+	return kron(ops...)
+end
+function bosonoccupationoperator(ns::AbstractVector{Int}; d::Int)
+	ops = [bosonoccupationoperator(n, d=d) for n in ns]
+	return kron(ops...)
+end
+
+function bosonoperator(L::Int, h::AdagATerm{T}; d::Int) where {T<:Number} 
+	i, j = positions(h)
+	m = bosonadagoperator(L, i, d=d) * bosonaoperator(L, j, d=d)
+	return h.coeff * m
+end
+function bosonoperator(L::Int, h::AdagAdagTerm{T}; d::Int) where {T<:Number} 
+	i, j = positions(h)
+	m = bosonadagoperator(L, i, d=d) * bosonadagoperator(L, j, d=d)
+	return h.coeff * m
+end
+function bosonoperator(L::Int, h::AATerm{T}; d::Int) where {T<:Number} 
+	i, j = positions(h)
+	m = bosonaoperator(L, i, d=d) * bosonaoperator(L, j, d=d)
+	return h.coeff * m
+end
+function bosonoperator(L::Int, h::QuarticTerm{T}; d::Int) where {T<:Number} 
+	i, j, k, _l = positions(h)
+	m = bosonadagoperator(L, i, d=d) * bosonadagoperator(L, j, d=d) * bosonaoperator(L, k, d=d) * bosonaoperator(L, _l, d=d)
+	return h.coeff * m
+end
+function bosonoperator(h::AbstractHamiltonian{T}; d::Int) where {T<:Number}
+	L = num_sites(h)
+	m = zeros(T, d^L, d^L)
+	for t in h.data
+		m .+= bosonoperator(L, t, d=d)
+	end
+	return m
+end
+function bosondensityoperator(L::Int; d::Int)
+	m = zeros(Float64, d^L, d^L)
+	for i in 1:L
+		m .+= bosondensityoperator(L, i, d=d)
+	end
+	return m
+end
+function bosonicthermodm(h::AbstractHamiltonian; d::Int, β::Real, μ::Real=0)
+	m = bosonoperator(h, d=d)
+	# @assert m ≈ m' atol=1.0e-12
+	if μ != zero(μ)
+		m = m - μ * bosondensityoperator(num_sites(h), d=d)
+	end
+	# rho = exp(-β .* m)
+	# rho ./= tr(rho)
+	# return rho
+	return thermodm(m, β=β)
+end
+
+
 function bosonaoperator(; d::Int)
 	(d <= 1) && error("d must be larger than 1.")
 	a = zeros(Float64, d, d)
@@ -337,6 +419,7 @@ function bosonoccupationoperator(n::Int; d::Int)
 	r[n+1, n+1] = 1
 	return r
 end
+
 
 # function get_paulistring(h::AdagATerm{T}) where {T}
 # 	r = Dict{Int, Matrix{T}}()
@@ -367,3 +450,4 @@ end
 # 	return kron(ops...)
 # end
 
+Base.kron(a::AbstractMatrix) = a
