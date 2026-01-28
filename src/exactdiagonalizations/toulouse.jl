@@ -116,7 +116,7 @@ end
 # end
 
 cmatrix(m::Toulouse) = toulouse_cmatrix(m.bath, ϵ_d=m.ϵ_d)
-function toulouse_cmatrix(b::AbstractDiscreteNormalBath{Fermion}; ϵ_d::Real)
+function toulouse_cmatrix(b::AbstractDiscreteNormalBath; ϵ_d::Real)
 	n = num_sites(b)
 	m = zeros(Float64, n+1, n+1)
 	m[1, 1] = ϵ_d
