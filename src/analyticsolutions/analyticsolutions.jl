@@ -7,3 +7,6 @@ include("independentbosons/independentbosons.jl")
 
 # holstein model
 include("holstein/holstein.jl")
+
+# dephasing dynamics
+include("dephasing.jl")

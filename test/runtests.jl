@@ -10,7 +10,7 @@ Random.seed!(12354)
 # util
 include("ed.jl")
 
-### tests
+# ### tests
 
 include("auxiliary.jl")
 include("fourier.jl")
@@ -23,6 +23,7 @@ include("interactingbosons/util.jl")
 include("interactingbosons/noninteracting.jl")
 include("interactingbosons/interacting.jl")
 
+include("dephasing.jl")
 
 
 ### include("holstein.jl")
