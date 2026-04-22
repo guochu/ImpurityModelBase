@@ -55,7 +55,7 @@ export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser
 
-export spinboson_dephasingdynamics
+export spinboson_dephasingdynamics, ddxx_spinboson_dephasingdynamics
 
 # export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
 # export holstein_G0w_to_Gw, holstein_G0w_to_Σw, bethe_holstein_dmft_iteration
