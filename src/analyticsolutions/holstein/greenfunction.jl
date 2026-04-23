@@ -9,12 +9,18 @@ struct GreenFunction{T<:Number, I} <: Function
 	δ::Float64
 	interp::I
 end
-function GreenFunction(ws::AbstractVector{<:Real}, fs::AbstractVector{T}; δ::Real=1.0e-8) where {T<:Number}
+function GreenFunction(ws::AbstractVector{<:Real}, fs::AbstractVector{T}, interp; δ::Real=1.0e-8) where {T<:Number}
 	ws = convert(Vector{Float64}, ws)
 	fs = convert(Vector{T}, fs)
-	interp = linear_interpolation(ws, fs)
 	return GreenFunction(ws, fs, convert(Float64, δ), interp)
 end
+GreenFunction(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Number}; δ::Real=1.0e-8) = GreenFunction(ws, fs, linear_interpolation(ws, fs), δ=δ)
+# function GreenFunction(ws::AbstractVector{<:Real}, fs::AbstractVector{T}; δ::Real=1.0e-8) where {T<:Number}
+# 	ws = convert(Vector{Float64}, ws)
+# 	fs = convert(Vector{T}, fs)
+# 	interp = linear_interpolation(ws, fs)
+# 	return GreenFunction(ws, fs, convert(Float64, δ), interp)
+# end
 
 function (x::GreenFunction)(ω::Real)
 	if (ω < first(x.ws)) || (ω > last(x.ws))
