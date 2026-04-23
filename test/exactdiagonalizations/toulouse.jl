@@ -46,6 +46,10 @@ println("------------------------------------")
 
 		@test g1 ≈ g2 atol=atol
 
+		g3 = [toulouse_Gτ(b, τ, ϵ_d=ϵ_d) for τ in τs]
+
+		@test norm(g1 - g3) / norm(g1) < 1.0e-3
+
 		# equilibrium greater and lesser
 		hh = hamiltonian(model, include_chemical=true)
 		dm = fermionicthermodm(hh, β=β)
@@ -65,6 +69,11 @@ println("------------------------------------")
 
 		@test g1 ≈ g3 atol=atol
 		@test l1 ≈ l3 atol=atol
+
+		# gt = [toulouse_Gt(b, t, ϵ_d=ϵ_d) for t in ts]
+
+		# gt0 = g3 - l3
+		# @test norm(gt - gt0) / norm(gt0) < 1.0e-3
 
 		# nonequilibrium greater and lesser
 		dm = separabledm(model)
