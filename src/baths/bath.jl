@@ -5,7 +5,7 @@
 Fermionic bath container, includes a bath spectrum density,
 the inverse temperature β and the chemical potential μ
 """
-struct Bath{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractContinuousNormalBath{P}
+struct Bath{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractNormalBath{P}
 	f::F
 	β::Float64
 	μ::Float64
@@ -43,7 +43,7 @@ Fermionic bath container, includes a bath spectrum density,
 the chemical potential μ
 the inverse temperature β=Inf
 """
-struct Vacuum{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractContinuousNormalBath{P}
+struct Vacuum{P<:AbstractParticle, F <: AbstractBoundedFunction} <: AbstractNormalBath{P}
 	f::F
 	μ::Float64	
 end
@@ -62,8 +62,8 @@ BosonicVacuum(f::AbstractBoundedFunction; kwargs...) = Vacuum(Boson, f; kwargs..
 bosonicvacuum(f::AbstractBoundedFunction; kwargs...) = BosonicVacuum(f; kwargs...)
 
 
-const AbstractBosonicBath = Union{BosonicBath{F}, BosonicVacuum{F}} where {F<:AbstractBoundedFunction}
-const AbstractFermionicBath = Union{FermionicBath{F}, FermionicVacuum{F}} where {F<:AbstractBoundedFunction}
+# const AbstractBosonicBath = Union{BosonicBath{F}, BosonicVacuum{F}} where {F<:AbstractBoundedFunction}
+# const AbstractFermionicBath = Union{FermionicBath{F}, FermionicVacuum{F}} where {F<:AbstractBoundedFunction}
 
 
 bath(::Type{Boson}, f::AbstractBoundedFunction; kwargs...) = bosonicbath(f; kwargs...)

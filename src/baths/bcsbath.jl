@@ -1,6 +1,6 @@
 
 
-struct BCSBath{F <: AbstractBoundedFunction, T<:Number} <: AbstractContinuousBCSBath
+struct BCSBath{F <: AbstractBoundedFunction, T<:Number} <: AbstractBCSBath
 	f::F
 	β::Float64
 	μ::Float64
@@ -17,7 +17,7 @@ bcsbath(f::AbstractBoundedFunction; kwargs...) = BCSBath(f; kwargs...)
 bcsbath(bath::FermionicBath; Δ::Number=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
 
 
-struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractContinuousBCSBath
+struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBCSBath
 	f::F
 	μ::Float64
 	Δ::T	

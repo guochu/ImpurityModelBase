@@ -2,30 +2,34 @@
 # particletype(::Type{<:AbstractDiscreteBath{P}}) where {P<:AbstractParticle} = P
 # particletype(x::AbstractDiscreteBath) = particletype(typeof(x))
 
-frequencies(b::AbstractDiscreteBath) = b.ws
-spectrumvalues(b::AbstractDiscreteBath) = b.fs
-num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
 
-"""
-	struct DiscreteBath{P<:AbstractParticle}
 
-Fermionic bath container, includes a bath spectrum density,
-the inverse temperature β and the chemical potential μ
-"""
-struct DiscreteBath{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
-	ws::Vector{Float64}
-	fs::Vector{Float64}
-	β::Float64
-	μ::Float64
-end
-function DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real, μ::Real=0) where {P<:AbstractParticle}
-	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
-	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
-	issorted(ws) || throw("frequencies should be sorted")
-	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(β), float(μ))
-end 
-Base.eltype(::Type{DiscreteBath{P}}) where {P} = Float64
+# """
+# 	struct DiscreteBath{P<:AbstractParticle}
 
+# Fermionic bath container, includes a bath spectrum density,
+# the inverse temperature β and the chemical potential μ
+# """
+# struct DiscreteBath{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
+# 	ws::Vector{Float64}
+# 	fs::Vector{Float64}
+# 	β::Float64
+# 	μ::Float64
+# end
+# function DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real, μ::Real=0) where {P<:AbstractParticle}
+# 	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
+# 	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
+# 	issorted(ws) || throw("frequencies should be sorted")
+# 	DiscreteBath{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(β), float(μ))
+# end 
+# Base.eltype(::Type{DiscreteBath{P}}) where {P} = Float64
+
+const DiscreteBath{P<:AbstractParticle} = Bath{P, DiscreteSpectrum}
+
+DiscreteBath(::Type{P}, f::DiscreteSpectrum; kwargs...) where {P<:AbstractParticle} = Bath(P, f; kwargs...)
+DiscreteBath(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) where {P<:AbstractParticle} = DiscreteBath(P, DiscreteSpectrum(ws, fs); kwargs...)
+
+DiscreteBosonicBath(f::DiscreteSpectrum; kwargs...) = DiscreteBath(Boson, f; kwargs...)
 DiscreteBosonicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 """
 	discretebosonicbath(ws, fs; β, μ) 
@@ -34,6 +38,7 @@ Return a bosonic bath with β and μ
 """
 discretebosonicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 
+DiscreteFermionicBath(f::DiscreteSpectrum; kwargs...) = DiscreteBath(Fermion, f; kwargs...)
 DiscreteFermionicBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
 """
 	discretefermionicbath(ws, fs; β, μ) 
@@ -42,25 +47,31 @@ Return a fermionic bath with β and μ
 """
 discretefermionicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
 
-"""
-	struct DiscreteVacuum{P<:AbstractParticle}
+# """
+# 	struct DiscreteVacuum{P<:AbstractParticle}
 
-Fermionic bath container, includes a bath spectrum density,
-the chemical potential μ
-the inverse temperature β=Inf
-"""
-struct DiscreteVacuum{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
-	ws::Vector{Float64}
-	fs::Vector{Float64}
-	μ::Float64	
-end
-function DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Real=0) where {P<:AbstractParticle}
-	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
-	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
-	issorted(ws) || throw("frequencies should be sorted")
-	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(μ))
-end 
-Base.eltype(::Type{DiscreteVacuum{P}}) where {P} = Float64
+# Fermionic bath container, includes a bath spectrum density,
+# the chemical potential μ
+# the inverse temperature β=Inf
+# """
+# struct DiscreteVacuum{P<:AbstractParticle} <: AbstractDiscreteNormalBath{P}
+# 	ws::Vector{Float64}
+# 	fs::Vector{Float64}
+# 	μ::Float64	
+# end
+# function DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Real=0) where {P<:AbstractParticle}
+# 	(length(ws) == length(fs)) || throw(DimensionMismatch("num frequencies mismatch with num spectrum values"))
+# 	all(x->x>=0, fs) || throw(ArgumentError("spectrum values can not be negative"))
+# 	issorted(ws) || throw("frequencies should be sorted")
+# 	DiscreteVacuum{P}(convert(Vector{Float64}, ws), convert(Vector{Float64}, fs), float(μ))
+# end 
+# Base.eltype(::Type{DiscreteVacuum{P}}) where {P} = Float64
+
+const DiscreteVacuum{P<:AbstractParticle} = Vacuum{P, DiscreteSpectrum} 
+
+
+DiscreteVacuum(::Type{P}, f::DiscreteSpectrum; kwargs...) where {P<:AbstractParticle} = Vacuum(P, f; kwargs...)
+DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) where {P<:AbstractParticle} = DiscreteVacuum(P, DiscreteSpectrum(ws, fs); kwargs...)
 
 DiscreteBosonicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)
 discretebosonicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBosonicVacuum(Boson, ws, fs; kwargs...)
@@ -68,29 +79,36 @@ DiscreteFermionicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; 
 discretefermionicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteFermionicVacuum(Fermion, ws, fs; kwargs...)
 
 
+const AbstractDiscreteNormalBath{P<:AbstractParticle} = Union{DiscreteBath{P}, DiscreteVacuum{P}}
+
+frequencies(b::AbstractDiscreteNormalBath) = frequencies(b.f)
+spectrumvalues(b::AbstractDiscreteNormalBath) = spectrumvalues(b.f)
+spectrumcouplings(b::AbstractDiscreteNormalBath) = spectrumcouplings(b.f)
+num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
+
 # const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
 # const AbstractDiscreteFermionicBath = Union{DiscreteBath{Fermion}, DiscreteVacuum{Fermion}}
 
 # thermaloccupation(bath::AbstractDiscreteBath, ϵ::Real) = thermaloccupation(particletype(bath), bath.β, bath.μ, ϵ)
 # num_sites(b::Union{DiscreteBath, DiscreteVacuum}) = length(frequencies(b))
 
-function Base.getproperty(m::DiscreteBath, s::Symbol)
-	if s == :T
-		return 1 / m.β
-	else
-		return getfield(m, s)
-	end
-end
+# function Base.getproperty(m::DiscreteBath, s::Symbol)
+# 	if s == :T
+# 		return 1 / m.β
+# 	else
+# 		return getfield(m, s)
+# 	end
+# end
 
-function Base.getproperty(m::DiscreteVacuum, s::Symbol)
-	if s == :β
-		return Inf
-	elseif s == :T
-		return 0.
-	else
-		return getfield(m, s)
-	end
-end
+# function Base.getproperty(m::DiscreteVacuum, s::Symbol)
+# 	if s == :β
+# 		return Inf
+# 	elseif s == :T
+# 		return 0.
+# 	else
+# 		return getfield(m, s)
+# 	end
+# end
 
 discretebath(::Type{Boson}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 discretebath(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
@@ -129,7 +147,8 @@ function spectrum_couplings(freqs::Union{Vector{<:Real}, AbstractRange}, f::Func
 			omega = v2 / v1
 			@assert (freqs[i] <= omega <= freqs[i+1]) 
 			push!(omegas, omega)
-			push!(couplings, sqrt(v1))
+			# push!(couplings, sqrt(v1))
+			push!(couplings, v1)
 		end
 	end
 	return omegas, couplings

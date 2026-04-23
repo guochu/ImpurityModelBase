@@ -1,4 +1,4 @@
-struct Toulouse{B<:AbstractDiscreteBath}
+struct Toulouse{B<:Union{AbstractDiscreteNormalBath, AbstractDiscreteBCSBath}}
 	bath::B
 	ϵ_d::Float64
 end
@@ -14,9 +14,9 @@ particletype(x::Toulouse) = particletype(typeof(x))
 
 
 const NormalToulouse{T} = Toulouse{T} where {T<:AbstractDiscreteNormalBath}
-const FermionicToulouse{T} = Toulouse{T} where {T<:AbstractDiscreteBath{Fermion}}
-const NormalFermionicToulouse{T} = NormalToulouse{T} where {T<:AbstractDiscreteNormalBath{Fermion}}
-const NormalBosonicToulouse{T} = NormalToulouse{T} where {T<:AbstractDiscreteNormalBath{Boson}}
+const FermionicToulouse{T} = Toulouse{T} where {T<:AbstractBath{Fermion}}
+const NormalFermionicToulouse{T} = NormalToulouse{T} where {T<:AbstractFermionicNormalBath}
+const NormalBosonicToulouse{T} = NormalToulouse{T} where {T<:AbstractBosonicNormalBath}
 const BCSToulouse =Toulouse{T} where {T<:AbstractDiscreteBCSBath}
 
 num_sites(m::NormalToulouse) = num_sites(m.bath) + 1
@@ -41,7 +41,7 @@ function freehamiltonian(h::NormalToulouse; include_chemical::Bool=false)
 end
 function hamiltonian(h::NormalToulouse; include_chemical::Bool=false)
 	ham = freehamiltonian(h, include_chemical=include_chemical)
-	fs = spectrumvalues(h.bath)
+	fs = spectrumcouplings(h.bath)
 	for i in 1:num_sites(h)-1
 		t = adaga(1, 1+i, coeff=fs[i])
 		push!(ham, t)
@@ -73,7 +73,7 @@ function freehamiltonian(h::BCSToulouse)
 end
 function hamiltonian(h::BCSToulouse)
 	ham = freehamiltonian(h)
-	fs =spectrumvalues(h.bath)
+	fs =spectrumcouplings(h.bath)
 	L = div(num_sites(h), 2)
 	for i in 1:L-1
 		t = adaga(1, 2i+1, coeff=fs[i])
@@ -120,7 +120,7 @@ function toulouse_cmatrix(b::AbstractDiscreteNormalBath; ϵ_d::Real)
 	n = num_sites(b)
 	m = zeros(Float64, n+1, n+1)
 	m[1, 1] = ϵ_d
-	ws, fs = frequencies(b), spectrumvalues(b)
+	ws, fs = frequencies(b), spectrumcouplings(b)
 	for i in 1:n
 		m[1+i, 1+i] = ws[i]
 		m[1, 1+i] = fs[i]
@@ -138,7 +138,7 @@ function toulouse_cmatrix(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 	n = div(num_sites(b), 2)
 	L = n + 1
 	Δ = b.Δ
-	ws, fs = frequencies(b), spectrumvalues(b)
+	ws, fs = frequencies(b), spectrumcouplings(b)
 
 	h = zeros(typeof(Δ), 2L, 2L)
 	h[1, 1] = ϵ_d
@@ -283,7 +283,7 @@ function toulouse_Gτ(b::AbstractDiscreteBCSBath; ϵ_d::Real)
 end
 toulouse_Gτ(m::Toulouse) = toulouse_Gτ(m.bath; ϵ_d=m.ϵ_d)
 toulouse_Gτ(m::Toulouse, τs::AbstractVector{<:Real}) = toulouse_Gτ(m.bath, τs, ϵ_d=m.ϵ_d)
-function toulouse_Gτ(h::AbstractDiscreteBath, τs::AbstractVector{<:Real}; kwargs...)
+function toulouse_Gτ(h::AbstractBath, τs::AbstractVector{<:Real}; kwargs...)
 	f = toulouse_Gτ(h; kwargs...)
 	return f.(τs)
 end
@@ -361,16 +361,16 @@ end
 
 bathsites(m::NormalToulouse) = 2:num_sites(m)
 
-function _particlecurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
-	fs = spectrumvalues(b)
+function _particlecurrent_util!(h::AbstractMatrix, b::AbstractBath, bsites, band::Int)
+	fs = spectrumcouplings(b)
 	for (j, v) in zip(bsites, fs)
 		h[j, band] = -2*im*v
 	end
 	return h
 end
 
-function _heatcurrent_util!(h::AbstractMatrix, b::AbstractDiscreteBath, bsites, band::Int)
-	ws, fs = frequencies(b), spectrumvalues(b)
+function _heatcurrent_util!(h::AbstractMatrix, b::AbstractBath, bsites, band::Int)
+	ws, fs = frequencies(b), spectrumcouplings(b)
 	for (j, w, v) in zip(bsites, ws, fs)
 		h[j, band] = -2*im*w*v
 	end
@@ -386,16 +386,16 @@ function heatcurrent_hamiltonian(m::NormalToulouse)
 	return _heatcurrent_hamiltonian_util!(h, m.bath, bathsites(m), 1)
 end
 
-function _particlecurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractDiscreteBath, bsites, band::Int)
-	fs = spectrumvalues(b)
+function _particlecurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractBath, bsites, band::Int)
+	fs = spectrumcouplings(b)
 	for (j, v) in zip(bsites, fs)
 		t = adaga(j, band, coeff=-2*im*v)
 		push!(h, t)
 	end
 	return h	
 end
-function _heatcurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractDiscreteBath, bsites, band::Int)
-	ws, fs = frequencies(b), spectrumvalues(b)
+function _heatcurrent_hamiltonian_util!(h::AbstractHamiltonian, b::AbstractBath, bsites, band::Int)
+	ws, fs = frequencies(b), spectrumcouplings(b)
 	for (j, w, v) in zip(bsites, ws, fs)
 		t = adaga(j, band, coeff=-2*im*w*v)
 		push!(h, t)

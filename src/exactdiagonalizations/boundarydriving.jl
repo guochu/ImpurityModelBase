@@ -46,7 +46,7 @@ function hamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 	pos = L
 	for (band, bj) in ((1, leftbath), (L, rightbath))
 		Lj = num_sites(bj)
-		fs = spectrumvalues(bj)
+		fs = spectrumcouplings(bj)
 		for j in 1:Lj
 			t = adaga(band, pos + j, coeff=fs[j])
 			push!(ham, t)
@@ -68,7 +68,7 @@ function cmatrix(m::BoundaryDriving)
 	pos = L
 	for (band, bj) in ((1, leftbath), (L, rightbath))
 		Lj = num_sites(bj)
-		ws, fs = frequencies(bj), spectrumvalues(bj)
+		ws, fs = frequencies(bj), spectrumcouplings(bj)
 		for j in 1:Lj
 			h[pos + j, pos + j] = ws[j]
 			h[band, pos + j] = fs[j]

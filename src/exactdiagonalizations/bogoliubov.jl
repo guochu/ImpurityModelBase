@@ -60,7 +60,7 @@ end
 function bogoliubov_hamiltonian(h::BCSToulouse)
 	ham = bogoliubov_freehamiltonian(h)
 	bath = h.bath
-	ws, fs = frequencies(bath), spectrumvalues(bath)
+	ws, fs = frequencies(bath), spectrumcouplings(bath)
 	Δ = bath.Δ
 	L = div(num_sites(h), 2)
 	for i in 1:L-1
@@ -119,7 +119,7 @@ function bogoliubov_separablecdm(m::BCSToulouse, nsys::Real)
 	ρ[2L+2, 2L+2] = 1-nsys	
 
 	bath = m.bath
-	ws, fs = frequencies(bath), spectrumvalues(bath)
+	ws, fs = frequencies(bath), spectrumcouplings(bath)
 	ws2 = [_dispersion(w, f) for (w, f) in zip(ws, fs)]
 	ns = [fermidirac(bath.β, bath.μ, w) for w in ws2]
 	N = div(num_sites(bath), 2)
