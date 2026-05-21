@@ -12,7 +12,7 @@ with β, μ at energy ϵ
 μ = 0 by default
 """
 function boseeinstein(β::Real, ϵ::Real)
-	(ϵ > 0) || throw(ArgumentError("energy must be larger than μ"))
+	(ϵ >= zero(ϵ)) || throw(ArgumentError("energy must be larger than μ"))
 	x = exp(-safe_mult(β, ϵ))
 	return x / (1 - x)
 end
