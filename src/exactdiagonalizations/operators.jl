@@ -106,7 +106,7 @@ interaction(i::Int, j::Int, k::Int, l::Int; kwargs...) = QuarticTerm(i, j, k, l;
 
 function Base.adjoint(x::QuarticTerm)
 	i, j, k, l = positions(x)
-	return interaction((l,k,j,i), coeff=conj(x.coeff))
+	return interaction(l,k,j,i, coeff=conj(x.coeff))
 end
 
 Base.copy(x::QuarticTerm) = QuarticTerm(positions(x), copy(x.coeff))
@@ -401,7 +401,7 @@ end
 
 
 function bosonaoperator(; d::Int)
-	(d <= 1) && error("d must be larger than 1.")
+	(d <= 1) && error("d must be larger than 1")
 	a = zeros(Float64, d, d)
 	for i = 1:(d - 1)
 		a[i, i+1] = sqrt(i)
