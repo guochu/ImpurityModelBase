@@ -1,4 +1,15 @@
+"""
+	AbstractTerm{T}
+
+Abstract type for a term in a Hamiltonian; the type parameter `T` is the coefficient type.
+"""
 abstract type AbstractTerm{T<:Number} end
+"""
+	QuadraticTerm{T}
+
+Abstract type for a quadratic term (`AdagATerm`, `AdagAdagTerm`, `AATerm`), corresponding
+to a free-particle Hamiltonian.
+"""
 abstract type QuadraticTerm{T} <: AbstractTerm{T} end
 
 positions(x::AbstractTerm) = x.positions
@@ -25,6 +36,12 @@ end
 
 AdagATerm(pos::Tuple{Int, Int}; coeff::Number=1) = AdagATerm(pos, float(coeff))
 AdagATerm(i::Int, j::Int; kwargs...) = AdagATerm((i, j); kwargs...)
+"""
+	tunneling(i, j; coeff=1)
+	adaga(i, j; coeff=1)
+
+Construct an `AdagATerm` (âᵢ†âⱼ term); `tunneling` and `adaga` are equivalent.
+"""
 tunneling(i::Int, j::Int; kwargs...) = AdagATerm(i, j; kwargs...)
 adaga(i::Int, j::Int; kwargs...) = AdagATerm(i, j; kwargs...)
 
@@ -50,10 +67,15 @@ end
 
 AdagAdagTerm(pos::Tuple{Int, Int}; coeff::Number=1) = AdagAdagTerm(pos, float(coeff))
 AdagAdagTerm(i::Int, j::Int; kwargs...) = AdagAdagTerm((i, j); kwargs...)
+"""
+	adagadag(i, j; coeff=1)
+
+Construct an `AdagAdagTerm` (âᵢ†âⱼ† term).
+"""
 adagadag(i::Int, j::Int; kwargs...) = AdagAdagTerm(i, j; kwargs...)
 
-Base.copy(x::AdagAdagTerm) = AdagATerm(positions(x), copy(x.coeff))
-Base.:*(s::AdagAdagTerm, m::Number) = AdagATerm(positions(s), coeff=s.coeff * m)
+Base.copy(x::AdagAdagTerm) = AdagAdagTerm(positions(x), copy(x.coeff))
+Base.:*(s::AdagAdagTerm, m::Number) = AdagAdagTerm(positions(s), coeff=s.coeff * m)
 Base.convert(::Type{AdagAdagTerm{T}}, x::AdagAdagTerm) where {T<:Number} = AdagAdagTerm(positions(x), convert(T, x.coeff))
 
 
@@ -69,6 +91,11 @@ end
 
 AATerm(pos::Tuple{Int, Int}; coeff::Number=1) = AATerm(pos, float(coeff))
 AATerm(i::Int, j::Int; kwargs...) = AATerm((i, j); kwargs...)
+"""
+	aa(i, j; coeff=1)
+
+Construct an `AATerm` (âᵢâⱼ term).
+"""
 aa(i::Int, j::Int; kwargs...) = AATerm(i, j; kwargs...)
 
 Base.copy(x::AATerm) = AATerm(positions(x), copy(x.coeff))
@@ -102,6 +129,11 @@ end
 
 QuarticTerm(pos::NTuple{4, Int}; coeff::Real=1) = QuarticTerm(pos, float(coeff))
 QuarticTerm(i::Int, j::Int, k::Int, l::Int; kwargs...) = QuarticTerm((i, j, k, l); kwargs...)
+"""
+	interaction(i, j, k, l; coeff=1)
+
+Construct a `QuarticTerm` (four-body interaction term, e.g. ĉᵢ†ĉⱼ†ĉₖĉₗ for fermions).
+"""
 interaction(i::Int, j::Int, k::Int, l::Int; kwargs...) = QuarticTerm(i, j, k, l; kwargs...)
 
 function Base.adjoint(x::QuarticTerm)
@@ -114,6 +146,12 @@ Base.:*(s::QuarticTerm, m::Number) = QuarticTerm(positions(s), coeff=s.coeff * m
 Base.convert(::Type{QuarticTerm{T}}, x::QuarticTerm) where {T<:Number} = QuarticTerm(positions(x), convert(T, x.coeff))
 
 
+"""
+	NormalTerm{T}
+
+Union type for normal (â†â-type only) terms, equivalent to
+`Union{AdagATerm{T}, QuarticTerm{T}}`.
+"""
 const NormalTerm{T<:Number} = Union{AdagATerm{T}, QuarticTerm{T}}
 
 abstract type AbstractHamiltonian{T<:Number} end
@@ -127,6 +165,16 @@ function Base.:+(x::M, y::M) where {M<:AbstractHamiltonian}
 	return M(data, n)
 end
 
+"""
+	struct NormalHamiltonian{T}
+
+General Hamiltonian (possibly interacting), composed of `NormalTerm`s (â†â terms and
+quartic terms).
+
+	NormalHamiltonian(n, data)
+
+Construct a Hamiltonian with `n` sites and the term list `data`.
+"""
 struct NormalHamiltonian{T<:Number} <: AbstractHamiltonian{T}
 	data::Vector{NormalTerm{T}}
 	n::Int
@@ -134,6 +182,14 @@ end
 NormalHamiltonian(::Type{T}, n::Int) where {T<:Number} = NormalHamiltonian(Vector{NormalTerm{T}}(), n)
 NormalHamiltonian(n::Int, x::Vector{<:NormalTerm{T}}) where {T} = NormalHamiltonian(convert(Vector{NormalTerm{T}}, x), n)
 
+"""
+	struct NormalQuadraticHamiltonian{T}
+
+Quadratic Hamiltonian containing only âᵢ†âⱼ terms (e.g. a normal free particle/fermion
+system).
+
+	NormalQuadraticHamiltonian(n, data)
+"""
 struct NormalQuadraticHamiltonian{T<:Number} <: QuadraticHamiltonian{T}
 	data::Vector{AdagATerm{T}}
 	n::Int
@@ -141,6 +197,14 @@ end
 NormalQuadraticHamiltonian(::Type{T}, n::Int) where {T<:Number} = NormalQuadraticHamiltonian(Vector{AdagATerm{T}}(), n)
 NormalQuadraticHamiltonian(n::Int, x::Vector{AdagATerm{T}}) where {T} = NormalQuadraticHamiltonian(x, n)
 
+"""
+	struct GenericQuadraticHamiltonian{T}
+
+General quadratic Hamiltonian, possibly containing â†â, â†â† and ââ terms (e.g. BCS-type
+Hamiltonians).
+
+	GenericQuadraticHamiltonian(n, data)
+"""
 struct GenericQuadraticHamiltonian{T<:Number} <: QuadraticHamiltonian{T}
 	data::Vector{QuadraticTerm{T}}
 	n::Int
@@ -153,6 +217,13 @@ function Base.push!(x::AbstractHamiltonian, f::AbstractTerm)
 	push!(x.data, f)
 end 
 
+"""
+	quadratichamiltonian(n, x)
+
+Construct a Hamiltonian from a list of quadratic terms `x`: returns a
+`NormalQuadraticHamiltonian` if all terms are `AdagATerm`, otherwise a
+`GenericQuadraticHamiltonian`.
+"""
 function quadratichamiltonian(n::Int, x::Vector{<:QuadraticTerm{T}}) where {T<:Number}
 	if all(y->isa(y, AdagATerm), x)
 		return NormalQuadraticHamiltonian(n, convert(Vector{AdagATerm{T}}, x))
@@ -162,6 +233,17 @@ function quadratichamiltonian(n::Int, x::Vector{<:QuadraticTerm{T}}) where {T<:N
 end
 
 # coefficient matrix of Quadratic Hamiltonians
+"""
+	cmatrix(h)
+
+Return the coefficient matrix of the quadratic Hamiltonian `h` (for BCS-type Hamiltonians
+this is the 2L×2L Bogoliubov-de Gennes form).
+
+The coefficient matrix is defined such that the quadratic Hamiltonian reads
+h = [h₁₁ c₁†c₁, h₁₂ c₁†c₂, h₁₃ c₁†c₃...; h₂₁ c₂†c₁, h₂₂ c₂†c₂, h₂₃ c₂†c₃; ...],
+and the quadratic observables are encoded in the coefficient density matrix (cdm) ρ.
+The time evolution of a free-fermion system is then dρ/dt = -i [hᵀ, ρ].
+"""
 function cmatrix(L::Int, h::AdagATerm{T}; normal::Bool=true) where {T<:Number} 
 	i, j = positions(h)
 	if normal
@@ -227,9 +309,34 @@ end
 
 # const σ₊, σ₋, σz, JW, n̂ = spin_half_matrices()
 
+"""
+	fermionadagoperator()
+	fermionadagoperator(L, pos)
+
+Return the matrix representation of a single fermionic creation operator ĉ†;
+`fermionadagoperator(L, pos)` returns the creation operator at site `pos` in the occupation
+number basis of `L` sites (including the Jordan-Wigner string).
+"""
 fermionadagoperator() = Array{Float64, 2}([0 0; 1 0])
+"""
+	fermionaoperator()
+	fermionaoperator(L, pos)
+
+Return the matrix representation of a single fermionic annihilation operator ĉ;
+`fermionaoperator(L, pos)` returns the annihilation operator at site `pos` in the occupation
+number basis of `L` sites.
+"""
 fermionaoperator() = adjoint(fermionadagoperator())
 JWoperator() = Array{Float64, 2}([1 0; 0 -1])
+"""
+	fermiondensityoperator()
+	fermiondensityoperator(L, pos)
+	fermiondensityoperator(L)
+
+Return the matrix representation of the fermionic density operator n̂ = ĉ†ĉ: the
+single-site version, the version at site `pos`, and the total particle-number operator
+of `L` sites.
+"""
 function fermiondensityoperator()
 	adag = fermionadagoperator()
 	return adag * adag'
@@ -255,6 +362,14 @@ function fermiondensityoperator(L::Int, pos::Int)
 	adag = fermionadagoperator(L, pos)
 	return adag * adag'
 end
+"""
+	fermionoccupationoperator(n)
+	fermionoccupationoperator(L, pos, n)
+	fermionoccupationoperator(ns)
+
+Return the projection operator onto the occupation number `n` (0 or 1); the multi-site
+version is the tensor product of the single-site projectors.
+"""
 function fermionoccupationoperator(n::Int)
 	(n in (0, 1)) || throw(ArgumentError("occupation must be 0 or 1"))
 	nop = fermiondensityoperator()
@@ -270,6 +385,13 @@ function fermionoccupationoperator(ns::AbstractVector{Int})
 	return kron(ops...)
 end
 
+"""
+	fermionoperator(L, term)
+	fermionoperator(h::AbstractHamiltonian)
+
+Map a quadratic/quartic term `term` or a Hamiltonian `h` to a matrix operator on the
+fermionic Fock space (dimension 2^L).
+"""
 function fermionoperator(L::Int, h::AdagATerm{T}) where {T<:Number} 
 	i, j = positions(h)
 	m = fermionadagoperator(L, i) * fermionaoperator(L, j)
@@ -305,6 +427,15 @@ function fermiondensityoperator(L::Int)
 	end
 	return m
 end
+"""
+	fermionicthermodm(h; β, μ=0)
+
+Construct the fermionic thermal equilibrium (true) density matrix (dm)
+exp(-β(Ĥ-μN̂))/Z of the Hamiltonian `h` at inverse temperature `β` and chemical
+potential `μ`; the dm lives in the Fock space and can be used to evaluate the
+expectation value of any observable, in contrast to the cdm which only encodes
+quadratic observables (see `thermocdm`).
+"""
 function fermionicthermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
 	m = fermionoperator(h)
 	# @assert m ≈ m' atol=1.0e-12
@@ -316,6 +447,13 @@ function fermionicthermodm(h::AbstractHamiltonian; β::Real, μ::Real=0)
 	# return rho
 	return thermodm(m, β=β)
 end
+"""
+	thermodm(h, cache=eigencache(h); β)
+	thermodm(cache; β)
+
+Construct the thermal equilibrium (true) density matrix (dm) exp(-βh)/Z of a matrix
+(Hamiltonian) `h` at inverse temperature `β`; `cache` is an eigendecomposition cache.
+"""
 thermodm(h::AbstractMatrix, cache::EigenCache=eigencache(h); β::Real) = thermodm(cache, β=β)
 function thermodm(cache::EigenCache; β::Real)
 	U, λs = cache.U, cache.λs
@@ -327,6 +465,14 @@ end
 
 
 ### bosonic operators
+"""
+	bosonaoperator(L, pos; d)
+	bosonaoperator(; d)
+
+Return the matrix representation of the bosonic annihilation operator â with truncation
+dimension `d`; `bosonaoperator(L, pos; d)` returns the annihilation operator of mode `pos`
+among `L` modes with truncation dimension `d`.
+"""
 function bosonaoperator(L::Int, pos::Int; d::Int)
 	a = bosonaoperator(d=d)
 	Ia = one(a)
@@ -335,10 +481,26 @@ function bosonaoperator(L::Int, pos::Int; d::Int)
 	return kron(ops...)
 end
 bosonadagoperator(L::Int, pos::Int; d::Int) = adjoint(bosonaoperator(L, pos, d=d))
+"""
+	bosondensityoperator(L, pos; d)
+	bosondensityoperator(L; d)
+	bosondensityoperator(; d)
+
+Return the matrix representation of the bosonic density operator n̂ = â†â: for a single
+mode, for mode `pos`, or the total particle-number operator of `L` modes.
+"""
 function bosondensityoperator(L::Int, pos::Int; d::Int)
 	adag = bosonadagoperator(L, pos, d=d)
 	return adag * adag'
 end
+"""
+	bosonoccupationoperator(n; d)
+	bosonoccupationoperator(L, pos, n; d)
+	bosonoccupationoperator(ns; d)
+
+Return the bosonic projection operator onto the occupation number `n` (0 ≤ n < d); the
+multi-mode version is the tensor product of the single-mode projectors.
+"""
 function bosonoccupationoperator(L::Int, pos::Int, n::Int; d::Int)
 	(0 <= n < d ) || throw(BoundsError(0:d-1, n))
 	a = bosonoccupationoperator(n, d=d)
@@ -352,6 +514,13 @@ function bosonoccupationoperator(ns::AbstractVector{Int}; d::Int)
 	return kron(ops...)
 end
 
+"""
+	bosonoperator(L, term; d)
+	bosonoperator(h::AbstractHamiltonian; d)
+
+Map a quadratic/quartic term `term` or a Hamiltonian `h` to a matrix operator on the
+bosonic Fock space (dimension d^L).
+"""
 function bosonoperator(L::Int, h::AdagATerm{T}; d::Int) where {T<:Number} 
 	i, j = positions(h)
 	m = bosonadagoperator(L, i, d=d) * bosonaoperator(L, j, d=d)
@@ -387,6 +556,13 @@ function bosondensityoperator(L::Int; d::Int)
 	end
 	return m
 end
+"""
+	bosonicthermodm(h; d, β, μ=0)
+
+Construct the bosonic thermal equilibrium (true) density matrix (dm)
+exp(-β(Ĥ-μN̂))/Z of the Hamiltonian `h` at inverse temperature `β` and chemical
+potential `μ`, with truncation dimension `d` per mode.
+"""
 function bosonicthermodm(h::AbstractHamiltonian; d::Int, β::Real, μ::Real=0)
 	m = bosonoperator(h, d=d)
 	# @assert m ≈ m' atol=1.0e-12
@@ -408,6 +584,14 @@ function bosonaoperator(; d::Int)
 	end
 	return a
 end
+"""
+	bosonadagoperator(L, pos; d)
+	bosonadagoperator(; d)
+
+Return the matrix representation of the bosonic creation operator â† with truncation
+dimension `d`; `bosonadagoperator(L, pos; d)` returns the creation operator of mode `pos`
+among `L` modes with truncation dimension `d`.
+"""
 bosonadagoperator(; d::Int) = adjoint(bosonaoperator(d=d))
 function bosondensityoperator(; d::Int) 
 	a = bosonaoperator(d=d)

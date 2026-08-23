@@ -1,3 +1,10 @@
+"""
+	struct Toulouse{B<:Union{AbstractDiscreteNormalBath, AbstractDiscreteBCSBath}}
+
+Toulouse model (a single impurity coupled to a discrete bath), consisting of a discrete
+bath `bath` and the impurity on-site energy `ϵ_d`. Construct with `Toulouse(bath; ϵ_d)`;
+for BCS baths `μ = 0` is required.
+"""
 struct Toulouse{B<:Union{AbstractDiscreteNormalBath, AbstractDiscreteBCSBath}}
 	bath::B
 	ϵ_d::Float64
@@ -24,6 +31,12 @@ num_sites(m::BCSToulouse) = num_sites(m.bath) + 2
 
 
 # hamiltonian and cmatrix
+"""
+	hamiltonian(m::Toulouse; include_chemical=false)
+
+Construct the full quadratic Hamiltonian (impurity + bath) of the Toulouse model;
+`include_chemical=true` absorbs the chemical potential into the bath energies.
+"""
 function freehamiltonian(h::NormalToulouse; include_chemical::Bool=false)
 	T = eltype(h)
 	data = AdagATerm{T}[]
@@ -115,6 +128,12 @@ end
 # 	return GenericQuadraticHamiltonian(2L, data)
 # end
 
+"""
+	cmatrix(m::Toulouse)
+
+Return the coefficient matrix of the Toulouse model (for BCS baths this is the 2L×2L BdG
+form, see `toulouse_cmatrix`).
+"""
 cmatrix(m::Toulouse) = toulouse_cmatrix(m.bath, ϵ_d=m.ϵ_d)
 function toulouse_cmatrix(b::AbstractDiscreteNormalBath; ϵ_d::Real)
 	n = num_sites(b)
@@ -162,6 +181,14 @@ end
 
 
 # thermal state
+"""
+	thermocdm(m::Toulouse)
+
+Construct the thermal equilibrium coefficient density matrix (cdm) of the Toulouse
+model; the cdm is a single-particle correlation matrix of the quadratic Hamiltonian,
+from which all quadratic observables can be computed without building the many-body
+state.
+"""
 function thermocdm(m::NormalToulouse)
 	h = cmatrix(hamiltonian(m, include_chemical=true))
 	cache = eigencache(h)
@@ -172,6 +199,15 @@ function thermocdm(m::BCSToulouse)
 	cache = eigencache(h)
 	return fermionicthermocdm(cache, β=m.bath.β)
 end
+
+"""
+	thermodm(m::Toulouse)
+
+Construct the thermal equilibrium (true) density matrix (dm) ρ = exp(-β(Ĥ-μN̂))/Z of the
+Toulouse model in the many-body Fock space. Note that this is the genuine density matrix,
+not the coefficient density matrix (cdm, see `thermocdm`). A truncation dimension `d` is
+required for `Boson` baths.
+"""
 function thermodm(m::NormalFermionicToulouse)
 	h = hamiltonian(m, include_chemical=true)
 	return fermionicthermodm(h, β=m.bath.β)
@@ -186,6 +222,13 @@ function thermodm(m::BCSToulouse)
 end
 
 # separable state
+"""
+	separablecdm(m::Toulouse, nsys)
+	separablecdm(m::Toulouse; nsys)
+
+Construct a separable coefficient density matrix (cdm) with impurity occupation `nsys`
+and the bath in thermal equilibrium.
+"""
 separablecdm(m::Toulouse; nsys::Real=thermaloccupation(particletype(m), m.bath.β, 0, m.ϵ_d)) = separablecdm(m, nsys)
 function separablecdm(m::NormalToulouse, nsys::Real)
 	N = num_sites(m) 
@@ -200,6 +243,12 @@ function separabledm(m::NormalFermionicToulouse)
 	h = freehamiltonian(m, include_chemical=true)
 	return fermionicthermodm(h, β=m.bath.β)
 end
+"""
+	separabledm(m::Toulouse; d)
+
+Construct the separable (true) density matrix (dm) with no impurity-bath coupling (the
+bath is in thermal equilibrium).
+"""
 function separabledm(m::NormalBosonicToulouse; d::Int)
 	h = freehamiltonian(m, include_chemical=true)
 	return bosonicthermodm(h, β=m.bath.β, d=d)
@@ -314,6 +363,13 @@ function toulouse_Gt(m::Toulouse, ts::AbstractVector{<:Real})
 end
 
 
+"""
+	toulouse_greater_lesser(m::Toulouse)
+	toulouse_greater_lesser(b, ts)
+
+Compute the greater/lesser Green's functions of the Toulouse model in thermal equilibrium;
+when a vector of times `ts` is given, the two arrays at those times are returned.
+"""
 function toulouse_greater_lesser(model::FermionicToulouse)
 	h = cmatrix(model)
 	b = model.bath
@@ -332,6 +388,14 @@ function toulouse_greater_lesser(b::Toulouse, ts::AbstractVector{<:Real})
 	return map(x->x[1], r), map(x->x[2], r)
 end
 
+"""
+	toulouse_neq_greater_lesser(m::Toulouse; nsys)
+	toulouse_neq_greater_lesser(b, ts; nsys)
+
+Compute the non-equilibrium greater/lesser Green's functions of the Toulouse model with the
+initial separable state (impurity occupation `nsys`); when a vector of times `ts` is given,
+the two arrays at those times are returned.
+"""
 function toulouse_neq_greater_lesser(b::FermionicToulouse; kwargs...)
 	h = cmatrix(b)
 	ρ = separablecdm(b; kwargs...)
@@ -350,6 +414,13 @@ end
 
 
 # currents
+"""
+	particlecurrent_cmatrix(m::NormalToulouse)
+	heatcurrent_cmatrix(m::NormalToulouse)
+
+Return the coefficient-matrix representation of the particle/heat current operators of the
+Toulouse model (used for averages with reduced density matrices).
+"""
 function particlecurrent_cmatrix(m::NormalToulouse)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.bath, bathsites(m), 1)
@@ -377,6 +448,13 @@ function _heatcurrent_util!(h::AbstractMatrix, b::AbstractBath, bsites, band::In
 	return h
 end
 
+"""
+	particlecurrent_hamiltonian(m::NormalToulouse)
+	heatcurrent_hamiltonian(m::NormalToulouse)
+
+Return the Hamiltonian representation of the particle/heat current operators of the
+Toulouse model (used for averages with full Fock-space density matrices).
+"""
 function particlecurrent_hamiltonian(m::NormalToulouse)
 	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
 	return _particlecurrent_hamiltonian_util!(h, m.bath, bathsites(m), 1)

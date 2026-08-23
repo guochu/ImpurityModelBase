@@ -1,4 +1,11 @@
 # BoundaryDriving does not support BCS or BEC type bath
+"""
+	struct BoundaryDriving
+
+Boundary-driven model: a system with Hamiltonian `hsys`, coupled on the left and right to
+discrete baths `leftbath` and `rightbath`; used for non-equilibrium transport simulations
+(BCS/BEC baths are not supported).
+"""
 struct BoundaryDriving{B<:AbstractDiscreteNormalBath, M<:AbstractMatrix}
 	hsys::M
 	leftbath::B
@@ -38,6 +45,13 @@ function freehamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 	end
 	return NormalQuadraticHamiltonian(num_sites(h), data)	
 end
+"""
+	hamiltonian(m::BoundaryDriving; include_chemical=false)
+
+Construct the full quadratic Hamiltonian (system + left/right baths + couplings) of the
+boundary-driven model; `include_chemical=true` absorbs the chemical potential into the bath
+energies.
+"""
 function hamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 	leftbath, rightbath = h.leftbath, h.rightbath
 	L = num_bands(h)
@@ -58,6 +72,12 @@ function hamiltonian(h::BoundaryDriving; include_chemical::Bool=false)
 end
 
 
+"""
+	cmatrix(m::BoundaryDriving)
+
+Return the coefficient matrix of the boundary-driven model (system + left/right baths +
+couplings).
+"""
 function cmatrix(m::BoundaryDriving)
 	hsys, leftbath, rightbath = m.hsys, m.leftbath, m.rightbath
 	L = size(hsys, 1)
@@ -80,12 +100,29 @@ function cmatrix(m::BoundaryDriving)
 end
 
 # thermal state
+"""
+	thermocdm(m::BoundaryDriving)
+
+Construct the thermal equilibrium coefficient density matrix (cdm) of the boundary-driven
+model; the cdm is a single-particle correlation matrix of the quadratic Hamiltonian, from
+which all quadratic observables can be evaluated. The left and right baths must have the
+same `β` and `μ`.
+"""
 function thermocdm(m::BoundaryDriving)
 	β, μ = m.leftbath.β, m.leftbath.μ
 	((β==m.rightbath.β) && (μ==m.rightbath.μ)) || throw(ArgumentError("thermocdm requires all the baths to have the same β and μ"))
 	h = cmatrix(m)
 	return thermocdm(particletype(m), eigencache(h), β=β, μ=μ)
 end
+
+"""
+	fermionicthermodm(m::BoundaryDriving)
+
+Construct the thermal equilibrium (true) density matrix (dm) ρ = exp(-β(Ĥ-μN̂))/Z of the
+boundary-driven model in the many-body Fock space. Note that this is the genuine density
+matrix, not the coefficient density matrix (cdm, see `thermocdm`). The left and right
+baths must have the same `β` and `μ`.
+"""
 function fermionicthermodm(m::BoundaryDriving)
 	(particletype(m) == Fermion) || throw(ArgumentError("Fermion particletype assumed"))
 	β, μ = m.leftbath.β, m.leftbath.μ
@@ -95,6 +132,12 @@ function fermionicthermodm(m::BoundaryDriving)
 end
 
 # separable state
+"""
+	separablecdm(m::BoundaryDriving, ρ_sys)
+
+Construct a separable coefficient density matrix (cdm) with the system initialized in
+`ρ_sys` and the left/right baths in their own thermal equilibrium.
+"""
 function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	(size(ρ_sys) == size(m.hsys)) || throw(DimensionMismatch("Hamiltonian size mismatch with density matrix size"))
 	leftbath, rightbath = m.leftbath, m.rightbath
@@ -111,6 +154,15 @@ function separablecdm(m::BoundaryDriving, ρ_sys::AbstractMatrix)
 	end
 	return ρ
 end
+
+"""
+	fermionicseparabledm(m::BoundaryDriving, sysdm)
+
+Construct the separable (true) fermionic density matrix (dm) with the system initialized
+in `sysdm` and the left/right baths in their own thermal equilibrium. Note that this is
+the genuine density matrix in the many-body Fock space, not the coefficient density
+matrix (cdm, see `separablecdm`).
+"""
 function fermionicseparabledm(m::BoundaryDriving, sysdm::AbstractMatrix)
 	(particletype(m) == Fermion) || throw(ArgumentError("Fermion particletype assumed"))
 	(size(sysdm, 1) == 2^(size(m.hsys, 1))) || throw(DimensionMismatch("Hamiltonian size mismatch with density operator size"))
@@ -121,6 +173,13 @@ function fermionicseparabledm(m::BoundaryDriving, sysdm::AbstractMatrix)
 end
 
 # currents
+"""
+	leftparticlecurrent_cmatrix(m::BoundaryDriving)
+	rightparticlecurrent_cmatrix(m::BoundaryDriving)
+
+Return the coefficient-matrix representation of the particle current operators at the
+left/right contacts (used for averages with reduced density matrices).
+"""
 function leftparticlecurrent_cmatrix(m::BoundaryDriving)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.leftbath, leftbathsites(m), 1)
@@ -129,6 +188,13 @@ function rightparticlecurrent_cmatrix(m::BoundaryDriving)
 	N = num_sites(m)
 	return _particlecurrent_util!(zeros(ComplexF64, N, N), m.rightbath, rightbathsites(m), num_bands(m))
 end
+"""
+	leftheatcurrent_cmatrix(m::BoundaryDriving)
+	rightheatcurrent_cmatrix(m::BoundaryDriving)
+
+Return the coefficient-matrix representation of the heat current operators at the left/right
+contacts (used for averages with reduced density matrices).
+"""
 function leftheatcurrent_cmatrix(m::BoundaryDriving)
 	N = num_sites(m)
 	return _heatcurrent_util!(zeros(ComplexF64, N, N), m.leftbath, leftbathsites(m), 1)
@@ -148,6 +214,13 @@ function rightbathsites(m::BoundaryDriving)
 end
 
 
+"""
+	leftparticlecurrent_hamiltonian(m::BoundaryDriving)
+	rightparticlecurrent_hamiltonian(m::BoundaryDriving)
+
+Return the Hamiltonian representation of the particle current operators at the left/right
+contacts (used for averages with full Fock-space density matrices).
+"""
 function leftparticlecurrent_hamiltonian(m::BoundaryDriving)
 	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
 	return _particlecurrent_hamiltonian_util!(h, m.leftbath, leftbathsites(m), 1)
@@ -156,6 +229,13 @@ function rightparticlecurrent_hamiltonian(m::BoundaryDriving)
 	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
 	return _particlecurrent_hamiltonian_util!(h, m.rightbath, rightbathsites(m), num_bands(m))
 end
+"""
+	leftheatcurrent_hamiltonian(m::BoundaryDriving)
+	rightheatcurrent_hamiltonian(m::BoundaryDriving)
+
+Return the Hamiltonian representation of the heat current operators at the left/right
+contacts (used for averages with full Fock-space density matrices).
+"""
 function leftheatcurrent_hamiltonian(m::BoundaryDriving)
 	h = NormalQuadraticHamiltonian(ComplexF64, num_sites(m))
 	return _heatcurrent_hamiltonian_util!(h, m.leftbath, leftbathsites(m), 1)

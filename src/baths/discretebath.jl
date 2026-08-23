@@ -24,6 +24,14 @@
 # end 
 # Base.eltype(::Type{DiscreteBath{P}}) where {P} = Float64
 
+"""
+	DiscreteBath{P}
+
+Type alias for a discrete particle bath, equivalent to `Bath{P, DiscreteSpectrum}`, whose
+spectral density is given by discrete frequencies `ws` and spectral values `fs`.
+
+	DiscreteBath(::Type{P}, ws, fs; β, μ=0)
+"""
 const DiscreteBath{P<:AbstractParticle} = Bath{P, DiscreteSpectrum}
 
 DiscreteBath(::Type{P}, f::DiscreteSpectrum; kwargs...) where {P<:AbstractParticle} = Bath(P, f; kwargs...)
@@ -67,6 +75,14 @@ discretefermionicbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kw
 # end 
 # Base.eltype(::Type{DiscreteVacuum{P}}) where {P} = Float64
 
+"""
+	DiscreteVacuum{P}
+
+Type alias for a discrete vacuum (zero-temperature) particle bath, equivalent to
+`Vacuum{P, DiscreteSpectrum}`.
+
+	DiscreteVacuum(::Type{P}, ws, fs; μ=0)
+"""
 const DiscreteVacuum{P<:AbstractParticle} = Vacuum{P, DiscreteSpectrum} 
 
 
@@ -74,16 +90,49 @@ DiscreteVacuum(::Type{P}, f::DiscreteSpectrum; kwargs...) where {P<:AbstractPart
 DiscreteVacuum(::Type{P}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) where {P<:AbstractParticle} = DiscreteVacuum(P, DiscreteSpectrum(ws, fs); kwargs...)
 
 DiscreteBosonicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)
-discretebosonicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBosonicVacuum(Boson, ws, fs; kwargs...)
+"""
+	discretebosonicvacuum(ws, fs; μ)
+
+Construct a bosonic discrete vacuum bath (zero temperature) with frequencies `ws` and
+spectral values `fs`.
+"""
+discretebosonicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBosonicVacuum(ws, fs; kwargs...)
 DiscreteFermionicVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Fermion, ws, fs; kwargs...)
-discretefermionicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteFermionicVacuum(Fermion, ws, fs; kwargs...)
+"""
+	discretefermionicvacuum(ws, fs; μ)
+
+Construct a fermionic discrete vacuum bath (zero temperature) with frequencies `ws` and
+spectral values `fs`.
+"""
+discretefermionicvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteFermionicVacuum(ws, fs; kwargs...)
 
 
 const AbstractDiscreteNormalBath{P<:AbstractParticle} = Union{DiscreteBath{P}, DiscreteVacuum{P}}
 
+"""
+	frequencies(b::AbstractDiscreteNormalBath)
+
+Return the list of discrete frequencies of the discrete bath `b`.
+"""
 frequencies(b::AbstractDiscreteNormalBath) = frequencies(b.f)
+"""
+	spectrumvalues(b::AbstractDiscreteNormalBath)
+
+Return the list of spectral values of the discrete bath `b` at each frequency.
+"""
 spectrumvalues(b::AbstractDiscreteNormalBath) = spectrumvalues(b.f)
+"""
+	spectrumcouplings(b::AbstractDiscreteNormalBath)
+
+Return the coupling strengths of the discrete bath `b`, given by the square roots of the
+spectral values.
+"""
 spectrumcouplings(b::AbstractDiscreteNormalBath) = spectrumcouplings(b.f)
+"""
+	num_sites(x)
+
+Return the number of sites (modes) of a discrete bath, Hamiltonian or Toulouse model.
+"""
 num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
 
 # const AbstractDiscreteBosonicBath = Union{DiscreteBath{Boson}, DiscreteVacuum{Boson}} 
@@ -110,8 +159,27 @@ num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
 # 	end
 # end
 
+"""
+	discretebath(::Type{P}, ws, fs; β, μ=0)
+	discretebath(::Type{P}, freqs, f; β, μ=0, atol=1e-6)
+	discretebath(b::AbstractBath; δw=0.1)
+
+Construct a discrete bath of particle species `P`:
+- directly from frequencies `ws` and spectral values `fs`;
+- by discretizing a continuous spectral function `f` on the intervals defined by `freqs`
+  (see [`spectrum_couplings`](@ref));
+- or by uniformly discretizing a continuous bath `b` with step size `δw`.
+"""
 discretebath(::Type{Boson}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 discretebath(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
+"""
+	discretevacuum(::Type{P}, ws, fs; μ=0)
+	discretevacuum(::Type{P}, freqs, f; μ=0, atol=1e-6)
+	discretevacuum(b::AbstractBath; δw=0.1)
+
+Construct a discrete vacuum (zero-temperature) bath of particle species `P`; the
+parameters have the same meaning as in [`discretebath`](@ref).
+"""
 discretevacuum(::Type{Boson}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Boson, ws, fs; kwargs...)
 discretevacuum(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteVacuum(Fermion, ws, fs; kwargs...)
 

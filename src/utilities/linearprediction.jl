@@ -1,7 +1,24 @@
+"""
+	AbstractPredictionScheme
+
+Abstract type for time-series extrapolation (prediction) schemes of observables.
+"""
 abstract type AbstractPredictionScheme end
 
 # see PHYSICAL REVIEW B 79, 245101 (2009), BarthelWhite2009
 # also Appendix in PHYSICAL REVIEW B 90, 115124 (2014), WolfSchollwock2014b
+"""
+	struct LinearPrediction{T}
+
+Linear-prediction (LP) extrapolation scheme, based on Barthel & White, PRB 79, 245101
+(2009). Fits an autoregressive model to a known equally-spaced observable series and
+extrapolates it to longer times.
+
+	LinearPrediction(obs, ws=ones(length(obs)); stepsize, nfit=length(obs), p=div(nfit,2))
+
+`obs` is the observable series, `ws` the corresponding weights, `stepsize` the time step,
+`nfit` the number of points used for the fit and `p` the autoregressive order.
+"""
 struct LinearPrediction{T<:Number} <: AbstractPredictionScheme
 	stepsize::Float64
 	nob::Int
@@ -87,6 +104,13 @@ function (x::LinearPrediction)(t::Real)
 	return x[n+1] * (1-dif) + x[n+2] * dif
 end
 
+"""
+	linear_predict(obs, stepsize; nfit, p, δt, maxiter, tol)
+
+Extrapolate the equally-spaced observable series `obs` (with step `stepsize`) using linear
+prediction, iterating until convergence or `maxiter` iterations, and return the complete
+(extrapolated) series resampled with step `δt`.
+"""
 function linear_predict(obs::Vector{<:Number}, stepsize::Real; nfit=length(obs), p::Int=div(nfit, 2), 
 						δt::Real=stepsize, maxiter::Int=10000, tol::Real=1.0e-6, verbosity::Int=1)
 	x = LinearPrediction(obs, stepsize=stepsize, nfit=nfit, p=p)

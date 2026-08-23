@@ -1,4 +1,22 @@
 # fermions
+"""
+	freefermions_Gt(h, i, j=i, cache=eigencache(h); β, μ=0)
+	freefermions_Gt(h, ts, i, j=i, cache=eigencache(h); β, μ=0)
+	freefermions_Gt(h, ρ₀, i, j=i, cache=eigencache(h))
+	freefermions_Gt(h, ρ₀, ts, i, j=i, cache=eigencache(h))
+
+Return the real-time retarded Green's function G(t) = G>(t) - G<(t) of free fermions.
+
+Without the initial state `ρ₀`, the equilibrium Green's function is evaluated: the
+initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
+density matrix ρ = thermocdm(h; β, μ) at inverse temperature `β` and chemical potential
+`μ`. When the initial coefficient density matrix `ρ₀` is provided, the nonequilibrium
+Green's function starting from that initial state is evaluated instead.
+
+When a vector of times `ts` is given, the Green's function values at those specific
+times are returned (an array with the same length as `ts`); otherwise a function is
+returned, which evaluates the Green's function when applied to a time.
+"""
 function freefermions_Gt(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); kwargs...)
 	f = freefermions_greater_lesser(h, i, j, cache; kwargs...)
 	function f′(t)
@@ -14,9 +32,20 @@ end
 
 
 """
-	freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int; kwargs...) 
-	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i)
-Real-time greater and lesser Green's functions
+	freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int=i, cache=eigencache(h); β, μ=0)
+	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache=eigencache(h))
+
+Real-time greater and lesser Green's functions G>(t), G<(t) of free fermions.
+
+Without the initial state `ρ₀`, the equilibrium Green's functions are evaluated: the
+initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
+density matrix ρ = thermocdm(h; β, μ) at inverse temperature `β` and chemical potential
+`μ`. When the initial coefficient density matrix `ρ₀` is provided, the nonequilibrium
+Green's functions starting from that initial state are evaluated instead.
+
+When a vector of times `ts` is given, the greater and lesser values at those specific
+times are returned (two arrays with the same length as `ts`); otherwise a function is
+returned, which evaluates (G>(t), G<(t)) when applied to a time.
 """
 function freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real, μ::Real=0) 
 	# @assert ishermitian(h)
@@ -135,6 +164,16 @@ end
 
 
 # Matsubara Green's functions
+"""
+	freefermions_Gτ(h, i, j=i, cache=eigencache(h); β)
+	freefermions_Gτ(h, τs, i, j=i, cache=eigencache(h); β)
+
+Return the imaginary-time (Matsubara) Green's function G(τ) of free fermions in thermal
+equilibrium at inverse temperature `β`. When a vector of times `τs` is given, the
+Green's function values at those specific times are returned (an array with the same
+length as `τs`); otherwise a function is returned, which evaluates the Green's function
+when applied to a time.
+"""
 function freefermions_Gτ(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real)
 	λs, U = cache.λs, cache.U
 	function f(τ)
@@ -155,7 +194,24 @@ end
 
 
 ### bosons
+"""
+	freebosons_Gt(h, i, j=i, cache=eigencache(h); β, μ=0)
+	freebosons_Gt(h, ts, i, j=i, cache=eigencache(h); β, μ=0)
+	freebosons_Gt(h, ρ₀, i, j=i, cache=eigencache(h))
+	freebosons_Gt(h, ρ₀, ts, i, j=i, cache=eigencache(h))
 
+Return the real-time retarded Green's function G(t) = G>(t) - G<(t) of free bosons.
+
+Without the initial state `ρ₀`, the equilibrium Green's function is evaluated: the
+initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
+density matrix ρ = thermocdm(h; β, μ) at inverse temperature `β` and chemical potential
+`μ`. When the initial coefficient density matrix `ρ₀` is provided, the nonequilibrium
+Green's function starting from that initial state is evaluated instead.
+
+When a vector of times `ts` is given, the Green's function values at those specific
+times are returned (an array with the same length as `ts`); otherwise a function is
+returned, which evaluates the Green's function when applied to a time.
+"""
 function freebosons_Gt(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); kwargs...)
 	f = freebosons_greater_lesser(h, i, j, cache; kwargs...)
 	function f′(t)
@@ -171,9 +227,20 @@ end
 
 
 """
-	freefermions_greater_lesser(h::AbstractMatrix, i::Int, j::Int; kwargs...) 
-	freefermions_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i)
-Real-time greater and lesser Green's functions
+	freebosons_greater_lesser(h::AbstractMatrix, i::Int, j::Int=i, cache=eigencache(h); β, μ=0)
+	freebosons_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache=eigencache(h))
+
+Real-time greater and lesser Green's functions G>(t), G<(t) of free bosons.
+
+Without the initial state `ρ₀`, the equilibrium Green's functions are evaluated: the
+initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
+density matrix ρ = thermocdm(h; β, μ) at inverse temperature `β` and chemical potential
+`μ`. When the initial coefficient density matrix `ρ₀` is provided, the nonequilibrium
+Green's functions starting from that initial state are evaluated instead.
+
+When a vector of times `ts` is given, the greater and lesser values at those specific
+times are returned (two arrays with the same length as `ts`); otherwise a function is
+returned, which evaluates (G>(t), G<(t)) when applied to a time.
 """
 function freebosons_greater_lesser(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real, μ::Real=0) 
 	# @assert ishermitian(h)
@@ -236,6 +303,16 @@ end
 
 
 # Matsubara Green's functions
+"""
+	freebosons_Gτ(h, i, j=i, cache=eigencache(h); β)
+	freebosons_Gτ(h, τs, i, j=i, cache=eigencache(h); β)
+
+Return the imaginary-time (Matsubara) Green's function G(τ) of free bosons in thermal
+equilibrium at inverse temperature `β`. When a vector of times `τs` is given, the
+Green's function values at those specific times are returned (an array with the same
+length as `τs`); otherwise a function is returned, which evaluates the Green's function
+when applied to a time.
+"""
 function freebosons_Gτ(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=eigencache(h); β::Real)
 	λs, U = cache.λs, cache.U
 	function f(τ)

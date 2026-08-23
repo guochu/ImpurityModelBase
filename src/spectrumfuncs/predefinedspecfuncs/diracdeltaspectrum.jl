@@ -56,3 +56,9 @@ Base.similar(x::DiracDelta; ω::Real=x.ω, α::Real=x.α) = DiracDelta(ω, α=α
 # quadgkwrapper(f::DiracDelta) = ifelse(lowerbound(f) <= f.ω <= upperbound(f), f.α, 0.)
 # spectrumshift(m::DiracDelta, μ::Real) = DiracDelta(ω=m.ω+μ, α=m.α, lb=lowerbound(m)-μ, ub=upperbound(m)-μ)
 spectrumshift(m::DiracDelta, μ::Real) = DiracDelta(ω=m.ω+μ, α=m.α)
+
+"""
+	spectrumshift(m::DiracDelta, μ)
+
+Shift the position of the δ function `m` by `μ`, i.e. `ω → ω + μ`.
+"""

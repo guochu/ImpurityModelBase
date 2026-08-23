@@ -1,6 +1,21 @@
 # definition of particle type
+"""
+	AbstractParticle
+
+Abstract type used to distinguish particle species (boson/fermion).
+"""
 abstract type AbstractParticle end
+"""
+	Boson
+
+Marker type for bosons, used to specify the statistics of a bath or particle.
+"""
 struct Boson <: AbstractParticle end
+"""
+	Fermion
+
+Marker type for fermions, used to specify the statistics of a bath or particle.
+"""
 struct Fermion <: AbstractParticle end
 
 
@@ -47,6 +62,15 @@ fermidirac(β::Real, μ::Real, ϵ::Real) = fermidirac(β, ϵ-μ)
 # 	x = exp(-safe_mult(β, ϵ-μ))
 # 	return x/(1+x)
 # end
+
+"""
+	thermaloccupation(::Type{P}, β, μ, ϵ)
+	thermaloccupation(::Type{P}, β, ϵ)
+
+Return the thermal occupation of particle species `P` (`Boson` or `Fermion`) at inverse
+temperature `β`, chemical potential `μ` and energy `ϵ`: the Bose-Einstein distribution for
+bosons and the Fermi-Dirac distribution for fermions.
+"""
 thermaloccupation(::Type{Fermion}, β::Real, μ::Real, ϵ::Real) = fermidirac(β, μ, ϵ)
 thermaloccupation(::Type{Fermion}, β::Real, ϵ::Real) = fermidirac(β, ϵ)
 

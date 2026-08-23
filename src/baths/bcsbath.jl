@@ -1,5 +1,13 @@
 
 
+"""
+	struct BCSBath{F<:AbstractBoundedFunction, T<:Number}
+
+BCS (paired) fermionic bath container holding a bath spectral density `f`, the inverse
+temperature `β`, the chemical potential `μ` and the pairing parameter `Δ`.
+
+	BCSBath(f; β, μ=0, Δ=0)
+"""
 struct BCSBath{F <: AbstractBoundedFunction, T<:Number} <: AbstractBCSBath
 	f::F
 	β::Float64
@@ -13,10 +21,26 @@ Base.similar(x::BCSBath, f::AbstractBoundedFunction; β::Real=x.β, μ::Real=x.�
 Base.similar(x::BCSBath; f::AbstractBoundedFunction=x.f, β::Real=x.β, μ::Real=x.μ, Δ::Number=x.Δ) = BCSBath(f, β=β, μ=μ, Δ=Δ)
 Base.eltype(::Type{BCSBath{F, T}}) where {F, T} = T
 
+"""
+	bcsbath(f; β, μ=0, Δ=0)
+	bcsbath(bath::FermionicBath; Δ=0)
+
+Construct a BCS fermionic bath; alternatively, obtain one from a normal fermionic bath
+`bath` by adding a pairing parameter `Δ`.
+"""
 bcsbath(f::AbstractBoundedFunction; kwargs...) = BCSBath(f; kwargs...)
 bcsbath(bath::FermionicBath; Δ::Number=0) = bcsbath(bath.spectrum, β=bath.β, μ=bath.μ, Δ=Δ)
 
 
+"""
+	struct BCSVacuum{F<:AbstractBoundedFunction, T<:Number}
+
+BCS (paired) fermionic vacuum (zero-temperature) bath container holding a bath spectral
+density `f`, the chemical potential `μ` and the pairing parameter `Δ`, with inverse
+temperature `β = Inf`.
+
+	BCSVacuum(f; μ=0, Δ=0)
+"""
 struct BCSVacuum{F <: AbstractBoundedFunction, T<:Number} <: AbstractBCSBath
 	f::F
 	μ::Float64
@@ -28,6 +52,13 @@ Base.similar(x::BCSVacuum, f::AbstractBoundedFunction; μ::Real=x.μ, Δ::Number
 Base.similar(x::BCSVacuum; f::AbstractBoundedFunction=x.f, μ::Real=x.μ, Δ::Number=x.Δ) = BCSVacuum(f, μ=μ, Δ=Δ)
 Base.eltype(::Type{BCSVacuum{F, T}}) where {F, T} = T
 
+"""
+	bcsvacuum(f; μ=0, Δ=0)
+	bcsvacuum(bath::FermionicVacuum; Δ=0)
+
+Construct a BCS fermionic vacuum (zero-temperature) bath; alternatively, obtain one from a
+fermionic vacuum bath `bath` by adding a pairing parameter `Δ`.
+"""
 bcsvacuum(f::AbstractBoundedFunction; kwargs...) = BCSVacuum(f; kwargs...)
 bcsvacuum(bath::FermionicVacuum; Δ::Number=0) = bcsvacuum(bath.spectrum, μ=bath.μ, Δ=Δ)
 

@@ -36,6 +36,17 @@
 # 	return n
 # end
 
+"""
+	bcs_cmatrix(h, g)
+
+Assemble the BCS-type 2L×2L coefficient matrix from the particle-hole block `h` and the
+pairing block `g`:
+```
+[ h    g ]
+[ g'  -h^T ]
+```
+and anti-symmetrize it.
+"""
 function bcs_cmatrix(h::AbstractMatrix{<:Number}, g::AbstractMatrix{<:Number})
 	(size(h) == size(g)) || throw(DimensionMismatch())
 	# ishermitian(h) || throw(ArgumentError("h matrix should be hermitian"))
@@ -93,13 +104,13 @@ function antisymmetrize!(m::AbstractMatrix)
 end
 
 function bcs_hmatrix(m::AbstractMatrix)
-	L0 = size(h, 1)
+	L0 = size(m, 1)
 	L = div(L0, 2)
 	(2L == L0) || throw(ArgumentError("not a BCS cmatrix"))
 	return m[1:L, 1:L]	
 end
 function bcs_gmatrix(m::AbstractMatrix)
-	L0 = size(h, 1)
+	L0 = size(m, 1)
 	L = div(L0, 2)
 	(2L == L0) || throw(ArgumentError("not a BCS cmatrix"))
 	return m[1:L, L+1:2L]		

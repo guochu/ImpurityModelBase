@@ -3,10 +3,21 @@
 """
     toulouse_Giw(spectrum::AbstractBoundedFunction, ω::Real; ϵ_d::Real, μ::Real)
 
-Matsubara Green's function in the imaginary-frequency axis
+Matsubara Green's function in the imaginary-frequency axis for the Toulouse model.
+
+The Toulouse model consists of a single fermionic impurity (a localized electron)
+coupled to a noninteracting fermionic bath (a free-fermion heat reservoir). Its
+Hamiltonian reads
+
+H = ϵ_d d†d + ∑ₖ εₖ cₖ† cₖ + ∑ₖ Vₖ (d† cₖ + cₖ† d),
+
+where d† (d) creates (annihilates) an electron on the impurity with on-site energy ϵ_d,
+cₖ† (cₖ) creates (annihilates) a bath electron of energy εₖ, and Vₖ is the impurity-bath
+coupling strength, whose distribution is characterized by the bath spectrum density
+`spectrum`.
 
 ϵ_d is the on-site energy of the localized electron
-μ is the chemical potental of the bath
+μ is the chemical potential of the bath
 β is not a parameter as Gw is independent of β for the Toulouse model
 """
 function toulouse_Giw(f::AbstractBoundedFunction, ω::Real; ϵ_d::Real, μ::Real=0)

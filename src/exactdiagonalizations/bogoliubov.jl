@@ -90,7 +90,7 @@ function bogoliubov_hamiltonian(bath::DiscreteBCSBath)
 	L = div(num_sites(bath), 2)
 
 	T = eltype(bath)
-	data = QuadraticTerm{T}[]
+	ham = GenericQuadraticHamiltonian(T, num_sites(bath))
 	for i in 1:L-1
 		v = _dispersion(ws[i], Δ)
 		push!(ham, adaga(2i-1, 2i-1, coeff=v))

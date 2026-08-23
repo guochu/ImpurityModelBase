@@ -33,6 +33,12 @@ end
 
 
 # temporary (inefficient) solution for lindblad dynamics
+"""
+	struct LindbladOperator
+
+Matrix representation (4-dimensional array) of a Lindblad master-equation generator, used
+for Markovian open-quantum-system dynamics.
+"""
 struct LindbladOperator
 	m::Array{ComplexF64, 4}
 end
@@ -57,6 +63,13 @@ end
 # 	return LindbladOperator(L)
 # end
 
+"""
+	lindbladoperator(H, jumpops)
+
+Construct the Lindblad master-equation generator:
+dρ/dt = -i[H,ρ] + Σₖ(2JₖρJₖ† - {Jₖ†Jₖ, ρ}),
+where `H` is the Hamiltonian and `jumpops` the list of jump (dissipative) operators.
+"""
 function lindbladoperator(H::AbstractMatrix, jumpops::Vector)
 	I2 = one(H)
 	L = -im * lrmult(H, I2)
@@ -78,6 +91,11 @@ function (op::LindbladOperator)(rho::AbstractMatrix)
 	return reshape(r, d, d)
 end
 
+"""
+	timeevo(ρ, L::LindbladOperator, t)
+
+Evolve the density matrix `ρ` for time `t` under the Lindblad generator `L`.
+"""
 function timeevo(rho::AbstractMatrix, L::LindbladOperator, t::Real)
 	d = size(rho, 1)
 	d2 = d * d
@@ -86,6 +104,12 @@ function timeevo(rho::AbstractMatrix, L::LindbladOperator, t::Real)
 end
 
 const STEADY_STATE_TOL = 1.0e-10
+"""
+	steady_state(h::LindbladOperator)
+
+Find the steady state of the Lindblad master equation (eigenvector with zero eigenvalue),
+normalized to a density matrix with unit trace.
+"""
 function steady_state(h::LindbladOperator)
 	m = h.m
 	d = size(m, 1)

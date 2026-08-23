@@ -22,6 +22,13 @@
 # Base.eltype(::Type{DiscreteBCSBath{T}}) where {T} = T
 
 
+"""
+	DiscreteBCSBath{T}
+
+Type alias for a discrete BCS fermionic bath, equivalent to `BCSBath{DiscreteSpectrum, T}`.
+
+	DiscreteBCSBath(ws, fs; β, μ=0, Δ=0)
+"""
 const DiscreteBCSBath{T<:Number} = BCSBath{DiscreteSpectrum, T}
 DiscreteBCSBath(f::DiscreteSpectrum, Δ::Number; kwargs...) = BCSBath(f, Δ; kwargs...)
 DiscreteBCSBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}, Δ::Number; kwargs...) = DiscreteBCSBath(DiscreteSpectrum(ws, fs), Δ; kwargs...)
@@ -29,9 +36,12 @@ DiscreteBCSBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real
 
 
 """
-	DiscreteBCSBath(ws, fs; β, μ, Δ) 
+	discretebcsbath(ws, fs; β, μ=0, Δ=0)
+	discretebcsbath(freqs, f; β, μ=0, Δ=0, atol=1e-6)
 
-Return a fermionic bath with β and μ
+Construct a discrete BCS fermionic bath, either from frequencies `ws` and spectral values
+`fs`, or by discretizing a continuous spectral function `f` on the intervals defined by
+`freqs`.
 """
 discretebcsbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSBath(ws, fs; kwargs...)
 
@@ -58,19 +68,56 @@ discretebcsbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs..
 # discretebcsvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSVacuum(ws, fs; kwargs...)
 # Base.eltype(::Type{DiscreteBCSVacuum{T}}) where {T} = T
 
+"""
+	DiscreteBCSVacuum{T}
+
+Type alias for a discrete BCS fermionic vacuum bath, equivalent to
+`BCSVacuum{DiscreteSpectrum, T}`.
+
+	DiscreteBCSVacuum(ws, fs; μ=0, Δ=0)
+"""
 const DiscreteBCSVacuum{T<:Number} = BCSVacuum{DiscreteSpectrum, T}
 
 DiscreteBCSVacuum(f::DiscreteSpectrum, Δ::Number; kwargs...) = BCSVacuum(f, Δ; kwargs...)
 DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}, Δ::Number; kwargs...) = DiscreteBCSVacuum(DiscreteSpectrum(ws, fs), Δ; kwargs...)
 DiscreteBCSVacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; μ::Real=0, Δ::Number=0) = DiscreteBCSVacuum(ws, fs, Δ, μ=μ)
+"""
+	discretebcsvacuum(ws, fs; μ=0, Δ=0)
+	discretebcsvacuum(freqs, f; μ=0, Δ=0, atol=1e-6)
+
+Construct a discrete BCS fermionic vacuum (zero-temperature) bath; the parameters have the
+same meaning as in [`discretebcsbath`](@ref).
+"""
 discretebcsvacuum(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSVacuum(ws, fs; kwargs...)
 
 
 const AbstractDiscreteBCSBath{T<:Number} = Union{DiscreteBCSBath{T}, DiscreteBCSVacuum{T}}
 
+"""
+	frequencies(b::AbstractDiscreteBCSBath)
+
+Return the list of discrete frequencies of the discrete BCS bath `b`.
+"""
 frequencies(b::AbstractDiscreteBCSBath) = frequencies(b.f)
+"""
+	spectrumvalues(b::AbstractDiscreteBCSBath)
+
+Return the list of spectral values of the discrete BCS bath `b` at each frequency.
+"""
 spectrumvalues(b::AbstractDiscreteBCSBath) = spectrumvalues(b.f)
+"""
+	spectrumcouplings(b::AbstractDiscreteBCSBath)
+
+Return the coupling strengths of the discrete BCS bath `b`, given by the square roots of
+the spectral values.
+"""
 spectrumcouplings(b::AbstractDiscreteBCSBath) = spectrumcouplings(b.f)
+"""
+	num_sites(b::AbstractDiscreteBCSBath)
+
+Return the number of modes corresponding to the discrete BCS bath `b`, twice the number of
+frequencies (particle and hole branches).
+"""
 num_sites(x::AbstractDiscreteBCSBath) = 2 * length(frequencies(x))
 
 
@@ -114,5 +161,5 @@ end
 function discretevacuum(b::BCSVacuum; δw::Real=0.1, kwargs...)
 	f = b.spectrum
 	freqs = lowerbound(f):δw:upperbound(f)
-	return discretebcsvacuum(particletype(b), freqs, f; μ=b.μ, Δ=b.Δ, kwargs...)
+	return discretebcsvacuum(freqs, f; μ=b.μ, Δ=b.Δ, kwargs...)
 end

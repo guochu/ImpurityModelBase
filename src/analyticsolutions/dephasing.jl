@@ -1,8 +1,20 @@
 
 """
-	spinboson_dephasingdynamics(spectrum::AbstractBoundedFunction, t::Real; β::Real, Δ::Real)
+	spinboson_dephasingdynamics(spectrum::AbstractBoundedFunction, t::Real, ρ₀::AbstractMatrix; β::Real, Δ::Real=0)
 
-H = Δσz + σz∑ₖVₖ(aₖ + aₖ+) + ∑ₖωₖaₖ+aₖ
+Exact dephasing dynamics of the spin-boson model in the absence of the tunneling term
+(no σₓ coupling). The Hamiltonian reads
+
+H = Δσz + σz ∑ₖ Vₖ (aₖ + aₖ†) + ∑ₖ ωₖ aₖ† aₖ
+
+where `spectrum` is the bath spectrum density (an `AbstractBoundedFunction`), `β` the
+inverse temperature and `Δ` the energy splitting of the spin.
+
+Given the 2×2 reduced density matrix `ρ₀` of the spin at time t=0, return the evolved
+2×2 density matrix at time `t`. Since only σz couples to the bosonic bath, the
+populations (diagonal elements) are unchanged and only the coherences (off-diagonal
+elements) acquire a renormalized phase factor, which gives rise to the dephasing
+dynamics.
 """
 function spinboson_dephasingdynamics(spectrum::AbstractBoundedFunction, t::Real, ρ₀::AbstractMatrix; β::Real, Δ::Real=0)
 	(size(ρ₀, 1) == size(ρ₀, 2) == 2) || throw(ArgumentError("initial state should be a 2×2 density matrix"))
@@ -24,6 +36,13 @@ function _renormalized_phase(f::AbstractBoundedFunction, t, β, Δ)
 end
 
 # DD sequence XX
+"""
+	ddxx_spinboson_dephasingdynamics(spectrum, N, ρ₀; β, δt)
+
+Evolve the spin-boson dephasing model under an XX dynamical-decoupling (DD) pulse sequence,
+returning the evolved 2×2 density matrix. `N` is an even number of DD steps and `δt` the
+time interval per step.
+"""
 function ddxx_spinboson_dephasingdynamics(spectrum::AbstractBoundedFunction, N::Int, ρ₀::AbstractMatrix; β::Real, δt::Real)
 	iseven(N) || throw("Even number of DD steps assumed")
 	(size(ρ₀, 1) == size(ρ₀, 2) == 2) || throw(ArgumentError("initial state should be a 2×2 density matrix"))

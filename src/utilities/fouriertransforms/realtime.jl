@@ -80,7 +80,7 @@ end
 Obtaining the bath spectrum density J(ω) from the frequency-domain hybridization function Δ(ω),
 using the relation J(ω) = -imag(Δ(ω)) / π (the relation is the same as Gw_to_Aw)
 """
-Δw_to_Jw(Δw::Vector{<:Number}; verbosity::Int=1) = Gw_to_Aw(Δω, verbosity=verbosity)
+Δw_to_Jw(Δw::Vector{<:Number}; verbosity::Int=1) = Gw_to_Aw(Δw, verbosity=verbosity)
 
 """
 	Gt_to_Gw(gt::Vector{<:Number}, ws; δt, δ::Real=1.0e-8)
