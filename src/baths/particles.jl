@@ -28,8 +28,9 @@ with β, μ at energy ϵ
 """
 function boseeinstein(β::Real, ϵ::Real)
 	(ϵ >= zero(ϵ)) || throw(ArgumentError("energy must be larger than μ"))
-	x = exp(-safe_mult(β, ϵ))
-	return x / (1 - x)
+	# 1/(exp(x)-1) evaluated via expm1 to avoid the catastrophic
+	# cancellation of exp(x)-1 when x = βϵ is smaller than machine precision
+	return 1 / expm1(safe_mult(β, ϵ))
 end
 
 boseeinstein(β::Real, μ::Real, ϵ::Real) = boseeinstein(β, ϵ - μ)
