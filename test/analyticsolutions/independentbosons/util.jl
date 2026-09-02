@@ -46,3 +46,21 @@ end
 # 		return exp(-β*(Himp + Hbath)) 
 # 	end
 # end
+
+# product initial state: impurity density matrix ρ_0 ⊗ thermal equilibrium of a
+# single bosonic mode of frequency ω₀, truncated to d levels
+#
+# `ρ_0` is given in the analytical-solution convention:
+#   bands=1: 2×2 matrix in the |0⟩,|1⟩ basis
+#   bands=2: 4×4 matrix in the |0⟩,|↑⟩,|↓⟩,|↑↓⟩ basis, where |↑⟩ = first spin
+#            occupied, |↓⟩ = second spin occupied.
+# The ED basis is the natural kron basis |00⟩,|0↓⟩,|↑0⟩,|↑↓⟩, so the rows/columns
+# of the singly-occupied states (indices 2 and 3) must be swapped for bands=2.
+function prod_state(ρ_0::AbstractMatrix{<:Number}, ω₀::Real, β::Real, d::Int)
+	ρ_bath = Diagonal(exp.(-β .* (0:d-1) .* ω₀))
+	if size(ρ_0, 1) == 4
+		# code convention [|0⟩,|↑⟩,|↓⟩,|↑↓⟩] -> ED kron basis [|0⟩,|0↓⟩,|↑0⟩,|↑↓⟩]
+		ρ_0 = ρ_0[[1, 3, 2, 4], [1, 3, 2, 4]]
+	end
+	return kron(ρ_0, ρ_bath)
+end

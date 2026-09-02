@@ -280,6 +280,52 @@ independentbosons_greater
 independentbosons_lesser
 ```
 
+### 任意初始杂质密度矩阵（乘积初始态）
+
+上面各式的初始态为整体热平衡 ``e^{-\beta H}/Z``。本包还支持**乘积初始态**
+``\rho(0) = \rho_0 \otimes \rho_{\rm bath}``，其中 ``\rho_{\rm bath} = e^{-\beta H_{\rm bath}}/Z_{\rm bath}``
+是声子浴的热平衡态，而 ``\rho_0`` 是**任意的**杂质密度矩阵（可含相干元）。
+
+因为 ``[H, \hat n_d] = 0``，杂质占据数守恒，只有 ``\rho_0`` 的**对角元**进入格林函数，
+相干元不贡献。接口中 ``\rho_0`` 以完整密度矩阵给出：
+
+- `bands = 1`：``2\times2`` 矩阵，基矢 ``(|0\rangle, |1\rangle)``；
+- `bands = 2`：``4\times4`` 矩阵，基矢 ``(|0\rangle, |\uparrow\rangle, |\downarrow\rangle, |\uparrow\downarrow\rangle)``。
+
+记对角元为 ``\rho_0^{00},\ \rho_0^{11}``（`bands=1`）与
+``\rho_0^{00},\ \rho_0^{\uparrow\uparrow},\ \rho_0^{\downarrow\downarrow},\ \rho_0^{\uparrow\downarrow}``
+（`bands=2`）。乘积初始态下的 greater / lesser 格林函数为
+
+```math
+G^>(t) = -i\,\rho_0^{00}\, e^{i\mu' t}\, e^{-\Phi(it)},
+\qquad
+G^<(t) = i\,\rho_0^{11}\, e^{i\mu' t}\, e^{-\Phi(it)}
+\qquad (\text{bands}=1),
+```
+
+```math
+\begin{aligned}
+G^>_\uparrow(t) &= -i\left[\rho_0^{00} + \rho_0^{\downarrow\downarrow}\,
+  e^{i(\mu'-U')t}\, e^{-2i\Gamma(t)}\right] e^{i\mu' t}\, e^{-\Phi(it)},\\
+G^<_\uparrow(t) &= \phantom{-}i\left[\rho_0^{\uparrow\uparrow} + \rho_0^{\uparrow\downarrow}\,
+  e^{i(\mu'-U')t}\, e^{-2i\Gamma(t)}\right] e^{i\mu' t}\, e^{-\Phi(it)}
+  \qquad (\text{bands}=2),
+\end{aligned}
+```
+
+其中
+
+```math
+\Gamma(t) = \int \mathrm{d}\omega\, J(\omega)\,
+\frac{\sin(\omega t)}{\omega^2}
+```
+
+是进入/离开双占据态时声子浴额外汇集到的位移相因子（`_double_transition`）。
+
+!!! note
+    乘积初始态下 greater 与 lesser **都用** ``e^{-\Phi(it)}``；而热平衡态的 lesser
+    按 KMS 关系用 ``e^{-\Phi(-it)}``（见上节）。两者之差正是初始态类型造成的。
+
 ## 自旋-玻色退相干
 
 自旋-玻色模型去掉隧穿项（无 ``\sigma_x`` 耦合）后的精确退相干动力学：

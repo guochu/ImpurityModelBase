@@ -12,6 +12,17 @@ function _exponent_f(f::AbstractBoundedFunction, τ, β)
     return exp(-_e)
 end
 
+# Bath transition factor for entering/leaving the doubly-occupied impurity
+# state (bands=2) with a product initial state:
+# exp(-2i ∫ dω J(ω)/ω² sin(ωt)).
+# It encodes the extra displacement phase picked up when the electron is added
+# on top of an already-occupied (opposite-spin) impurity state.
+function _double_transition(f::AbstractBoundedFunction, t::Real)
+    g(ω) = sin(ω*t)/ω^2
+    _e = quadgkwrapper(f * g)
+    return exp(-2im * _e)
+end
+
 # _interact(τ, β, μ, Δ, U) = (exp(τ*(μ+Δ)) + exp(β*(μ+Δ) + τ*(μ+Δ-U))) / (1+2*exp(β*(μ+Δ))+exp(β*(2μ+2Δ-U)))
 
 # function _interact(τ, β, μ, Δ, U)
