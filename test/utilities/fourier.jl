@@ -39,7 +39,7 @@ end
 	ϵ_d = 0.
 
 
-	giw = toulouse_Giw(spec, β=β, ϵ_d=ϵ_d, n=n) 
+	giw = toulouse_Giw(fermionicbath(spec, β=β); ϵ_d=ϵ_d, n=n) 
 	# println("giw[1]=", giw[1], " giw[end]=", giw[end])
 
 	gτ = Giw_to_Gτ(giw; β=β, Nτ=Nτ)

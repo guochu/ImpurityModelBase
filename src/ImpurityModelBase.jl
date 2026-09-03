@@ -51,8 +51,7 @@ export Gτ_to_Giw, Giw_to_Gτ, Δτ_to_Δiw, ifrequency, ifrequencies
 # analytical solutions 
 export freefermion_greater, freefermion_lesser, freefermion_Gt, freefermion_Gτ, freefermion_occupation
 export fermion_greater, fermion_lesser, fermion_Gt, fermion_Gτ
-export toulouse_Gw, toulouse_Gt, toulouse_Δw
-export toulouse_Giw, toulouse_Gτ, toulouse_Δiw, toulouse_Δτ
+export toulouse_Gw, toulouse_Giw, toulouse_Gt, toulouse_Gτ, toulouse_Δw, toulouse_Δiw, toulouse_Δτ
 
 export freeboson_greater, freeboson_lesser, freeboson_Gt, freeboson_Gτ, freeboson_occupation
 export independentbosons_Gτ, independentbosons_greater, independentbosons_lesser

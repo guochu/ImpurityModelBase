@@ -37,6 +37,6 @@ end
 
 function holstein_Gw(f::AbstractBoundedFunction, ϵ::Real; g::Real, ω::Real, ϵ_d::Real, μ::Real=0, β::Real=Inf, 
 						δ::Real=1.0e-8, maxiter::Int=10, rtol::Real=holstein_finiteT_rtol)
-	G0w(y) = toulouse_Gw(f, y, ϵ_d=ϵ_d, μ=μ, δ=δ)
+	G0w(y) = fermionic_toulouse_Gw(f, y, ϵ_d=ϵ_d, μ=μ, δ=δ)
 	return holstein_G0w_to_Gw(G0w, ϵ, g=g, ω=ω, β=β, maxiter=maxiter, rtol=rtol)
 end

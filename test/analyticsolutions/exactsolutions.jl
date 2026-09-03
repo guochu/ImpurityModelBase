@@ -29,6 +29,33 @@ println("------------------------------------")
 end
 
 
+@testset "GF-imaginary time (bosons): benchmarking ED with Analytic solutions" begin
+	N = 25
+	δτ = 0.01
+	ϵ_d = 1.25*pi
+	dw = 0.1
+	β = N * δτ
+	τs = collect(0:δτ:β)
+	rtol = 1.0e-2
+
+	spec = spectrum_func()
+
+	# for a (normal) bosonic Toulouse model the chemical potential must be negative to
+	# keep the single-particle spectrum positive (required for a stable thermal state)
+	for μ in (-5, -2)
+
+		b1 = bath(Boson, spec, β=β, μ=μ)
+		b2 = discretebath(b1, δw=dw)
+
+		g₁ = toulouse_Gτ(Toulouse(b2, ϵ_d=ϵ_d), τs)
+		g₂ = [real(toulouse_Gτ(b1, τ, ϵ_d = ϵ_d)) for τ in τs]
+
+		@test norm(g₁ - g₂) / norm(g₁) < rtol
+	end
+
+end
+
+
 @testset "GF-real time: benchmarking ED with Analytic solutions" begin
 	N = 10
 	δt = 0.01
@@ -44,7 +71,7 @@ end
 	for spec in (spectrum_func(),)
 		b1 = bath(Fermion, spec, β=β, μ=0.)
 		b2 = discretebath(b1, δw=dw)
-		gf1 = [toulouse_Gt(spec, tj, ϵ_d = ϵ_d, wmax=100) for tj in ts]
+		gf1 = [toulouse_Gt(b1, tj, ϵ_d = ϵ_d, wmax=100) for tj in ts]
 		gf2 = toulouse_Gt(Toulouse(b2, ϵ_d = ϵ_d), ts)
 		@test norm(gf1 - gf2) / norm(gf1) < rtol
 
@@ -92,6 +119,6 @@ end
 	ϵ_d = 0.2
 	δ = 1.0e-8
 	gspec = spectrum(ϵ -> 0.0, -1, 1)
-	@test toulouse_Gw(gspec, 0.3; ϵ_d=ϵ_d, μ=0.0, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d)
-	@test toulouse_Gw(δd, 0.3; ϵ_d=ϵ_d, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d - α / (0.3 - ω0 + im * δ))
+	@test toulouse_Gw(fermionicbath(gspec, β=β, μ=0.0), 0.3; ϵ_d=ϵ_d, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d)
+	@test toulouse_Gw(fermionicbath(δd, β=β), 0.3; ϵ_d=ϵ_d, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d - α / (0.3 - ω0 + im * δ))
 end

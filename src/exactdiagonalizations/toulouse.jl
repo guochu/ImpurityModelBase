@@ -342,6 +342,10 @@ function toulouse_Gτ(h::AbstractBath, τs::AbstractVector{<:Real}; kwargs...)
 	return f.(τs)
 end
 
+# scalar (single-τ) convenience methods, used to sample G(τ) at individual points
+toulouse_Gτ(b::AbstractDiscreteNormalBath{Fermion}, τ::Real; ϵ_d::Real) = toulouse_Gτ(b; ϵ_d=ϵ_d)(τ)
+toulouse_Gτ(b::AbstractDiscreteNormalBath{Boson}, τ::Real; ϵ_d::Real) = toulouse_Gτ(b; ϵ_d=ϵ_d)(τ)
+
 
 # function _fermionic_Gτ_util(cache::EigenCache, ns, i::Int, j::Int, t::Real)
 # 	λs, U = cache.λs, cache.U

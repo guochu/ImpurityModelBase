@@ -1,7 +1,7 @@
 # G(ω) for the Holstein model
 
 function holstein_Σw_zeroT(f::AbstractBoundedFunction, ϵ::Real; g::Real, ω::Real, ϵ_d::Real, μ::Real=0, δ::Real=1.0e-8, maxiter::Int=10)
-	G0w(y) = toulouse_Gw(f, y, ϵ_d=ϵ_d, μ=μ, δ=δ)
+	G0w(y) = fermionic_toulouse_Gw(f, y, ϵ_d=ϵ_d, μ=μ, δ=δ)
 	return holstein_G0w_to_Σw_zeroT(G0w, ϵ, g=g, ω=ω, maxiter)
 end
 
