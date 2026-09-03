@@ -1,5 +1,6 @@
 include("greenfunction.jl")
 include("realtime.jl")
+include("dmft.jl")
 
 """
 	holstein_scaleless_parameters(; g::Real, ω::Real, t::Real=1)

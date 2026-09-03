@@ -1,14 +1,6 @@
 include("zeroT.jl")
 include("finiteT.jl")
 
-function holstein_G0w_to_Σw(G0w::Function, ϵ::Real; g::Real, ω::Real, β::Real=Inf, maxiter::Int=10, rtol::Real=holstein_finiteT_rtol)
-	if β == Inf
-		return holstein_G0w_to_Σw_zeroT(G0w, ϵ, g=g, ω=ω, maxiter=maxiter)
-	else
-		error("holstein_G0w_to_Σw not implemented for zero temperature")
-	end
-end
-
 function holstein_G0w_to_Gw(G0w::Function, ϵ::Real; g::Real, ω::Real, β::Real=Inf, maxiter::Int=10, rtol::Real=holstein_finiteT_rtol)
 	if β == Inf
 		return holstein_G0w_to_Gw_zeroT(G0w, ϵ, g=g, ω=ω, maxiter=maxiter)
@@ -18,15 +10,9 @@ function holstein_G0w_to_Gw(G0w::Function, ϵ::Real; g::Real, ω::Real, β::Real
 end
 
 
-function bethe_holstein_dmft_iteration(G0w::Function, wk::Real; g::Real, ω::Real, β::Real=Inf, t::Real=1, maxiter::Int=10, rtol::Real=holstein_finiteT_rtol)
-	Σk = holstein_G0w_to_Σw(G0w, wk, β=β, g=g, ω=ω, maxiter=maxiter, rtol=rtol) 
-	a = -(Σk-wk)
-	b = sqrt((Σk-wk)^2-t^2)
-	Gk = (a + b) / (t^2/2)
-	if imag(Gk) > 0
-		Gk = (a - b) / (t^2/2)
-	end
-	return Gk
+function holstein_G0w_to_Σw(G0w::Function, ϵ::Real; g::Real, ω::Real, β::Real=Inf, maxiter::Int=10)
+	β == Inf || error("holstein_G0w_to_Σw is only implemented at zero temperature; use holstein_G0w_to_Gw_finiteT for β < Inf")
+	return holstein_G0w_to_Σw_zeroT(G0w, ϵ, g=g, ω=ω, maxiter=maxiter)
 end
 
 function holstein_Gt(f::AbstractBoundedFunction, t::Real; g::Real, ω::Real, ϵ_d::Real, μ::Real=0, 

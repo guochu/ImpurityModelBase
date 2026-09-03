@@ -58,9 +58,8 @@ export independentbosons_Gτ, independentbosons_greater, independentbosons_lesse
 
 export spinboson_dephasingdynamics, ddxx_spinboson_dephasingdynamics
 
-# export holstein_scaleless_parameters, holstein_bare_parameters, GreenFunction
-# export holstein_G0w_to_Gw, holstein_G0w_to_Σw, bethe_holstein_dmft_iteration
-# export holstein_Gt, holstein_Gw, holstein_Σw
+# holstein model: analytical CFE solutions and DMFT on the Bethe lattice
+export holstein_Gt, holstein_Gw, holstein_G0w_to_Gw, holstein_G0w_to_Σw, holstein_dmft_bethe
 
 # utilities
 export AbstractPredictionScheme, LinearPrediction, linear_predict

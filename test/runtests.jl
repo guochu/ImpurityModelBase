@@ -31,7 +31,7 @@ include("analyticsolutions/freefermion.jl")
 include("analyticsolutions/exactsolutions.jl")
 include("analyticsolutions/independentbosons/independentbosons.jl")
 include("analyticsolutions/dephasing.jl")
-# include("analyticsolutions/holstein.jl")
+include("analyticsolutions/holstein.jl")
 
 # 5. utilities
 include("utilities/fourier.jl")

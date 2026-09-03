@@ -1,4 +1,5 @@
 .DS_Store
+*.pdf
 Manifest.toml
 docs/build/
 docs/Manifest.toml
