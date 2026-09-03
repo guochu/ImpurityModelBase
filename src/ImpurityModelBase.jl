@@ -7,7 +7,7 @@ export DiracDelta, quadgkwrapper, spectrumshift
 
 # definition of bosonic and fermionic bath, thermal distributions
 export AbstractParticle, Boson, Fermion, particletype
-export AbstractBath, AbstractBCSBath, AbstractBECBath
+export AbstractBath, AbstractNormalBath, AbstractBCSBath, AbstractBECBath
 export AbstractFermionicNormalBath, AbstractBosonicNormalBath
 export Bath, Vacuum, bath, vacuum, fermidirac, boseeinstein, thermaloccupation
 export FermionicBath, FermionicVacuum, fermionicvacuum, bosonicvacuum, fermionicbath
@@ -25,16 +25,18 @@ export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum
 
 
 # exact diagonalizations
-export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, adagadag, AATerm, aa, QuarticTerm, interaction
+export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, adagadag, AATerm, aa, QuarticTerm, interaction, positions
 export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadraticHamiltonian, quadratichamiltonian
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm, fermionicthermodm
 export bosonaoperator, bosonadagoperator, bosonoperator, bosondensityoperator, bosonoccupationoperator, fermionoccupationoperator
+export bosonicthermodm
 
 export eigencache, thermocdm, fermionicthermocdm, bosonicthermocdm, freefermions_greater_lesser, freefermions_Gt, freefermions_Gτ
 export freebosons_greater_lesser, freebosons_Gt, freebosons_Gτ
-export bcs_cmatrix
+export bcs_cmatrix, bcs_cdm
 export timeevo, correlation_2op_1t, correlation_2op_1τ, LindbladOperator, lindbladoperator, steady_state
 export Toulouse, hamiltonian, toulouse_greater_lesser, toulouse_neq_greater_lesser
+export bogoliubov_cmatrix, bogoliubov_thermocdm, bogoliubov_separablecdm
 export particlecurrent_cmatrix, heatcurrent_cmatrix, separablecdm, separabledm
 export particlecurrent_hamiltonian, heatcurrent_hamiltonian
 export BoundaryDriving, leftparticlecurrent_cmatrix, rightparticlecurrent_cmatrix, fermionicseparabledm

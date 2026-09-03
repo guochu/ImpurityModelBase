@@ -1,9 +1,5 @@
 using Test, Random
-
-# push!(LOAD_PATH, dirname(Base.@__DIR__) * "/src")
-# using ImpurityModelBase
-
-include("../src/includes.jl")
+using ImpurityModelBase
 
 Random.seed!(12354)
 

@@ -189,10 +189,15 @@ model; the cdm is a single-particle correlation matrix of the quadratic Hamilton
 from which all quadratic observables can be computed without building the many-body
 state.
 """
-function thermocdm(m::NormalToulouse)
+function thermocdm(m::NormalFermionicToulouse)
 	h = cmatrix(hamiltonian(m, include_chemical=true))
 	cache = eigencache(h)
 	return fermionicthermocdm(cache, β=m.bath.β)
+end
+function thermocdm(m::NormalBosonicToulouse)
+	h = cmatrix(hamiltonian(m, include_chemical=true))
+	cache = eigencache(h)
+	return bosonicthermocdm(cache, β=m.bath.β)
 end
 function thermocdm(m::BCSToulouse)
 	h = cmatrix(hamiltonian(m))

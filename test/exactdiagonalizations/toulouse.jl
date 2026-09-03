@@ -145,6 +145,85 @@ end
 end
 
 
+@testset "Toulouse Green's functions, bosonic normal bath" begin
+	atol = 1.0e-8
+	rtol = 1.0e-2
+
+	β = 10
+	δτ = 1
+	τs = collect(0:δτ:β)
+	δt = 0.7
+	t = 3.5
+	ts = collect(0:δt:t)
+
+	dw = 0.5
+	d = 4
+
+	ϵ_d = 1.0
+
+	for μ in (-2.0, -3.0)
+		b = discretebath(bosonicbath(semicircular(t=1), β=β, μ=μ), δw=dw)
+		model = Toulouse(b, ϵ_d = ϵ_d)
+		@test num_sites(model) == 5
+
+		ham = hamiltonian(model)
+		@test cmatrix(ham) ≈ cmatrix(model) atol=atol
+
+		h = bosonoperator(ham, d=d)
+
+		a = bosonaoperator(num_sites(model), 1, d=d)
+		adag = a'
+
+		# chemical-potential-shifted Hamiltonian (μ subtracted only on bath sites),
+		# mirroring the fermionic reference: toulouse_Gτ/toulouse_greater_lesser
+		# apply the same shift internally
+		chemical = zero(h)
+		for i in 2:num_sites(model)
+			chemical .+= bosondensityoperator(num_sites(model), i, d=d)
+		end
+		h1 = h - μ * chemical
+		cache1 = eigencache(h1)
+
+		hh = hamiltonian(model, include_chemical=true)
+
+		# thermal state (cdm and full dm)
+		cdm = bosonicthermocdm(eigencache(cmatrix(hh)), β=β)
+		@test cdm ≈ thermocdm(model) atol=atol
+
+		dm = bosonicthermodm(hh, β=β, d=d)
+		@test dm ≈ thermodm(model, d=d) atol=atol
+
+		cdm2 = boson_normal_quadratic_obs(dm, d=d)
+		@test norm(cdm2 - cdm) / norm(cdm) < rtol
+
+		# Matsubara Green's function
+		g1 = correlation_2op_1τ(h1, a, adag, τs, cache1, β=β)
+		g2 = toulouse_Gτ(model, τs)
+		@test norm(g1 - g2) / norm(g2) < rtol
+
+		# equilibrium greater and lesser
+		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
+		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
+
+		g3, l3 = toulouse_greater_lesser(model, ts)
+		@test norm(g1 - g3) / norm(g3) < rtol
+		@test norm(l1 - l3) / norm(l3) < rtol
+
+		# nonequilibrium greater and lesser
+		dm = separabledm(model, d=d)
+		cdm = separablecdm(model)
+		@test norm(boson_normal_quadratic_obs(dm, d=d) - cdm) / norm(cdm) < rtol
+
+		g1 = -im .* correlation_2op_1t(h, a, adag, dm, ts, reverse = false)
+		l1 = im .* correlation_2op_1t(h, adag, a, dm, ts, reverse = true)
+
+		g2, l2 = toulouse_neq_greater_lesser(model, ts)
+		@test norm(g1 - g2) / norm(g2) < rtol
+		@test norm(l1 - l2) / norm(l2) < rtol
+	end
+end
+
+
 @testset "Toulouse Green's functions, BCS bath" begin
 	atol=1.0e-8
 
