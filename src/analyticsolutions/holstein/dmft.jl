@@ -42,7 +42,7 @@ calculation is performed on the grid `z = ω + iδ`.
 
 The electron-phonon coupling can be specified either with the bare parameters
 (`g`, `ω`), or with the scaleless ones (`λ`, `γ`) where λ = g²/(ω t) and
-γ = ω/t (see [`holstein_scaleless_parameters`](@ref)).
+γ = ω/t (see `holstein_scaleless_parameters`).
 
 # Arguments
 - `ws`: frequency window (in units of `t`) on which the spectrum is requested.

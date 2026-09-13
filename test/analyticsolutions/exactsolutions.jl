@@ -122,3 +122,85 @@ end
 	@test toulouse_Gw(fermionicbath(gspec, β=β, μ=0.0), 0.3; ϵ_d=ϵ_d, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d)
 	@test toulouse_Gw(fermionicbath(δd, β=β), 0.3; ϵ_d=ϵ_d, δ=δ) ≈ 1 / (0.3 + im * δ - ϵ_d - α / (0.3 - ω0 + im * δ))
 end
+
+@testset "Toulouse model: semicircular bath closed forms" begin
+	# --- G(ω): closed form vs numerical Hilbert transform of semicircular(t) ---
+	for (ϵ_d, μ, t) in ((0.3, 0.0, 1.0), (-0.7, 0.4, 1.0), (0.5, -0.3, 2.0), (2.3, 0.0, 1.0), (-2.5, 0.6, 2.0))
+		spec = semicircular(t)
+		bath = fermionicbath(spec, β=1.0, μ=μ)
+		for ω in (-3.0, -1.5, -0.7, 0.0, 0.5, 1.2, 2.5)
+			@test fermionic_toulouse_Gw_semicircular(ω; ϵ_d=ϵ_d, μ=μ, t=t) ≈
+				toulouse_Gw(bath, ω; ϵ_d=ϵ_d) rtol = 1.0e-8
+		end
+	end
+
+	# --- G(τ): closed form vs numerical Fourier transform of the generic G(ω) ---
+	τs = collect(0.1:0.2:2.0)
+	for (ϵ_d, μ, t) in ((0.3, 0.0, 1.0), (-0.7, 0.4, 1.0), (2.3, 0.0, 1.0), (-2.5, 0.6, 2.0), (0.0, 0.0, 1.6), (0.0, 0.0, 2.5))
+		spec = semicircular(t)
+		bath = fermionicbath(spec, β=1.0, μ=μ)
+		g1 = [fermionic_toulouse_Gt_semicircular(τ; ϵ_d=ϵ_d, μ=μ, t=t) for τ in τs]
+		g2 = [toulouse_Gt(bath, τ; ϵ_d=ϵ_d) for τ in τs]
+		# the generic reference carries finite-window/δ/quadrature errors (its
+		# quadgk must resolve the near-δ bound-state Lorentzians), hence 2e-2
+		@test norm(g1 - g2) / norm(g2) < 2.0e-2
+	end
+
+	# --- exact known limit: ϵ_d = μ = 0, t = 2 (where 𝒢 coincides with Δ) →
+	#     G(τ) = -iθ(τ) 2J₁(tτ)/(tτ); for t ≠ 2 no such simple form exists ---
+	besselj1(x) = sum((-1.0)^k * (x / 2)^(2k + 1) / (factorial(big(k)) * factorial(big(k + 1))) for k in 0:30)
+	for τ in (0.1, 0.7, 1.5, 2.5)
+		@test fermionic_toulouse_Gt_semicircular(τ; ϵ_d=0.0, t=2.0) ≈
+			-im * 2 * besselj1(2.0 * τ) / (2.0 * τ) rtol = 1.0e-8
+	end
+
+	# --- sum rule G(0⁺) = -i, causality, and the bound-state poles ---
+	@test fermionic_toulouse_Gt_semicircular(1.0e-12; ϵ_d=0.7, μ=0.3, t=1.0) ≈ -im rtol = 1.0e-6
+	@test fermionic_toulouse_Gt_semicircular(-0.4; ϵ_d=0.7, t=1.0) == 0.0im
+	# single bound state far outside the band: for t=2, r = ϵ_d + 1/ϵ_d, Z = t²/((t²-2)+2r/√(r²-t²));
+	# at large τ the pole dominates the vanishing cut contribution
+	t, ϵ_d = 2.0, 3.0
+	r = ϵ_d + 1 / ϵ_d
+	s = sqrt(r^2 - t^2)
+	Z = t^2 / ((t^2 - 2) + 2 * r / s)
+	τ = 15.0
+	@test fermionic_toulouse_Gt_semicircular(τ; ϵ_d=ϵ_d, t=t) ≈ -im * Z * cis(-r * τ) atol = 3.0e-2 * Z
+	# narrow band (t < √2): a particle-hole pair of bound states even at ϵ_d = μ = 0,
+	# at r = ±2/√(4-t²) with Z = t²/((t²-2)+2r/√(r²-t²)) each; the cut is negligible at large τ
+	t = 1.0
+	r = 2 / sqrt(4 - t^2)
+	s = sqrt(r^2 - t^2)
+	Z = t^2 / ((t^2 - 2) + 2 * r / s)
+	τ = 15.0
+	@test fermionic_toulouse_Gt_semicircular(τ; ϵ_d=0.0, t=t) ≈ -im * Z * (cis(-r * τ) + cis(r * τ)) atol = 3.0e-2 * 2Z
+
+	# --- Matsubara G(iω): closed form vs numerical Hilbert transform of semicircular(t) ---
+	for (ϵ_d, μ, t) in ((0.3, 0.0, 1.0), (-0.7, 0.4, 1.0), (2.3, 0.0, 1.0), (-2.5, 0.6, 2.0), (0.0, 0.0, 1.6))
+		spec = semicircular(t)
+		bath = fermionicbath(spec, β=2.0, μ=μ)
+		for ω in (0.4, 1.7, -3.1, 9.3)  # ω=0 avoided: the generic integral is PV-divergent for |μ|<t
+			@test fermionic_toulouse_Giw_semicircular(ω; ϵ_d=ϵ_d, μ=μ, t=t) ≈
+				toulouse_Giw(bath, ω; ϵ_d=ϵ_d) rtol = 1.0e-8
+		end
+	end
+
+	# --- imaginary-time G(τ): closed form vs generic Matsubara sum (interior points) ---
+	β = 2.0
+	τs = (0.2, 0.6, 1.0, 1.4, 1.8)
+	for (ϵ_d, μ, t) in ((0.3, 0.0, 1.0), (-0.7, 0.4, 1.0), (2.3, 0.0, 1.0), (-2.5, 0.6, 2.0), (0.0, 0.0, 1.6))
+		spec = semicircular(t)
+		bath = fermionicbath(spec, β=β, μ=μ)
+		g1 = [fermionic_toulouse_Gτ_semicircular(τ; β=β, ϵ_d=ϵ_d, μ=μ, t=t) for τ in τs]
+		g2 = [toulouse_Gτ(bath, τ; ϵ_d=ϵ_d, n=2000) for τ in τs]
+		# the generic Matsubara sum carries a slow O(1/n) tail error, hence 5e-3
+		@test norm(g1 - g2) / norm(g2) < 5.0e-3
+	end
+
+	# --- particle-hole symmetry: at the PH-invariant point ϵ_d = μ = 0 → G(τ) = G(β-τ) ---
+	for t in (1.0, 2.0)
+		for τ in (0.3, 0.9, 1.4)
+			@test fermionic_toulouse_Gτ_semicircular(τ; β=β, ϵ_d=0.0, μ=0.0, t=t) ≈
+				fermionic_toulouse_Gτ_semicircular(β - τ; β=β, ϵ_d=0.0, μ=0.0, t=t) rtol = 1.0e-8
+		end
+	end
+end

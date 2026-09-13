@@ -171,8 +171,12 @@ G(t) = \frac{1}{2\pi}\int_{\omega_{\min}}^{\omega_{\max}} \mathrm{d}\omega\,
 
 ```@docs
 toulouse_Gw
+ImpurityModelBase.fermionic_toulouse_Gw
+ImpurityModelBase.bosonic_toulouse_Gw
 toulouse_Δw
 toulouse_Gt
+ImpurityModelBase.fermionic_toulouse_Gt
+ImpurityModelBase.bosonic_toulouse_Gt
 ```
 
 ### 虚频率 / 虚时间（Matsubara）
@@ -201,7 +205,11 @@ G(\tau) = \frac{1}{2} - \frac{1}{\beta}\sum_{n=-n_{\max}}^{n_{\max}+1}
 
 ```@docs
 toulouse_Giw
+ImpurityModelBase.fermionic_toulouse_Giw
+ImpurityModelBase.bosonic_toulouse_Giw
 toulouse_Gτ
+ImpurityModelBase.fermionic_toulouse_Gτ
+ImpurityModelBase.bosonic_toulouse_Gτ
 toulouse_Δiw
 toulouse_Δτ
 ```
@@ -219,6 +227,97 @@ giw = toulouse_Giw(f; β=β, ϵ_d=-0.5, μ=0.0)   # Matsubara 频点上的 G(iω
 db = discretebath(Fermion, -1:0.02:1, f; β=β, μ=0.0)
 m = Toulouse(db, ϵ_d=-0.5)
 gτ_ed = toulouse_Gτ(m, range(0, β; length=100))
+```
+
+### 半圆浴的闭式解
+
+对半圆谱浴 ``J(\epsilon) = \frac{2}{\pi t^2}\sqrt{t^2-\epsilon^2}``（即 `semicircular(t)`，
+归一化、半带宽 ``t``），混合函数的希尔伯特变换有解析表达式，因此实频率、实时间、
+Matsubara 频率与虚时间四个格林函数**全部有闭式解**，无需任何数值积分或展宽参数。
+记 ``w`` 为（实频率轴上的）``w = \omega + \mu + i\delta`` 或（Matsubara 轴上的）
+``w = \mu + i\omega_n``，取分支 ``s(w) = \sqrt{w-t}\,\sqrt{w+t} \sim w``，则
+
+```math
+\Delta(w) = \frac{2\,(w - s(w))}{t^2}.
+```
+
+!!! warning
+    复平方根不能写成 ``\sqrt{w^2 - t^2}``：其主值分支在 ``\mathrm{Re}\,w < 0`` 时
+    给出错误的符号，必须用两个主值平方根之积 ``\sqrt{w-t}\,\sqrt{w+t}``。
+
+**实频率**（推迟格林函数，与温度无关）：
+
+```math
+G(\omega) = \frac{1}{\omega + i\delta - \epsilon_d - \Delta(\omega + \mu + i\delta)}.
+```
+
+**虚频率**（Matsubara，同样无需展宽）：
+
+```math
+G(i\omega_n) = \frac{1}{i\omega_n - \epsilon_d - \Delta(\mu + i\omega_n)}.
+```
+
+**实时间**（``\tau > 0``）。记 ``\tilde\epsilon = \epsilon_d + \mu``、
+``\gamma(\omega) = \sqrt{t^2 - \omega^2}``。推迟格林函数解析延拓到实轴的割线跃变给出
+单积分表示，外加可能存在的**束缚态极点**：
+
+```math
+G(\tau) = e^{i\mu\tau}\left[
+-i \sum_j Z_j\, e^{-ir_j\tau}
+- \frac{2i}{\pi}\int_{-t}^{t} \mathrm{d}\omega\,
+\frac{e^{-i\omega\tau}\,\gamma(\omega)}
+{\left|(\omega - \tilde\epsilon)\left(\omega + i\gamma(\omega)\right) - 2\right|^2}
+\right].
+```
+
+束缚态是带外实根（``|r_j| > t``），满足隐式方程
+
+```math
+(r_j - \tilde\epsilon)\left(r_j + \mathrm{sign}(r_j)\sqrt{r_j^2 - t^2}\right) = 2,
+\qquad
+Z_j = \frac{t^2}{t^2 - 2 + 2r_j/\sqrt{r_j^2 - t^2}},
+```
+
+最多有两个：能级远离带外（``|\tilde\epsilon| > t``）时一个；窄带（``t < \sqrt{2}``）时
+即使 ``\tilde\epsilon = 0`` 也存在一对粒子-空穴配对的束缚态。特例 ``\tilde\epsilon = 0,\ t = 2``
+（此时 ``G = \Delta``）还原为著名形式 ``G(\tau) = -i\theta(\tau)\,2J_1(t\tau)/(t\tau)``。
+求和规则 ``G(0^+) = -i`` 一般成立，且 ``G(\tau<0) = 0``（严格因果）。
+
+**虚时间**（有限 ``\beta`` 下无初等闭式，但谱表示给出精确的单积分表示）。以
+``k(x) = \dfrac{e^{-x(\tau - \beta/2)}}{2\cosh(x\beta/2)} = \dfrac{e^{-x\tau}}{1+e^{-\beta x}}``
+为数值稳定的费米核：
+
+```math
+G(\tau) = \sum_j Z_j\, k(r_j - \mu)
++ \int_{-t-\mu}^{t-\mu} \mathrm{d}\omega\,
+\frac{b(\omega)}{\pi\left[a(\omega)^2 + b(\omega)^2\right]}\, k(\omega),
+```
+
+其中 ``a(\omega) = \omega - \epsilon_d - 2(\omega+\mu)/t^2``、
+``b(\omega) = 2\gamma(\omega+\mu)/t^2``，``\tau`` 按反周期性 ``G(\tau+\beta) = -G(\tau)``
+约化到 ``[0, \beta]``。
+
+```@docs
+fermionic_toulouse_Gw_semicircular
+fermionic_toulouse_Gt_semicircular
+fermionic_toulouse_Giw_semicircular
+fermionic_toulouse_Gτ_semicircular
+```
+
+示例——闭式解与通用数值实现的对比（半圆浴下两者应一致，闭式解更快更精确）：
+
+```julia
+using ImpurityModelBase
+
+t, ϵ_d, μ = 1.0, 0.3, 0.0
+spec = semicircular(t)
+bath = fermionicbath(spec, β=2.0, μ=μ)
+
+Gw_semicircular(ω) = fermionic_toulouse_Gw_semicircular(ω; ϵ_d=ϵ_d, μ=μ, t=t)
+Gw_numerical(ω)    = toulouse_Gw(bath, ω; ϵ_d=ϵ_d)
+
+Gτ_semicircular(τ) = fermionic_toulouse_Gτ_semicircular(τ; β=2.0, ϵ_d=ϵ_d, μ=μ, t=t)
+Gτ_numerical(τ)    = toulouse_Gτ(bath, τ; ϵ_d=ϵ_d)
 ```
 
 ## 独立玻色子模型
@@ -371,18 +470,48 @@ F_N(\omega) = \sum_{j=1}^{N}\left[1 + 2\sum_{k=1}^{j-1} (-1)^{j+k}
 ddxx_spinboson_dephasingdynamics
 ```
 
-## Holstein 模型（实验性）
+## Holstein 模型
 
-Holstein 模型（电子-声子耦合格点模型）的零温精确解（连分数）与有限温近似解
-当前已实现于 `src/analyticsolutions/holstein/`，但导出暂被注释，
-API 尚未稳定，此处不做详细介绍。相关无量纲参数转换
-（`λ = g²/(ωt)`、`γ = ω/t`）：
+Holstein 模型（电子-声子耦合格点模型）的解析连续分数展开（CFE）解，以及其在无限配位数
+Bethe 晶格上的 DMFT 自洽求解（Ciuchi, de Pasquale, Fratini & Feinberg, PRB 56, 4494 (1997)）：
+
+```math
+H = \epsilon_d\, d^\dagger d + \omega_0\, b^\dagger b
++ g\, d^\dagger d\,(b^\dagger + b)
++ \sum_k \epsilon_k\, c_k^\dagger c_k
++ \sum_k V_k\,(d^\dagger c_k + c_k^\dagger d).
+```
+
+杂质格林函数由 CFE 求得（``G = 1/(\mathcal{G}_0^{-1} - \Sigma)`` 的连分数展开；零温精确，
+有限温实现按谱的玻尔兹曼再分布处理），标度参数为 ``\lambda = g^2/(\omega_0 t)``、
+``\gamma = \omega_0/t``（``t`` 为 Bethe 晶格半带宽）。DMFT 自洽条件为
+
+```math
+\mathcal{G}_0^{-1}(\omega) = \omega - \frac{t^2}{4}\,G(\omega),
+```
+
+`holstein_dmft_bethe` 在频率网格上迭代该条件直到谱函数收敛（支持零温与有限温）。
+完整复现 Ciuchi et al. 论文各图表（Fig. 10–13、16）的教程见
+`docs/tutorials/holstein/holstein_tutorial.ipynb`，其中还包含论文图像的像素级数字化数据
+与复现谱的逐点对比。
+
+标度参数与裸参数的换算：
 
 ```@docs
 ImpurityModelBase.holstein_scaleless_parameters
 ImpurityModelBase.holstein_bare_parameters
+```
+
+```@docs
+holstein_Gt
+holstein_Gw
+holstein_G0w_to_Gw
+holstein_G0w_to_Σw
+holstein_dmft_bethe
 ImpurityModelBase.GreenFunction
 ImpurityModelBase.holstein_G0w_to_Gw_zeroT
 ImpurityModelBase.holstein_G0w_to_Gw_finiteT
 ImpurityModelBase.holstein_G0w_to_Σw_zeroT
+ImpurityModelBase.bethe_holstein_G0inv_from_G
+ImpurityModelBase.bethe_holstein_G_from_G0inv
 ```
