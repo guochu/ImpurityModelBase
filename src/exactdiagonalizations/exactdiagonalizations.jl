@@ -4,6 +4,7 @@ include("operators.jl")
 include("correlations.jl")
 
 include("greenfunctions.jl")
+include("contourgreenfunctions.jl")
 include("toulouse.jl")
 
 function hamiltonian(b::AbstractDiscreteNormalBath; include_chemical=false)

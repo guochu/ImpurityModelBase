@@ -470,6 +470,11 @@ end
 					@test norm(g1 - g3) / norm(g3) < rtol
 					@test norm(l1 - l3) / norm(l3) < rtol
 
+					# freebosons_Gt is the physical retarded function -iθ⟨[b(t), b†]⟩,
+					# which from the raw correlations is g1 + l1 (bosonic convention)
+					g4 = freebosons_Gt(m, ts, i, j, cache2, β=β, μ=μ)
+					@test norm(g4 - (g1 + l1)) / norm(g1 + l1) < rtol
+
 				end
 			end
 		end

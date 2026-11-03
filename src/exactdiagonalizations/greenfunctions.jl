@@ -200,7 +200,12 @@ end
 	freebosons_Gt(h, ρ₀, i, j=i, cache=eigencache(h))
 	freebosons_Gt(h, ρ₀, ts, i, j=i, cache=eigencache(h))
 
-Return the real-time retarded Green's function G(t) = G>(t) - G<(t) of free bosons.
+Return the real-time retarded Green's function Gᴿ(t) = -iθ(t)⟨[b(t), b†(0)]⟩ of free
+bosons, evaluated as Gᴿ(t) = G>(t) + G<(t): the codebase bosonic lesser carries the
+correlation convention G<(t) = +i⟨b†(0)b(t)⟩ (the negative of the physical, Haug–Jauho
+lesser), so the physical retarded function is the sum of the two outputs of
+`freebosons_greater_lesser`, mirroring the analytic solution
+`freeboson_Gt = freeboson_greater + freeboson_lesser`.
 
 Without the initial state `ρ₀`, the equilibrium Green's function is evaluated: the
 initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
@@ -216,7 +221,7 @@ function freebosons_Gt(h::AbstractMatrix, i::Int, j::Int=i, cache::EigenCache=ei
 	f = freebosons_greater_lesser(h, i, j, cache; kwargs...)
 	function f′(t)
 		x1, x2 = f(t)
-		return x1 - x2
+		return x1 + x2
 	end
 	return f′
 end
@@ -231,6 +236,10 @@ end
 	freebosons_greater_lesser(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=i, cache=eigencache(h))
 
 Real-time greater and lesser Green's functions G>(t), G<(t) of free bosons.
+
+The bosonic lesser carries the correlation convention G<(t) = +i⟨b†(0)b(t)⟩ — the
+negative of the physical (Haug–Jauho) lesser — so the physical retarded function is
+Gᴿ(t) = G>(t) + G<(t) (see `freebosons_Gt`); the greater G>(t) = -i⟨b(t)b†(0)⟩ is standard.
 
 Without the initial state `ρ₀`, the equilibrium Green's functions are evaluated: the
 initial state is assumed to be the thermal equilibrium state, i.e. the coefficient
@@ -273,9 +282,9 @@ function freebosons_Gt(h::AbstractMatrix, ρ₀::AbstractMatrix, i::Int, j::Int=
 	f = freebosons_greater_lesser(h, ρ₀, i, j, cache)
 	function f′(t)
 		x1, x2 = f(t)
-		return x1 - x2
+		return x1 + x2
 	end
-	return f′	
+	return f′
 end
 function freebosons_Gt(h::AbstractMatrix, ρ₀::AbstractMatrix, ts::AbstractVector{<:Real}, 
 									 i::Int=1, j::Int=i, cache::EigenCache=eigencache(h))

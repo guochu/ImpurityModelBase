@@ -75,7 +75,8 @@ end
 	pmulti = fermionoccupationoperator([1, 0])
 	@test pmulti == kron([0 0; 0 1], [1 0; 0 0])
 
-	# Gt is G> - G< for both fermions and bosons
+	# Gt is the physical retarded function: G> - G< for fermions, G> + G< for
+	# bosons (whose codebase lesser is +i⟨b†b⟩, minus the physical lesser)
 	L = 3
 	h = quadratichamiltonian(L, [adaga(i, i, coeff=0.3 * (i - 1)) for i in 1:L])
 	hc = cmatrix(h)
@@ -90,7 +91,12 @@ end
 	fb = freebosons_Gt(hc, 1, 1; β=β, μ=-1.0)
 	glb = freebosons_greater_lesser(hc, 1, 1; β=β, μ=-1.0)
 	gb, lb = glb(t)
-	@test fb(t) ≈ gb - lb
+	@test fb(t) ≈ gb + lb
+	# the retarded function agrees with the analytic single-mode solution and is
+	# μ-independent (μ enters only the density matrix; requires ε > μ)
+	ω = 0.3
+	@test freebosons_Gt([ω;;], 1, 1; β=β, μ=-1.0)(t) ≈ freeboson_Gt(t; β=β, ω=ω) atol=1.0e-12
+	@test freebosons_Gt([ω;;], 1, 1; β=β, μ=0.2)(t) ≈ freeboson_Gt(t; β=β, ω=ω) atol=1.0e-12
 end
 
 @testset "Lindblad operator" begin

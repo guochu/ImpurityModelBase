@@ -142,6 +142,84 @@ freebosons_greater_lesser
 freebosons_Gτ
 ```
 
+## 轮廓有序格林函数（Keldysh / Kadanoff / Matsubara）
+
+为下游 TEMPO / GTEMPO 基准提供的轮廓有序单粒子格林函数容器。三个容器共享
+统一的 `branch` 访问器与 Fock 基准验证过的构造器：
+
+- `RealGreenFunctions`：闭实时间（Keldysh）轮廓，存较少（`G₊₋`）与较多
+  （`G₋₊`）两个交叉块，其余轮廓块由轮廓排序 sector 规则导出；
+- `MixedGreenFunctions`：L 形（Kadanoff–Baym）轮廓，额外存混合块
+  （`G₊τ`、`Gτ₊`）与 Matsubara 块（`Gττ`）；
+- `ImagGreenFunctions{T}`：纯 Matsubara 容器，`data[m, n] = -i⟨T̂ x(τₘ) x†(τₙ)⟩`，
+  与 Kadanoff 容器的 `(τ,τ)` 块同约定（同网格下
+  `branch(kadanoff, :τ, :τ) == matsubara.data`）。
+
+约定（两种统计统一）：
+
+- 较少型核 `G<(t) = +i⟨x†(0)x(t)⟩`，较大型核 `G>(t) = -i⟨x(t)x†(0)⟩`；
+- 交叉块：`branch(:+, :-)` = 较少、`branch(:-, :+)` = 较多；
+- 对角块 sector 规则（`(a, b)` 为节点索引，`t_a > t_b` 时处于较多侧）：
+  `(+, +)[a, b] = a > b ? G₋₊[a, b] : G₊₋[a, b]`（时间有序）；
+  `(−, −)[a, b] = a > b ? G₊₋[a, b] : G₋₊[a, b]`（反时间有序）；
+  等时接触点取较少伙伴（`(+, +)`）/较多伙伴（`(−, −)`），与 QuAPI 的导出对角块约定一致
+  伙伴——与 QuAPI 的导出对角块约定一致。
+
+### 构造器（Keldysh 轮廓）
+
+```@docs
+freefermions_keldysh_gfs
+freebosons_keldysh_gfs
+RealGreenFunctions
+```
+
+### 构造器（Kadanoff 轮廓）
+
+```@docs
+freefermions_kadanoff_gfs
+freebosons_kadanoff_gfs
+MixedGreenFunctions
+```
+
+### 构造器（Matsubara 轴）
+
+```@docs
+freefermions_matsubara_gfs
+freebosons_matsubara_gfs
+ImagGreenFunctions
+```
+
+### branch 访问器
+
+```@docs
+branch
+branches
+```
+
+示例（自由费米子浴的 Keldysh 轮廓格林函数）：
+
+```julia
+using ImpurityModelBase
+
+h = [0.3 0.2; 0.2 0.5]           # 单粒子哈密顿量
+ts = collect(0.0:0.25:1.5)       # 实时间节点（t₁ = 0）
+g = freefermions_keldysh_gfs(h, ts, 1, 1; β=2.0, μ=0.1)
+
+branch(g, :+, :-)   # 较少块 ⟨c↑(tₖ)c†↑(tₗ)⟩-型
+branch(g, :-, :+)   # 较多块
+branch(g, :+, :+)   # 时间有序块（sector 规则导出）
+
+# Kadanoff 轮廓：τ 节点 0 ≤ τ < β + 闭实时间部分
+m = freefermions_kadanoff_gfs(h, ts, range(0, 1.2, length=5), 1, 1; β=2.0)
+branch(m, :τ, :+)   # ⟨c(τₘ)⟩-型混合块
+branch(m, :τ, :τ)   # Matsubara 块
+```
+
+!!! note
+    容器类型参数记录统计性（`Fermion`/`Boson`）；较少/较多核的统计权重
+    （n̄ 与 1−n̄ / 1+n̄）由构造器按统计性填充，`branch` 的 sector 规则对
+    两种统计统一。
+
 ## 关联函数与开放系统
 
 ```@docs
