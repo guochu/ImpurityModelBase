@@ -18,6 +18,7 @@ makedocs(;
         "简介" => "index.md",
         "谱密度函数" => "spectrumfuncs.md",
         "粒子浴" => "baths.md",
+        "二次型系统" => "quadraticsystems.md",
         "精确对角化" => "exactdiagonalizations.md",
         "解析解" => "analyticsolutions.md",
         "工具函数" => "utilities.md",
