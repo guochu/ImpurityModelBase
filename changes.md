@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Internal: `src/quadraticsystems` split from `src/exactdiagonalizations` (no interface change)
+
+The source folder `src/exactdiagonalizations` previously mixed the two solution routes
+of quadratic Hamiltonians. It is now split so that each folder holds one route; all
+exported names and signatures are unchanged, only the file layout moved:
+
+- `src/quadraticsystems/` (new) — the fast code based on the quadratic Hamiltonian
+  representation: term types, Hamiltonian containers and the coefficient matrix
+  (`hamiltonians.jl`), the `EigenCache` / `timeevo` / cdm machinery (`cache.jl`), the
+  BCS coefficient matrices (`bcscache.jl`), the bath-level `hamiltonian` / `cmatrix` /
+  `thermocdm` constructors (`baths.jl`), the free-particle Green's functions
+  (`greenfunctions.jl`, `contourgreenfunctions.jl`) and the quadratic Toulouse /
+  Bogoliubov / boundary-driven models (`toulouse.jl`, `bogoliubov.jl`,
+  `boundarydriving.jl`).
+- `src/exactdiagonalizations/` — only the brute-force full-Fock-space constructions
+  (matrix representations of the fermionic/bosonic operators of dimension 2^L / d^L and
+  the thermal many-body density matrices, `operators.jl`) plus the full-space
+  correlation functions and Lindblad dynamics (`correlations.jl`); kept as the
+  benchmark reference for the fast quadratic-systems methods.
+
+`src/quadraticsystems` is included before `src/exactdiagonalizations` in
+`src/ImpurityModelBase.jl`, so the benchmark code may build on the quadratic-systems
+infrastructure, but not vice versa.
+
 ### New: contour-ordered Green's functions (Keldysh / Kadanoff / Matsubara containers)
 
 New container types for the contour-ordered single-particle Green's functions of

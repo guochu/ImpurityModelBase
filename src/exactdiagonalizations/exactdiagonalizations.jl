@@ -1,78 +1,9 @@
-include("cache.jl")
-include("bcscache.jl")
+# Brute-force exact diagonalization on the full Fock space: matrix
+# representations of the fermionic/bosonic operators and the many-body density
+# matrices (dimension 2^L / d^L), plus full-space correlation functions and
+# Lindblad dynamics. Only for benchmarking the fast quadratic-systems methods
+# in src/quadraticsystems.
+
 include("operators.jl")
+
 include("correlations.jl")
-
-include("greenfunctions.jl")
-include("contourgreenfunctions.jl")
-include("toulouse.jl")
-
-function hamiltonian(b::AbstractDiscreteNormalBath; include_chemical=false)
-	T = eltype(b)
-	data = AdagATerm{T}[]
-	for (i, ϵ) in enumerate(frequencies(b))
-		if include_chemical
-			ϵ = ϵ - b.μ
-		end
-		push!(data, adaga(i, i, coeff=ϵ))
-	end
-	return NormalQuadraticHamiltonian(num_sites(b), data)	
-end
-
-function hamiltonian(b::AbstractDiscreteBCSBath)
-	T = eltype(b)
-	data = QuadraticTerm{T}[]
-	Δ = b.Δ
-	for (i, ϵ) in enumerate(frequencies(b))
-		push!(data, adaga(2i-1, 2i-1, coeff=ϵ))
-		push!(data, adaga(2i, 2i, coeff=ϵ))
-
-		t = adagadag(2i-1, 2i, coeff=-Δ)
-		push!(data, t)
-		push!(data, t')
-	end	
-	return GenericQuadraticHamiltonian(num_sites(b), data)	
-end
-
-function thermocdm(b::AbstractDiscreteNormalBath)
-	L = num_sites(b)
-	ρ = zeros(Float64, L, L)
-	for (i, ϵ) in enumerate(frequencies(b))
-		ρ[i, i] = thermaloccupation(b, ϵ)
-	end
-	return ρ
-end
-
-function cmatrix(b::AbstractDiscreteNormalBath)
-	L = num_sites(b)
-	h = zeros(Float64, L, L)
-	for (i, ϵ) in enumerate(frequencies(b))
-		h[i, i] = ϵ
-	end
-	return h
-end
-
-function thermocdm(b::AbstractDiscreteBCSBath)
-	h = cmatrix(b)
-	cache = eigencache(h)
-	return fermionicthermocdm(cache, β=b.β, μ=b.μ)
-end
-
-function cmatrix(b::AbstractDiscreteBCSBath)
-	L = div(num_sites(b), 2)
-	Δ = b.Δ
-	h = zeros(typeof(Δ), 2L, 2L)
-	g = zero(h)
-	for (i, ϵ) in enumerate(frequencies(b))
-		h[2i-1, 2i-1] = ϵ
-		h[2i, 2i] = ϵ
-
-		g[2i-1, 2i] = -Δ
-	end	
-
-	return bcs_cmatrix(h, g)
-end
-
-include("bogoliubov.jl")
-
-include("boundarydriving.jl")

@@ -4,15 +4,15 @@ using ImpurityModelBase
 Random.seed!(12354)
 
 # The test suite is organized into 5 parts, mirroring the source code layout
-# (src/spectrumfuncs, src/baths, src/exactdiagonalizations,
-# src/analyticsolutions, src/utilities):
+# (src/spectrumfuncs, src/baths, src/quadraticsystems,
+# src/exactdiagonalizations, src/analyticsolutions, src/utilities):
 #   1. spectrumfuncs          — spectrum density wrappers and predefined spectra
 #   2. baths                  — particle types, thermal distributions, bath containers
 #   3. exactdiagonalizations  — exact numerical solutions; the (efficient)
-#                               coefficient-matrix method is cross-checked against
-#                               the (debug-only) full-Hamiltonian method
+#                               quadratic-systems method is cross-checked against
+#                               the (benchmark-only) full-Fock-space method
 #   4. analyticsolutions      — analytical solutions, benchmarked against the
-#                               full-Hamiltonian ED reference
+#                               full-Fock-space ED reference
 #   5. utilities              — Fourier transforms and linear prediction
 
 # 1. spectrum functions

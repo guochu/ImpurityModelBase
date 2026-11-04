@@ -24,7 +24,7 @@ export BCSBath, bcsbath, BCSVacuum, bcsvacuum
 export DiscreteBCSBath, discretebcsbath, DiscreteBCSVacuum, discretebcsvacuum
 
 
-# exact diagonalizations
+# quadratic systems and exact-diagonalization benchmarks
 export AbstractTerm, QuadraticTerm, AdagATerm, tunneling, adaga, AdagAdagTerm, adagadag, AATerm, aa, QuarticTerm, interaction, positions
 export NormalTerm, NormalHamiltonian, NormalQuadraticHamiltonian, GenericQuadraticHamiltonian, quadratichamiltonian
 export cmatrix, fermionadagoperator, fermionaoperator, fermionoperator, fermiondensityoperator, thermodm, fermionicthermodm
@@ -80,7 +80,12 @@ include("spectrumfuncs/spectrumfuncs.jl")
 # baths: basic definitions of particle types, spectrum functions and temperature
 include("baths/baths.jl")
 
-# exact diagonalizations: exact numerical solutions for noninteracting cases
+# quadratic systems: fast single-particle (coefficient-matrix/cdm) solutions of
+# quadratic Hamiltonians
+include("quadraticsystems/quadraticsystems.jl")
+
+# exact diagonalizations: brute-force solutions on the full Fock space
+# (operators and many-body states), used as benchmarks for the fast methods
 include("exactdiagonalizations/exactdiagonalizations.jl")
 
 # analytical solutions for specific models
