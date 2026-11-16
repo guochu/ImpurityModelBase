@@ -37,11 +37,12 @@ DiscreteBCSBath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; β::Real
 
 """
 	discretebcsbath(ws, fs; β, μ=0, Δ=0)
-	discretebcsbath(freqs, f; β, μ=0, Δ=0, atol=1e-6)
+	discretebcsbath(freqs, f; β, μ=0, Δ=0, atol=0.0)
 
 Construct a discrete BCS fermionic bath, either from frequencies `ws` and spectral values
 `fs`, or by discretizing a continuous spectral function `f` on the intervals defined by
-`freqs`.
+`freqs` (see [`spectrum_couplings`](@ref); cells of spectral weight ≤ `atol` are dropped,
+by default only nonpositive cells are dropped).
 """
 discretebcsbath(ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBCSBath(ws, fs; kwargs...)
 
@@ -145,7 +146,7 @@ num_sites(x::AbstractDiscreteBCSBath) = 2 * length(frequencies(x))
 # const AbstractDiscreteBCSBath = Union{DiscreteBCSBath, DiscreteBCSVacuum}
 
 
-function discretebcsbath(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, Δ::Number=0, kwargs...)
+function discretebcsbath(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=0.0, β::Real, μ::Real=0, Δ::Number=0, kwargs...)
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return discretebcsbath(omegas, couplings; β=β, μ=μ, Δ=Δ)
 end
@@ -154,7 +155,7 @@ function discretebath(b::BCSBath; δw::Real=0.1, kwargs...)
 	freqs = lowerbound(f):δw:upperbound(f)
 	return discretebcsbath(freqs, f; β=b.β, μ=b.μ, Δ=b.Δ, kwargs...)
 end
-function discretebcsvacuum(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, μ::Real=0, Δ::Number=0, kwargs...) 
+function discretebcsvacuum(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=0.0, μ::Real=0, Δ::Number=0, kwargs...)
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return discretebcsvacuum(omegas, couplings; μ=μ, Δ=Δ) 
 end

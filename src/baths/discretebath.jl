@@ -161,20 +161,21 @@ num_sites(x::AbstractDiscreteNormalBath) = length(frequencies(x))
 
 """
 	discretebath(::Type{P}, ws, fs; β, μ=0)
-	discretebath(::Type{P}, freqs, f; β, μ=0, atol=1e-6)
+	discretebath(::Type{P}, freqs, f; β, μ=0, atol=0.0)
 	discretebath(b::AbstractBath; δw=0.1)
 
 Construct a discrete bath of particle species `P`:
 - directly from frequencies `ws` and spectral values `fs`;
 - by discretizing a continuous spectral function `f` on the intervals defined by `freqs`
-  (see [`spectrum_couplings`](@ref));
+  (see [`spectrum_couplings`](@ref); cells of spectral weight ≤ `atol` are dropped,
+  by default only nonpositive cells are dropped);
 - or by uniformly discretizing a continuous bath `b` with step size `δw`.
 """
 discretebath(::Type{Boson}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Boson, ws, fs; kwargs...)
 discretebath(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<:Real}; kwargs...) = DiscreteBath(Fermion, ws, fs; kwargs...)
 """
 	discretevacuum(::Type{P}, ws, fs; μ=0)
-	discretevacuum(::Type{P}, freqs, f; μ=0, atol=1e-6)
+	discretevacuum(::Type{P}, freqs, f; μ=0, atol=0.0)
 	discretevacuum(b::AbstractBath; δw=0.1)
 
 Construct a discrete vacuum (zero-temperature) bath of particle species `P`; the
@@ -186,21 +187,30 @@ discretevacuum(::Type{Fermion}, ws::AbstractVector{<:Real}, fs::AbstractVector{<
 """
 	spectrum_couplings(freqs::Vector{<:Real}, f; kwargs...)
 
-Arguments
-* f: pectrum function
-* freqs: L frequences {w1, w2, ... , wL}, sorted from small to large
+Discretize the spectrum (density) function `f` on the frequency intervals defined by the
+sorted frequencies `freqs` {w₁, w₂, ..., w_L}.
 
-Return discretized frequencies Xn and hybridizations Vn of size at most L-1,
-where |Vn|^2 = ∫_{w_{n}}^{w_{n+1}} dx f^2(x), and 
-Xn = ∫_{w_{n}}^{w_{n+1}} dx x f^2(x) / |Vn|^2.
-If |Vn| = 0 for some n, the corresponding Vn and Xn are removed.
+Note: the "couplings" in the name is historical — the function returns the per-cell
+SPECTRAL WEIGHTS (which feed `DiscreteSpectrum.fs`), not the hybridizations. The true
+couplings of the resulting discrete bath are given by
+`spectrumcouplings(::DiscreteBath) = sqrt.(fs)`; do not use the returned weights
+directly as couplings.
 
+Return the discretized frequencies Xn and the per-cell spectral weights Wn
+(vectors of size at most L-1), with
 
-Reference "How to discretize a quantum bath for real-time evolution".
-Eqs.(10a, 10b) 
+    Wn = ∫_{w_n}^{w_{n+1}} dx f(x)          (the |Vn|² of "How to discretize a quantum
+    Xn = ∫_{w_n}^{w_{n+1}} dx x f(x) / Wn    bath for real-time evolution", Eqs. (10a, 10b))
+
+i.e. the integrand is the spectral density `f` itself (not `f²`), and each discrete mode
+carries the total spectral weight of its cell at the cell's spectral center of mass.
+Cells with weight `Wn ≤ atol` are dropped; the default `atol = 0` only drops nonpositive
+cells, so that the total spectral weight Σ Wn is conserved up to the quadrature error.
+
+Reference "How to discretize a quantum bath for real-time evolution". Eqs.(10a, 10b)
 """
-function spectrum_couplings(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, kwargs...)
-	@assert atol > 0
+function spectrum_couplings(freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=0.0, kwargs...)
+	@assert atol >= 0
 	L = length(freqs)
 	omegas = Float64[]
 	couplings = Float64[]
@@ -213,16 +223,15 @@ function spectrum_couplings(freqs::Union{Vector{<:Real}, AbstractRange}, f::Func
 		end
 		if v1 > atol
 			omega = v2 / v1
-			@assert (freqs[i] <= omega <= freqs[i+1]) 
+			@assert (freqs[i] <= omega <= freqs[i+1])
 			push!(omegas, omega)
-			# push!(couplings, sqrt(v1))
 			push!(couplings, v1)
 		end
 	end
 	return omegas, couplings
 end
 
-function discretebath(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, β::Real, μ::Real=0, kwargs...) where {P<:AbstractParticle}
+function discretebath(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=0.0, β::Real, μ::Real=0, kwargs...) where {P<:AbstractParticle}
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return discretebath(P, omegas, couplings; β=β, μ=μ)
 end
@@ -231,7 +240,7 @@ function discretebath(b::AbstractBath; δw::Real=0.1, kwargs...)
 	freqs = lowerbound(f):δw:upperbound(f)
 	return discretebath(particletype(b), freqs, f; β=b.β, μ=b.μ, kwargs...)
 end
-function discretevacuum(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=1.0e-6, μ::Real=0, kwargs...) where {P<:AbstractParticle}
+function discretevacuum(::Type{P}, freqs::Union{Vector{<:Real}, AbstractRange}, f::Function; atol::Real=0.0, μ::Real=0, kwargs...) where {P<:AbstractParticle}
 	omegas, couplings = spectrum_couplings(freqs, f; atol=atol, kwargs...)
 	return discretevacuum(P, omegas, couplings; μ=μ) 
 end

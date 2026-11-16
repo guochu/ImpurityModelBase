@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Fixed: silent spectral-mass loss in continuous-bath discretization (precision bug)
+
+`spectrum_couplings` (and the four constructors that call it: `discretebath` /
+`discretevacuum` / `discretebcsbath` / `discretebcsvacuum`, the `discretebath(b; δw)`
+path included) dropped every cell whose integrated spectral weight `∫f ≤ atol` with the
+default `atol = 1e-6`. For smooth spectra vanishing at the band edges, refining the grid
+δw pushes more edge cells below the threshold, so the silently lost spectral mass grew
+superlinearly with refinement (measured 8e-7 → 4e-5 for δw 0.02 → 0.00125 on the
+bug-report spectrum), and phase-sensitive real-time observables evaluated on the
+discretized bath **diverged instead of converging** (impurity ⟨n(t)⟩ error worsened
+30× from δw = 0.02 to 0.00125). Equilibrium-type observables are diluted by the smooth
+thermal weights but drift as well once δw is fine enough. See
+`bugreports/2026-11-16-discretebath-spectral-mass-loss-and-coupling-convention.md`.
+
+**Fix.** The default `atol` is now `0.0`: only nonpositive cells are dropped, and the
+total spectral weight `Σ fs` equals `∫f` up to quadrature error (measured at machine
+precision, ≤ 1.2e-16 relative, for every δw). The `atol` keyword keeps its meaning
+(absolute lower threshold on the per-cell weight), so code passing `atol` explicitly
+keeps its old truncation behavior exactly.
+
+**Migration.** Fine-grid discretizations (δw ≲ 0.05) now return more modes and slightly
+different (convergent) values; downstream references/anchors built on fine `discretebath`
+grids should be regenerated. Coarse grids (δw ≳ 0.1) are unaffected at the 1e-16 level.
+
+Also corrected the `spectrum_couplings` docstring, which wrongly documented the return
+value as hybridizations `Vn` with `|Vn|² = ∫ f²`: the function integrates the spectral
+density `f` itself and returns the per-cell spectral weights `Wn = ∫f` (the paper's
+`|Vn|²`), which feed `DiscreteSpectrum.fs`; the hybridizations of the resulting bath are
+`spectrumcouplings(::DiscreteBath) = sqrt.(fs)`. The misleading commented-out
+`sqrt(v1)` line was removed. The function name is kept for compatibility.
+
 ### Internal: `src/quadraticsystems` split from `src/exactdiagonalizations` (no interface change)
 
 The source folder `src/exactdiagonalizations` previously mixed the two solution routes

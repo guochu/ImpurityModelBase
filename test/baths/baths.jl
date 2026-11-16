@@ -133,6 +133,41 @@ end
 	@test discretevacuum(Boson, ws, fs) isa DiscreteVacuum{Boson}
 end
 
+# regression for bugreports/2026-11-16: the default discretization used to silently
+# drop positive-weight cells below atol=1e-6, so the spectral mass loss grew as δw
+# was refined and real-time observables diverged; now atol defaults to 0 (only
+# nonpositive cells are dropped) and the spectral weight is conserved
+@testset "Discrete bath discretization" begin
+	spec = spectrum(ϵ -> 0.25 * cos(π * (ϵ - 0.2) / 4)^2, lb=-1.8, ub=2.2)
+	bath = fermionicbath(spec, β=1.0, μ=0)
+	total = 0.5  # ∫ spec dϵ = 0.5 exactly
+
+	# default keeps all positive-weight cells: spectral mass conserved at machine
+	# precision for every δw (the old default lost up to ~1e-5 of the mass)
+	for δw in (0.1, 0.05, 0.02, 0.01)
+		bd = discretebath(bath, δw=δw)
+		@test abs(sum(spectrumvalues(bd)) - total) / total < 1e-12
+		@test length(frequencies(bd)) == length(collect(lowerbound(spec):δw:upperbound(spec))) - 1
+	end
+
+	# explicit truncation keeps its old semantics (drop cells of weight ≤ atol)
+	bd = discretebath(bath, δw=0.5, atol=0.1)
+	@test sum(spectrumvalues(bd)) < total
+
+	# zero-weight cells are dropped without NaNs (spectrum supported on (0, 1) only)
+	spec2 = spectrum(ϵ -> (ϵ > 0) * 0.5 * cos(π * ϵ / 2)^2, lb=-1.0, ub=1.0)
+	bd2 = discretebath(Fermion, -1.0:0.5:1.0, spec2.f, β=1.0, μ=0.0)
+	@test sum(spectrumvalues(bd2)) ≈ 0.25
+	@test all(frequencies(bd2) .> 0)
+
+	# vacuum and BCS discretization share the same spectrum_couplings path
+	dv = discretevacuum(bath, δw=0.02)
+	@test abs(sum(spectrumvalues(dv)) - total) / total < 1e-12
+	bc = bcsbath(spec; β=1.0, μ=0, Δ=0.1)
+	dbc = discretebath(bc, δw=0.02)
+	@test abs(sum(spectrumvalues(dbc)) - total) / total < 1e-12
+end
+
 @testset "BCS baths" begin
 	ws = [0.5, 1.0, 1.5]
 	fs = [0.3, 0.5, 0.2]
