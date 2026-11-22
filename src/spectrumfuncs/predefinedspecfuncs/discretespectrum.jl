@@ -67,4 +67,4 @@ spectrumcouplings(x::DiscreteSpectrum) = sqrt.(spectrumvalues(x))
 # 	return r
 # end
 
-spectrumshift(m::DiscreteSpectrum, μ::Real) = DiscreteSpectrum(frequencies(m) .+ μ, spectrumvalues(m))
+spectrumshift(m::DiscreteSpectrum, μ::Real) = DiscreteSpectrum(frequencies(m) .- μ, spectrumvalues(m))  # 巨正则：同 generic 参数平移 f(ε+μ)（支撑集 ω − μ）
